@@ -215,46 +215,26 @@ Future<FFUploadedFile> pdfMultiImg(
   return uploadedFile;
 }
 
-// Future<FFUploadedFile> pdfMultiImg(
-//     List<FFUploadedFile> fileupList,
-//     String filename,
-//     String? notes,
-//     bool isFirstPageSelected,
-//     String? fit,
-//     int? selectedIndex // Nullable parameter for handling landscape images
-//     ) async {
-//   final pdf = pw.Document(compress: true); // Enable PDF compression
-//
-//   // Add notes page at the beginning if required
-//   if (isFirstPageSelected && notes != null && notes.isNotEmpty) {
-//     pdf.addPage(pw.Page(
-//       pageFormat: PdfPageFormat.a4,
-//       margin: pw.EdgeInsets.all(32),
-//       build: (pw.Context context) {
-//         return pw.Column(
-//           crossAxisAlignment: pw.CrossAxisAlignment.start,
-//           children: [
-//             pw.Text("Notes",
-//                 style: pw.TextStyle(
-//                     fontSize: 18, fontWeight: pw.FontWeight.bold)),
-//             pw.SizedBox(height: 10),
-//             pw.Text(
-//               notes,
-//               style: pw.TextStyle(fontSize: 16, color: PdfColors.black),
-//             ),
-//           ],
-//         );
-//       },
-//     ));
-//   }
-//
-//   // Process images in batches to optimize memory usage
-//   final int batchSize = 10; // Number of files to process at a time
-//   for (int i = 0; i < fileupList.length; i += batchSize) {
-//     final batch = fileupList.sublist(
-//       i,
-//       (i + batchSize > fileupList.length) ? fileupList.length : i + batchSize,
-//     );
+//todo using isolate
+
+// Define a parameter class for isolate communication
+class PdfMultiImgParams {
+  final List<FFUploadedFile> fileupList;
+  final String filename;
+  final String? notes;
+  final bool isFirstPageSelected;
+  final String? fit;
+  final int? selectedIndex;
+
+  PdfMultiImgParams({
+    required this.fileupList,
+    required this.filename,
+    this.notes,
+    required this.isFirstPageSelected,
+    this.fit,
+    this.selectedIndex,
+  });
+}
 
 //     for (var fileup in batch) {
 //       Uint8List? fileupBytes = fileup.bytes;

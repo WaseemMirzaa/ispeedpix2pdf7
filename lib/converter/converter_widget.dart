@@ -71,8 +71,6 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
   // List of options for the dropdown
   final List<String> _orientationOptions = ['DEFAULT - Mixed Orientation', 'Pages Fixed - Portrait', 'Landscape Photos - Top Aligned for easy viewing'];
 
-  // final List<String> _orientationOptions = ['PDF-Non.Oriented', 'PDF-Fixed.Portrait', 'PDF-DEFAULT.Portrait Consistency'];
-
   @override
   void dispose() {
     _model.dispose();
@@ -166,7 +164,6 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                               onChanged: (String? newValue) {
                                 setState(() {
                                   _selectedOrientation = newValue!;
-                                  LoadingDialog.show(context);
                                   try {
                                     createPDF();
                                   } catch (e) {
@@ -211,7 +208,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
 
-                                    LoadingDialog.show(context);
+                                    // LoadingDialog.show(context);
 
                                     try {
 
@@ -686,7 +683,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
     if(selectedMedia == null) {
 
-      LoadingDialog.hide(context);
+      // LoadingDialog.hide(context);
 
       return;
 
@@ -697,9 +694,9 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
             validateFileFormat(
                 m.storagePath, context))) {
 
+      LoadingDialog.show(context);
       safeSetState(
               () => _model.isDataUploading = true);
-
       var selectedUploadedFiles =
       <FFUploadedFile>[];
 
@@ -747,37 +744,48 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
       _model.uploadedLocalFiles.toList(),
     );
     if (_model.checkLandscapeGallery!) {
-      _model.pdf = await actions.pdfMultiImg(
-        _model.uploadedLocalFiles.toList(),
-        valueOrDefault<String>(
+      final params = PdfMultiImgParams(
+        fileupList: _model.uploadedLocalFiles.toList(),
+        filename: valueOrDefault<String>(
           _model.filenameTextController.text,
           'file',
         ),
-        _model.filenameTextController.text,
-        true,
-        'contain',
-        _orientationOptions.indexOf(_selectedOrientation),
+        notes: _model.filenameTextController.text,
+        isFirstPageSelected: true, // Hardcoded 'true' as per the example
+        fit: 'contain', // Hardcoded 'contain' as per the example
+        selectedIndex: _orientationOptions.indexOf(_selectedOrientation), // Get the index of the selected orientation
       );
-      _model.pdfFile = _model.pdf;
+
+      // LoadingDialog.hide(context);
+
+      _model.pdf2 = await pdfMultiImgIsolate(params);
+      _model.pdfFile = _model.pdf2;
+
       _model.landscapeExists =
           _model.checkLandscapeGallery;
+
       safeSetState(() {});
     } else {
-      _model.pdf2 = await actions.pdfMultiImg(
-        _model.uploadedLocalFiles.toList(),
-        valueOrDefault<String>(
+      final params = PdfMultiImgParams(
+        fileupList: _model.uploadedLocalFiles.toList(),
+        filename: valueOrDefault<String>(
           _model.filenameTextController.text,
           'file',
         ),
-        _model.filenameTextController.text,
-        true,
-        'contain',
-        _orientationOptions.indexOf(_selectedOrientation),
-
+        notes: _model.filenameTextController.text,
+        isFirstPageSelected: true, // Pass 'true' as specified
+        fit: 'contain', // Pass 'contain' as specified
+        selectedIndex: _orientationOptions.indexOf(_selectedOrientation), // Use the index of the selected orientation
       );
+
+      _model.pdf2 = await pdfMultiImgIsolate(params);
+
+      // LoadingDialog.hide(context);
+
       _model.pdfFile = _model.pdf2;
       _model.landscapeExists =
           _model.checkLandscapeGallery;
+
       safeSetState(() {});
     }
     safeSetState(() {});
