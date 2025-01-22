@@ -137,25 +137,25 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                         padding:
                         const EdgeInsetsDirectional.fromSTEB(4, 0, 4.0, 0.0),
                         child: Container(
-                            width:
-                            MediaQuery.sizeOf(context).width * 1.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(0.0),
-                                bottomRight: Radius.circular(0.0),
-                                topLeft: Radius.circular(0.0),
-                                topRight: Radius.circular(0.0),
-                              ),
-                              shape: BoxShape.rectangle,
-                              border: Border.all(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryText,
-                                width: 2.0,
-                              ),
+                          width:
+                          MediaQuery.sizeOf(context).width * 1.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(0.0),
+                              bottomRight: Radius.circular(0.0),
+                              topLeft: Radius.circular(0.0),
+                              topRight: Radius.circular(0.0),
                             ),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context)
+                                  .secondaryText,
+                              width: 2.0,
+                            ),
+                          ),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(3.0, 0.0, 0.0, 0.0),
                             child: DropdownButton<String>(
@@ -193,7 +193,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                       ),
                       Padding(
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                        const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -208,14 +208,14 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
 
-                                    // LoadingDialog.show(context);
+                                    LoadingDialog.show(context);
 
                                     try {
 
                                       var media = await selectMedia(
                                         maxWidth: 880.00,
                                         maxHeight: 660.00,
-                                        imageQuality: 80,
+                                        imageQuality: 100,
                                         includeDimensions: true,
                                         mediaSource: MediaSource.photoGallery,
                                         multiImage: true,
@@ -239,7 +239,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   },
                                   child: Container(
                                     width:
-                                        MediaQuery.sizeOf(context).width * 1.0,
+                                    MediaQuery.sizeOf(context).width * 1.0,
                                     height: 60.0,
                                     decoration: BoxDecoration(
                                       color: FlutterFlowTheme.of(context)
@@ -264,17 +264,17 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                         children: [
                                           Padding(
                                             padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                    4.0, 0.0, 0.0, 0.0),
+                                            const EdgeInsetsDirectional.fromSTEB(
+                                                4.0, 0.0, 0.0, 0.0),
                                             child: Container(
                                               width: 100.0,
                                               height: 40.0,
                                               decoration: BoxDecoration(
                                                 color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryText,
                                                 borderRadius:
-                                                    BorderRadius.circular(30.0),
+                                                BorderRadius.circular(30.0),
                                               ),
                                               child: Align(
                                                 alignment: const AlignmentDirectional(
@@ -282,39 +282,39 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                                 child: Text(
                                                   'Choose Files',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
+                                                      context)
                                                       .bodyMedium
                                                       .override(
-                                                        fontFamily: 'Inter',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondary,
-                                                        fontSize: 14.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
+                                                    fontFamily: 'Inter',
+                                                    color:
+                                                    FlutterFlowTheme.of(
+                                                        context)
+                                                        .secondary,
+                                                    fontSize: 14.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                    FontWeight.w500,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Padding(
                                             padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 0.0, 0.0),
+                                            const EdgeInsetsDirectional.fromSTEB(
+                                                8.0, 0.0, 0.0, 0.0),
                                             child: Text(
                                               valueOrDefault<String>(
                                                 _model.fname,
                                                 'no files selected',
                                               ),
                                               style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'Inter',
-                                                        letterSpacing: 0.0,
-                                                      ),
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .override(
+                                                fontFamily: 'Inter',
+                                                letterSpacing: 0.0,
+                                              ),
                                             ),
                                           ),
                                         ],),
@@ -328,7 +328,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                       ),
                       Padding(
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(8.0, 16.0, 8.0, 0.0),
+                        const EdgeInsetsDirectional.fromSTEB(8.0, 16.0, 8.0, 0.0),
                         child: TextFormField(
                           controller: _model.filenameTextController,
                           focusNode: _model.filenameFocusNode,
@@ -339,16 +339,16 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                             labelStyle: FlutterFlowTheme.of(context)
                                 .labelMedium
                                 .override(
-                                  fontFamily: 'Inter',
-                                  letterSpacing: 0.0,
-                                ),
+                              fontFamily: 'Inter',
+                              letterSpacing: 0.0,
+                            ),
                             hintText: 'Enter custom file name (optional)',
                             hintStyle: FlutterFlowTheme.of(context)
                                 .labelMedium
                                 .override(
-                                  fontFamily: 'Inter',
-                                  letterSpacing: 0.0,
-                                ),
+                              fontFamily: 'Inter',
+                              letterSpacing: 0.0,
+                            ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: FlutterFlowTheme.of(context).alternate,
@@ -380,10 +380,10 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                             filled: true,
                           ),
                           style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'Inter',
-                                    letterSpacing: 0.0,
-                                  ),
+                          FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'Inter',
+                            letterSpacing: 0.0,
+                          ),
                           validator: _model.filenameTextControllerValidator
                               .asValidator(context),
                         ),
@@ -399,13 +399,13 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                               child: FFButtonWidget(
                                 onPressed: () async {
                                   _model.filenameDefaultDown =
-                                      await actions.generateFormattedDateTime();
+                                  await actions.generateFormattedDateTime();
                                   _model.download =
-                                      await actions.downloadFFUploadedFile(
+                                  await actions.downloadFFUploadedFile(
                                     _model.pdfFile!,
                                     _model.filenameTextController
-                                                    .text !=
-                                                ''
+                                        .text !=
+                                        ''
                                         ? _model.filenameTextController.text
                                         : _model.filenameDefaultDown!,
                                   );
@@ -428,12 +428,12 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
-                                        fontFamily: 'Readex Pro',
-                                        color:
-                                            FlutterFlowTheme.of(context).info,
-                                        fontSize: 18.0,
-                                        letterSpacing: 0.0,
-                                      ),
+                                    fontFamily: 'Readex Pro',
+                                    color:
+                                    FlutterFlowTheme.of(context).info,
+                                    fontSize: 18.0,
+                                    letterSpacing: 0.0,
+                                  ),
                                   borderSide: BorderSide(
                                     color: FlutterFlowTheme.of(context).primary,
                                     width: 2.0,
@@ -472,34 +472,6 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                         ),
                                       ),
                                     );
-                                    // await showModalBottomSheet(
-                                    //   isScrollControlled: true,
-                                    //   backgroundColor: Colors.transparent,
-                                    //   useSafeArea: true,
-                                    //   context: context,
-                                    //   builder: (context) {
-                                    //     return GestureDetector(
-                                    //       onTap: () {
-                                    //         FocusScope.of(context).unfocus();
-                                    //         FocusManager.instance.primaryFocus
-                                    //             ?.unfocus();
-                                    //       },
-                                    //       child: Padding(
-                                    //         padding: MediaQuery.viewInsetsOf(
-                                    //             context),
-                                    //         child: Container(
-                                    //           height: PdfDimensionsHelper.calculateA4Height(MediaQuery.sizeOf(context).width * 0.95) + 100,
-                                    //
-                                    //           child: ViewPdfWidget(
-                                    //             pdf: _model.pdfFile!,
-                                    //             filename:
-                                    //                 _model.filenameDefault!,
-                                    //           ),
-                                    //         ),
-                                    //       ),
-                                    //     );
-                                    //   },
-                                    // ).then((value) => safeSetState(() {}));
                                   }
 
                                   safeSetState(() {});
@@ -520,12 +492,12 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
-                                        fontFamily: 'Readex Pro',
-                                        color:
-                                            FlutterFlowTheme.of(context).info,
-                                        fontSize: 18.0,
-                                        letterSpacing: 0.0,
-                                      ),
+                                    fontFamily: 'Readex Pro',
+                                    color:
+                                    FlutterFlowTheme.of(context).info,
+                                    fontSize: 18.0,
+                                    letterSpacing: 0.0,
+                                  ),
                                   elevation: 0.0,
                                   borderSide: BorderSide(
                                     color: FlutterFlowTheme.of(context).primary,
@@ -535,74 +507,44 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                 ),
                               ),
                             ), Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  8.0,16.0, 8.0, 0.0),
-                              child: FFButtonWidget(
-                                onPressed: () async {
-                                  context.pushNamed('Mainmenu');
-                                },
-                                text: 'Main Menu',
-                                // icon: const Icon(
-                                //   Icons.men,
-                                //   size: 20.0,
-                                // ),
-                                options: FFButtonOptions(
-                                  width: double.infinity,
-                                  height: 50.0,
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      24.0, 0.0, 24.0, 0.0),
-                                  iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
-                                  color: const Color(0xFF4A90E2),
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleLarge
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        color:
-                                            FlutterFlowTheme.of(context).info,
-                                        fontSize: 18.0,
-                                        letterSpacing: 0.0,
-                                      ),
-                                  elevation: 0.0,
-                                  borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8.0,16.0, 8.0, 0.0),
+                            child: FFButtonWidget(
+                              onPressed: () async {
+                                context.pushNamed('Mainmenu');
+                              },
+                              text: 'Main Menu',
+                              // icon: const Icon(
+                              //   Icons.men,
+                              //   size: 20.0,
+                              // ),
+                              options: FFButtonOptions(
+                                width: double.infinity,
+                                height: 50.0,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    24.0, 0.0, 24.0, 0.0),
+                                iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 0.0),
+                                color: const Color(0xFF4A90E2),
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleLarge
+                                    .override(
+                                  fontFamily: 'Readex Pro',
+                                  color:
+                                  FlutterFlowTheme.of(context).info,
+                                  fontSize: 18.0,
+                                  letterSpacing: 0.0,
                                 ),
+                                elevation: 0.0,
+                                borderSide: BorderSide(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                          // Padding(
-                          //   padding: const EdgeInsetsDirectional.fromSTEB(
-                          //       0.0, 20.0, 0.0, 0.0),
-                          //   child: FFButtonWidget(
-                          //     onPressed: () async {
-                          //       context.pushNamed('Mainmenu');
-                          //     },
-                          //     text: 'Main Menu',
-                          //     options: FFButtonOptions(
-                          //       height: 40.0,
-                          //       padding: const EdgeInsetsDirectional.fromSTEB(
-                          //           24.0, 0.0, 24.0, 0.0),
-                          //       iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                          //           0.0, 0.0, 0.0, 0.0),
-                          //       color: const Color(0xFF4A90E2),
-                          //       textStyle: FlutterFlowTheme.of(context)
-                          //           .titleSmall
-                          //           .override(
-                          //             fontFamily: 'Inter',
-                          //             color: Colors.white,
-                          //             letterSpacing: 0.0,
-                          //           ),
-                          //       elevation: 3.0,
-                          //       borderSide: const BorderSide(
-                          //         color: Colors.transparent,
-                          //         width: 1.0,
-                          //       ),
-                          //       borderRadius: BorderRadius.circular(8.0),
-                          //     ),
-                          //   ),
-                          // ),
+                          ),
+
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8,20,8,8),
                             child: Container(
@@ -620,7 +562,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                       padding: const EdgeInsets.all(10.0),
                                       child: RichText(
                                         textScaler:
-                                            MediaQuery.of(context).textScaler,
+                                        MediaQuery.of(context).textScaler,
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
@@ -628,16 +570,16 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                               style: FlutterFlowTheme.of(context)
                                                   .bodyMedium
                                                   .override(
-                                                    fontFamily: 'Inter',
-                                                    color: Colors.white,
-                                                    fontSize: 12.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                fontFamily: 'Inter',
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                             const TextSpan(
                                               text:
-                                                  ' We do not collect, store, or process any personal data from users. All data, including images and notes, is handled locally on your device. This means:',
+                                              ' We do not collect, store, or process any personal data from users. All data, including images and notes, is handled locally on your device. This means:',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 10.0,
@@ -645,7 +587,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                             ),
                                             const TextSpan(
                                               text:
-                                                  '\n- No images are uploaded to a server.\n- No personal data is collected, stored, or shared by our mobile app.',
+                                              '\n- No images are uploaded to a server.\n- No personal data is collected, stored, or shared by our mobile app.',
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
@@ -654,10 +596,10 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                fontFamily: 'Inter',
-                                                fontSize: 12.0,
-                                                letterSpacing: 0.0,
-                                              ),
+                                            fontFamily: 'Inter',
+                                            fontSize: 12.0,
+                                            letterSpacing: 0.0,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -683,460 +625,492 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
     if(selectedMedia == null) {
 
-      // LoadingDialog.hide(context);
+      LoadingDialog.hide(context);
 
       return;
 
     }
 
-    if (selectedMedia != null &&
-        selectedMedia!.every((m) =>
-            validateFileFormat(
-                m.storagePath, context))) {
+    try {
 
-      LoadingDialog.show(context);
-      safeSetState(
-              () => _model.isDataUploading = true);
-      var selectedUploadedFiles =
-      <FFUploadedFile>[];
+      if (selectedMedia != null && selectedMedia!.every((m) => validateFileFormat(m.storagePath, context))) {
 
-      try {
-        selectedUploadedFiles = selectedMedia!
-            .map((m) => FFUploadedFile(
-          name: m.storagePath
-              .split('/')
-              .last,
-          bytes: m.bytes,
-          height: m.dimensions?.height,
-          width: m.dimensions?.width,
-          blurHash: m.blurHash,
-        ))
-            .toList();
-      } finally {
-        _model.isDataUploading = false;
+        safeSetState(() => _model.isDataUploading = true);
+
+        var selectedUploadedFiles = <FFUploadedFile>[];
+
+        try {
+
+          selectedUploadedFiles = selectedMedia!
+              .map((m) => FFUploadedFile(
+            name: m.storagePath
+                .split('/')
+                .last,
+            bytes: m.bytes,
+            height: m.dimensions?.height,
+            width: m.dimensions?.width,
+            blurHash: m.blurHash,
+          )).toList();
+
+        } finally {
+
+          _model.isDataUploading = false;
+
+        }
+
+        if (selectedUploadedFiles.length == selectedMedia!.length) {
+
+          safeSetState(() {
+
+            _model.uploadedLocalFiles = selectedUploadedFiles;
+
+          });
+
+        } else {
+
+          safeSetState(() {});
+
+          LoadingDialog.hide(context);
+
+          return;
+
+        }
       }
-      if (selectedUploadedFiles.length ==
-          selectedMedia!.length) {
-        safeSetState(() {
-          _model.uploadedLocalFiles =
-              selectedUploadedFiles;
-        });
-      } else {
+
+      if (_model.uploadedLocalFiles.length > 1) {
+
+        _model.fname = '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+
         safeSetState(() {});
-        return;
+
+      } else {
+
+        _model.name = await actions.filename(_model.uploadedLocalFiles.firstOrNull!,);
+
+        _model.fname = _model.name;
+
+        safeSetState(() {});
+
       }
+
+      _model.checkLandscapeGallery = await actions.checkIfLandscape(_model.uploadedLocalFiles.toList(),);
+
+      if (_model.checkLandscapeGallery!) {
+
+        final params = PdfMultiImgParams(
+          fileupList: _model.uploadedLocalFiles.toList(),
+          filename: valueOrDefault<String>(
+            _model.filenameTextController.text,
+            'file',
+          ),
+          notes: _model.filenameTextController.text,
+          isFirstPageSelected: true, // Hardcoded 'true' as per the example
+          fit: 'contain', // Hardcoded 'contain' as per the example
+          selectedIndex: _orientationOptions.indexOf(_selectedOrientation), // Get the index of the selected orientation
+        );
+
+        // LoadingDialog.hide(context);
+
+        _model.pdf2 = await pdfMultiImgIsolate(params);
+        _model.pdfFile = _model.pdf2;
+
+        _model.landscapeExists =
+            _model.checkLandscapeGallery;
+
+        safeSetState(() {});
+
+      } else {
+
+        final params = PdfMultiImgParams(
+          fileupList: _model.uploadedLocalFiles.toList(),
+          filename: valueOrDefault<String>(
+            _model.filenameTextController.text,
+            'file',
+          ),
+          notes: _model.filenameTextController.text,
+          isFirstPageSelected: true, // Pass 'true' as specified
+          fit: 'contain', // Pass 'contain' as specified
+          selectedIndex: _orientationOptions.indexOf(_selectedOrientation), // Use the index of the selected orientation
+        );
+
+        _model.pdf2 = await pdfMultiImgIsolate(params);
+
+        // LoadingDialog.hide(context);
+
+        _model.pdfFile = _model.pdf2;
+        _model.landscapeExists =
+            _model.checkLandscapeGallery;
+
+        safeSetState(() {});
+      }
+
+      safeSetState(() {});
+
+    } catch (e) {
+
+      print('🔴🔴🔴Error While Creating PDF: $e');
+
     }
 
-    if (_model.uploadedLocalFiles.length > 1) {
-      _model.fname =
-      '${_model.uploadedLocalFiles.length.toString()} Files Selected';
-      safeSetState(() {});
-    } else {
-      _model.name = await actions.filename(
-        _model.uploadedLocalFiles.firstOrNull!,
-      );
-      _model.fname = _model.name;
-      safeSetState(() {});
-    }
-
-    _model.checkLandscapeGallery =
-        await actions.checkIfLandscape(
-      _model.uploadedLocalFiles.toList(),
-    );
-    if (_model.checkLandscapeGallery!) {
-      _model.pdf = await actions.pdfMultiImg(
-        _model.uploadedLocalFiles.toList(),
-        valueOrDefault<String>(
-          _model.filenameTextController.text,
-          'file',
-        ),
-        _model.filenameTextController.text,
-        true,
-        'contain',
-        _orientationOptions.indexOf(_selectedOrientation),
-      );
-      _model.pdfFile = _model.pdf;
-      _model.landscapeExists =
-          _model.checkLandscapeGallery;
-      safeSetState(() {});
-    } else {
-      _model.pdf2 = await actions.pdfMultiImg(
-        _model.uploadedLocalFiles.toList(),
-        valueOrDefault<String>(
-          _model.filenameTextController.text,
-          'file',
-        ),
-        _model.filenameTextController.text,
-        true,
-        'contain',
-        _orientationOptions.indexOf(_selectedOrientation),
-
-      );
-      _model.pdfFile = _model.pdf2;
-      _model.landscapeExists =
-          _model.checkLandscapeGallery;
-      safeSetState(() {});
-    }
-    safeSetState(() {});
     LoadingDialog.hide(context);
 
   }
 
-  // Future<void> createPDFView() async {
-  //   print('🟡 Starting createPDFView...');
-  //
-  //   // 🟡 Allow user to select media files from the photo gallery
-  //   final selectedMedia = await selectMedia(
-  //     imageQuality: 100,
-  //     includeDimensions: true,
-  //     mediaSource: MediaSource.photoGallery,
-  //     multiImage: true,
-  //   );
-  //   print('🟡 Media selected: ${selectedMedia?.length ?? 0} items.');
-  //
-  //   // 🟡 Check if media selection is valid and all files are of supported formats
-  //   if (selectedMedia != null &&
-  //       selectedMedia.every((m) => validateFileFormat(m.storagePath, context))) {
-  //     print('🟡 Valid media files selected. Proceeding to upload.');
-  //
-  //     // 🟡 Indicate that data upload is in progress
-  //     safeSetState(() => _model.isDataUploading = true);
-  //     print('🟡 Data upload started.');
-  //
-  //     // 🟡 Initialize a list to hold uploaded files
-  //     var selectedUploadedFiles = <FFUploadedFile>[];
-  //     print('🟡 Initialized list for uploaded files.');
-  //
-  //     // 🟡 Process and rotate selected media for correct orientation
-  //     var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
-  //     print('🟡 Media processed and rotated. Count: ${rotationCorrectedImages.length}');
-  //
-  //     try {
-  //       // 🟡 Map processed media to the uploaded file format
-  //       selectedUploadedFiles = rotationCorrectedImages
-  //           .map((m) => FFUploadedFile(
-  //         name: m.storagePath.split('/').last, // Extract the file name
-  //         bytes: m.bytes, // Include image bytes
-  //         height: m.dimensions?.height, // Image height
-  //         width: m.dimensions?.width, // Image width
-  //         blurHash: m.blurHash, // Optional blur hash
-  //       ))
-  //           .toList();
-  //       print('🟡 Uploaded files prepared. Count: ${selectedUploadedFiles.length}');
-  //     } finally {
-  //       // 🟡 Reset upload status regardless of the outcome
-  //       _model.isDataUploading = false;
-  //       print('🟡 Data upload status reset.');
-  //     }
-  //
-  //     // 🟡 Verify if all selected media files were processed and uploaded
-  //     if (selectedUploadedFiles.length == selectedMedia.length) {
-  //       print('🟡 All files uploaded successfully.');
-  //       safeSetState(() {
-  //         _model.uploadedLocalFiles = selectedUploadedFiles; // Store uploaded files
-  //       });
-  //     } else {
-  //       // 🟡 Handle incomplete upload scenario
-  //       print('🟡 Upload incomplete. Uploaded: ${selectedUploadedFiles.length}, Selected: ${selectedMedia.length}');
-  //       safeSetState(() {});
-  //       return;
-  //     }
-  //   } else {
-  //     print('🟡 No valid media files selected or unsupported format.');
-  //   }
-  //
-  //   // 🟡 Update file display details based on the number of uploaded files
-  //   if (_model.uploadedLocalFiles.length > 1) {
-  //     _model.fname = '${_model.uploadedLocalFiles.length.toString()} Files Selected';
-  //     print('🟡 Multiple files selected. File name: ${_model.fname}');
-  //     safeSetState(() {});
-  //   } else {
-  //     // 🟡 Retrieve and store the filename for a single uploaded file
-  //     _model.name = await actions.filename(_model.uploadedLocalFiles.firstOrNull!);
-  //     print('🟡 Single file selected. File name: ${_model.name}');
-  //     _model.fname = _model.name;
-  //     safeSetState(() {});
-  //   }
-  //
-  //   // 🟡 Check if any of the uploaded files are in landscape orientation
-  //   _model.checkLandscapeGallery = await actions.checkIfLandscape(
-  //     _model.uploadedLocalFiles.toList(),
-  //   );
-  //   print('🟡 Landscape orientation check: ${_model.checkLandscapeGallery}');
-  //
-  //   // 🟡 Generate a PDF file based on the orientation of the images
-  //   // if (_model.checkLandscapeGallery!) {
-  //   //   // 🟡 Handle landscape-oriented files
-  //   //   print('🟡 Generating PDF for landscape images...');
-  //   //   _model.pdf = await actions.pdfMultiImg(
-  //   //     _model.uploadedLocalFiles.toList(),
-  //   //     valueOrDefault<String>(
-  //   //       _model.filenameTextController.text,
-  //   //       'file',
-  //   //     ),
-  //   //     _model.filenameTextController.text,
-  //   //     true,
-  //   //     'contain',
-  //   //   );
-  //   //   print('🟡 PDF generated for landscape images.');
-  //   //   _model.pdfFile = _model.pdf;
-  //   //   _model.landscapeExists = _model.checkLandscapeGallery;
-  //   //   safeSetState(() {});
-  //   // } else {
-  //     // 🟡 Handle portrait-oriented files
-  //     print('🟡 Generating PDF for portrait images...');
-  //     _model.pdf2 = await actions.pdfMultiImg(
-  //       _model.uploadedLocalFiles.toList(),
-  //       valueOrDefault<String>(
-  //         _model.filenameTextController.text,
-  //         'file',
-  //       ),
-  //       _model.filenameTextController.text,
-  //       true,
-  //       'contain',
-  //     );
-  //     print('🟡 PDF generated for portrait images.');
-  //     _model.pdfFile = _model.pdf2;
-  //     _model.landscapeExists = _model.checkLandscapeGallery;
-  //     safeSetState(() {});
-  //   // }
-  //
-  //   // 🟡 Final update of the UI state after processing is complete
-  //   print('🟡 Finalizing UI updates...');
-  //   safeSetState(() {});
-  //   print('🟡 PDF generation and file processing completed.');
-  // }
-  //
-  // Future<void> createPDFView() async {
-  //
-  //
-  //   print('🟡 Starting createPDFView...');
-  //
-  //   // 🟡 Allow user to select media files from the photo gallery
-  //   final selectedMedia = await selectMedia(
-  //     imageQuality: 100,
-  //     includeDimensions: true,
-  //     mediaSource: MediaSource.photoGallery,
-  //     multiImage: true,
-  //   );
-  //
-  //   print('🟡 Media selected: ${selectedMedia?.length ?? 0} items.');
-  //
-  //   LoadingDialog.show(context, message: 'Uploading');
-  //
-  //   if (selectedMedia != null &&
-  //       selectedMedia.every((m) => validateFileFormat(m.storagePath, context))) {
-  //     print('🟡 Valid media files selected. Processing begins...');
-  //
-  //     // 🟡 Indicate that data upload is in progress
-  //     safeSetState(() => _model.isDataUploading = true);
-  //     print('🟡 Data upload state set to true.');
-  //
-  //     var selectedUploadedFiles = <FFUploadedFile>[];
-  //
-  //     try {
-  //       // 🟡 Process and rotate selected media for correct orientation
-  //       // var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
-  //       print('🟡 Media processed and rotated successfully.');
-  //
-  //       // 🟡 Map processed media to the uploaded file format
-  //       selectedUploadedFiles = selectedMedia
-  //           .map((m) => FFUploadedFile(
-  //         name: m.storagePath.split('/').last,
-  //         bytes: m.bytes,
-  //         height: m.dimensions?.height,
-  //         width: m.dimensions?.width,
-  //         blurHash: m.blurHash,
-  //       ))
-  //           .toList();
-  //       print('🟡 Uploaded files prepared. Count: ${selectedUploadedFiles.length}');
-  //
-  //     } catch (e, stackTrace) {
-  //       print('🔴 Error during media processing or upload: $e');
-  //       print(stackTrace);
-  //     } finally {
-  //       // 🟡 Reset upload status
-  //       safeSetState(() => _model.isDataUploading = false);
-  //       print('🟡 Data upload state reset.');
-  //     }
-  //
-  //     // 🟡 Verify upload completeness
-  //     if (selectedUploadedFiles.length == selectedMedia.length) {
-  //       safeSetState(() {
-  //         _model.uploadedLocalFiles = selectedUploadedFiles;
-  //       });
-  //       print('🟡 All files uploaded successfully.');
-  //     } else {
-  //       print('🔴 Upload incomplete. Aborting process.');
-  //       safeSetState(() {});
-  //       return;
-  //     }
-  //
-  //     // 🟡 Update filename display
-  //     if (_model.uploadedLocalFiles.length > 1) {
-  //       _model.fname = '${_model.uploadedLocalFiles.length.toString()} Files Selected';
-  //       print('🟡 Multiple files selected. Display name updated: ${_model.fname}');
-  //     } else {
-  //       _model.name = await actions.filename(_model.uploadedLocalFiles.firstOrNull!);
-  //       _model.fname = _model.name;
-  //       print('🟡 Single file selected. Display name: ${_model.fname}');
-  //     }
-  //
-  //     // 🟡 Check for landscape orientation among uploaded files
-  //     _model.checkLandscapeGallery = await actions.checkIfLandscape(_model.uploadedLocalFiles.toList());
-  //     print('🟡 Landscape orientation check result: ${_model.checkLandscapeGallery}');
-  //
-  //     try {
-  //       // 🟡 Generate PDF based on orientation
-  //       if (_model.checkLandscapeGallery!) {
-  //         print('🟡 Generating PDF for landscape images...');
-  //         _model.pdf = await actions.pdfMultiImg(
-  //           _model.uploadedLocalFiles.toList(),
-  //           valueOrDefault<String>(
-  //             _model.filenameTextController.text,
-  //             'file',
-  //           ),
-  //           _model.filenameTextController.text,
-  //           true,
-  //           'contain',
-  //         );
-  //         _model.pdfFile = _model.pdf;
-  //         _model.landscapeExists = _model.checkLandscapeGallery;
-  //         print('🟡 PDF generated for landscape images.');
-  //       } else {
-  //         print('🟡 Generating PDF for portrait images...');
-  //         _model.pdf2 = await actions.pdfMultiImg(
-  //           _model.uploadedLocalFiles.toList(),
-  //           valueOrDefault<String>(
-  //             _model.filenameTextController.text,
-  //             'file',
-  //           ),
-  //           _model.filenameTextController.text,
-  //           true,
-  //           'contain',
-  //         );
-  //         _model.pdfFile = _model.pdf2;
-  //         _model.landscapeExists = _model.checkLandscapeGallery;
-  //         print('🟡 PDF generated for portrait images.');
-  //       }
-  //     } catch (e, stackTrace) {
-  //       print('🔴 Error during PDF generation: $e');
-  //       print(stackTrace);
-  //     }
-  //
-  //     // 🟡 Final UI update
-  //     safeSetState(() {});
-  //     print('🟡 PDF generation process completed.');
-  //   } else {
-  //     print('🔴 No valid media files selected or unsupported format.');
-  //   }
-  //
-  //   Navigator.of(context).pop();
-  // }
+// Future<void> createPDFView() async {
+//   print('🟡 Starting createPDFView...');
+//
+//   // 🟡 Allow user to select media files from the photo gallery
+//   final selectedMedia = await selectMedia(
+//     imageQuality: 100,
+//     includeDimensions: true,
+//     mediaSource: MediaSource.photoGallery,
+//     multiImage: true,
+//   );
+//   print('🟡 Media selected: ${selectedMedia?.length ?? 0} items.');
+//
+//   // 🟡 Check if media selection is valid and all files are of supported formats
+//   if (selectedMedia != null &&
+//       selectedMedia.every((m) => validateFileFormat(m.storagePath, context))) {
+//     print('🟡 Valid media files selected. Proceeding to upload.');
+//
+//     // 🟡 Indicate that data upload is in progress
+//     safeSetState(() => _model.isDataUploading = true);
+//     print('🟡 Data upload started.');
+//
+//     // 🟡 Initialize a list to hold uploaded files
+//     var selectedUploadedFiles = <FFUploadedFile>[];
+//     print('🟡 Initialized list for uploaded files.');
+//
+//     // 🟡 Process and rotate selected media for correct orientation
+//     var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
+//     print('🟡 Media processed and rotated. Count: ${rotationCorrectedImages.length}');
+//
+//     try {
+//       // 🟡 Map processed media to the uploaded file format
+//       selectedUploadedFiles = rotationCorrectedImages
+//           .map((m) => FFUploadedFile(
+//         name: m.storagePath.split('/').last, // Extract the file name
+//         bytes: m.bytes, // Include image bytes
+//         height: m.dimensions?.height, // Image height
+//         width: m.dimensions?.width, // Image width
+//         blurHash: m.blurHash, // Optional blur hash
+//       ))
+//           .toList();
+//       print('🟡 Uploaded files prepared. Count: ${selectedUploadedFiles.length}');
+//     } finally {
+//       // 🟡 Reset upload status regardless of the outcome
+//       _model.isDataUploading = false;
+//       print('🟡 Data upload status reset.');
+//     }
+//
+//     // 🟡 Verify if all selected media files were processed and uploaded
+//     if (selectedUploadedFiles.length == selectedMedia.length) {
+//       print('🟡 All files uploaded successfully.');
+//       safeSetState(() {
+//         _model.uploadedLocalFiles = selectedUploadedFiles; // Store uploaded files
+//       });
+//     } else {
+//       // 🟡 Handle incomplete upload scenario
+//       print('🟡 Upload incomplete. Uploaded: ${selectedUploadedFiles.length}, Selected: ${selectedMedia.length}');
+//       safeSetState(() {});
+//       return;
+//     }
+//   } else {
+//     print('🟡 No valid media files selected or unsupported format.');
+//   }
+//
+//   // 🟡 Update file display details based on the number of uploaded files
+//   if (_model.uploadedLocalFiles.length > 1) {
+//     _model.fname = '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+//     print('🟡 Multiple files selected. File name: ${_model.fname}');
+//     safeSetState(() {});
+//   } else {
+//     // 🟡 Retrieve and store the filename for a single uploaded file
+//     _model.name = await actions.filename(_model.uploadedLocalFiles.firstOrNull!);
+//     print('🟡 Single file selected. File name: ${_model.name}');
+//     _model.fname = _model.name;
+//     safeSetState(() {});
+//   }
+//
+//   // 🟡 Check if any of the uploaded files are in landscape orientation
+//   _model.checkLandscapeGallery = await actions.checkIfLandscape(
+//     _model.uploadedLocalFiles.toList(),
+//   );
+//   print('🟡 Landscape orientation check: ${_model.checkLandscapeGallery}');
+//
+//   // 🟡 Generate a PDF file based on the orientation of the images
+//   // if (_model.checkLandscapeGallery!) {
+//   //   // 🟡 Handle landscape-oriented files
+//   //   print('🟡 Generating PDF for landscape images...');
+//   //   _model.pdf = await actions.pdfMultiImg(
+//   //     _model.uploadedLocalFiles.toList(),
+//   //     valueOrDefault<String>(
+//   //       _model.filenameTextController.text,
+//   //       'file',
+//   //     ),
+//   //     _model.filenameTextController.text,
+//   //     true,
+//   //     'contain',
+//   //   );
+//   //   print('🟡 PDF generated for landscape images.');
+//   //   _model.pdfFile = _model.pdf;
+//   //   _model.landscapeExists = _model.checkLandscapeGallery;
+//   //   safeSetState(() {});
+//   // } else {
+//     // 🟡 Handle portrait-oriented files
+//     print('🟡 Generating PDF for portrait images...');
+//     _model.pdf2 = await actions.pdfMultiImg(
+//       _model.uploadedLocalFiles.toList(),
+//       valueOrDefault<String>(
+//         _model.filenameTextController.text,
+//         'file',
+//       ),
+//       _model.filenameTextController.text,
+//       true,
+//       'contain',
+//     );
+//     print('🟡 PDF generated for portrait images.');
+//     _model.pdfFile = _model.pdf2;
+//     _model.landscapeExists = _model.checkLandscapeGallery;
+//     safeSetState(() {});
+//   // }
+//
+//   // 🟡 Final update of the UI state after processing is complete
+//   print('🟡 Finalizing UI updates...');
+//   safeSetState(() {});
+//   print('🟡 PDF generation and file processing completed.');
+// }
+//
+// Future<void> createPDFView() async {
+//
+//
+//   print('🟡 Starting createPDFView...');
+//
+//   // 🟡 Allow user to select media files from the photo gallery
+//   final selectedMedia = await selectMedia(
+//     imageQuality: 100,
+//     includeDimensions: true,
+//     mediaSource: MediaSource.photoGallery,
+//     multiImage: true,
+//   );
+//
+//   print('🟡 Media selected: ${selectedMedia?.length ?? 0} items.');
+//
+//   LoadingDialog.show(context, message: 'Uploading');
+//
+//   if (selectedMedia != null &&
+//       selectedMedia.every((m) => validateFileFormat(m.storagePath, context))) {
+//     print('🟡 Valid media files selected. Processing begins...');
+//
+//     // 🟡 Indicate that data upload is in progress
+//     safeSetState(() => _model.isDataUploading = true);
+//     print('🟡 Data upload state set to true.');
+//
+//     var selectedUploadedFiles = <FFUploadedFile>[];
+//
+//     try {
+//       // 🟡 Process and rotate selected media for correct orientation
+//       // var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
+//       print('🟡 Media processed and rotated successfully.');
+//
+//       // 🟡 Map processed media to the uploaded file format
+//       selectedUploadedFiles = selectedMedia
+//           .map((m) => FFUploadedFile(
+//         name: m.storagePath.split('/').last,
+//         bytes: m.bytes,
+//         height: m.dimensions?.height,
+//         width: m.dimensions?.width,
+//         blurHash: m.blurHash,
+//       ))
+//           .toList();
+//       print('🟡 Uploaded files prepared. Count: ${selectedUploadedFiles.length}');
+//
+//     } catch (e, stackTrace) {
+//       print('🔴 Error during media processing or upload: $e');
+//       print(stackTrace);
+//     } finally {
+//       // 🟡 Reset upload status
+//       safeSetState(() => _model.isDataUploading = false);
+//       print('🟡 Data upload state reset.');
+//     }
+//
+//     // 🟡 Verify upload completeness
+//     if (selectedUploadedFiles.length == selectedMedia.length) {
+//       safeSetState(() {
+//         _model.uploadedLocalFiles = selectedUploadedFiles;
+//       });
+//       print('🟡 All files uploaded successfully.');
+//     } else {
+//       print('🔴 Upload incomplete. Aborting process.');
+//       safeSetState(() {});
+//       return;
+//     }
+//
+//     // 🟡 Update filename display
+//     if (_model.uploadedLocalFiles.length > 1) {
+//       _model.fname = '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+//       print('🟡 Multiple files selected. Display name updated: ${_model.fname}');
+//     } else {
+//       _model.name = await actions.filename(_model.uploadedLocalFiles.firstOrNull!);
+//       _model.fname = _model.name;
+//       print('🟡 Single file selected. Display name: ${_model.fname}');
+//     }
+//
+//     // 🟡 Check for landscape orientation among uploaded files
+//     _model.checkLandscapeGallery = await actions.checkIfLandscape(_model.uploadedLocalFiles.toList());
+//     print('🟡 Landscape orientation check result: ${_model.checkLandscapeGallery}');
+//
+//     try {
+//       // 🟡 Generate PDF based on orientation
+//       if (_model.checkLandscapeGallery!) {
+//         print('🟡 Generating PDF for landscape images...');
+//         _model.pdf = await actions.pdfMultiImg(
+//           _model.uploadedLocalFiles.toList(),
+//           valueOrDefault<String>(
+//             _model.filenameTextController.text,
+//             'file',
+//           ),
+//           _model.filenameTextController.text,
+//           true,
+//           'contain',
+//         );
+//         _model.pdfFile = _model.pdf;
+//         _model.landscapeExists = _model.checkLandscapeGallery;
+//         print('🟡 PDF generated for landscape images.');
+//       } else {
+//         print('🟡 Generating PDF for portrait images...');
+//         _model.pdf2 = await actions.pdfMultiImg(
+//           _model.uploadedLocalFiles.toList(),
+//           valueOrDefault<String>(
+//             _model.filenameTextController.text,
+//             'file',
+//           ),
+//           _model.filenameTextController.text,
+//           true,
+//           'contain',
+//         );
+//         _model.pdfFile = _model.pdf2;
+//         _model.landscapeExists = _model.checkLandscapeGallery;
+//         print('🟡 PDF generated for portrait images.');
+//       }
+//     } catch (e, stackTrace) {
+//       print('🔴 Error during PDF generation: $e');
+//       print(stackTrace);
+//     }
+//
+//     // 🟡 Final UI update
+//     safeSetState(() {});
+//     print('🟡 PDF generation process completed.');
+//   } else {
+//     print('🔴 No valid media files selected or unsupported format.');
+//   }
+//
+//   Navigator.of(context).pop();
+// }
 
 // Future<void> createPDFView() async {
-  //
-  //   final selectedMedia = await selectMedia(
-  //     // maxWidth: 880.00,
-  //     // maxHeight: 660.00,
-  //     imageQuality: 100,
-  //     includeDimensions: true,
-  //     mediaSource: MediaSource.photoGallery,
-  //     multiImage: true,
-  //   );
-  //
-  //   if (selectedMedia != null &&
-  //       selectedMedia.every((m) =>
-  //           validateFileFormat(
-  //               m.storagePath, context))) {
-  //
-  //     safeSetState(
-  //             () => _model.isDataUploading = true);
-  //
-  //     var selectedUploadedFiles =
-  //     <FFUploadedFile>[];
-  //
-  //     var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
-  //     //uploading selected files
-  //
-  //     try {
-  //       selectedUploadedFiles = rotationCorrectedImages
-  //           .map((m) => FFUploadedFile(
-  //         name: m.storagePath
-  //             .split('/')
-  //             .last,
-  //         bytes: m.bytes,
-  //         height: m.dimensions?.height,
-  //         width: m.dimensions?.width,
-  //         blurHash: m.blurHash,
-  //
-  //       ))
-  //           .toList();
-  //     } finally {
-  //       _model.isDataUploading = false;
-  //     }
-  //     if (selectedUploadedFiles.length ==
-  //         selectedMedia.length) {
-  //       safeSetState(() {
-  //         _model.uploadedLocalFiles =
-  //             selectedUploadedFiles;
-  //       });
-  //     } else {
-  //       safeSetState(() {});
-  //       return;
-  //     }
-  //   }
-  //
-  //   if (_model.uploadedLocalFiles.length > 1) {
-  //     _model.fname =
-  //     '${_model.uploadedLocalFiles.length.toString()} Files Selected';
-  //     safeSetState(() {});
-  //   } else {
-  //     _model.name = await actions.filename(
-  //       _model.uploadedLocalFiles.firstOrNull!,
-  //     );
-  //     _model.fname = _model.name;
-  //     safeSetState(() {});
-  //   }
-  //
-  //   _model.checkLandscapeGallery =
-  //       await actions.checkIfLandscape(
-  //     _model.uploadedLocalFiles.toList(),
-  //   );
-  //   if (_model.checkLandscapeGallery!) {
-  //     _model.pdf = await actions.pdfMultiImg(
-  //       _model.uploadedLocalFiles.toList(),
-  //       valueOrDefault<String>(
-  //         _model.filenameTextController.text,
-  //         'file',
-  //       ),
-  //       _model.filenameTextController.text,
-  //       true,
-  //       'contain',
-  //     );
-  //     _model.pdfFile = _model.pdf;
-  //     _model.landscapeExists =
-  //         _model.checkLandscapeGallery;
-  //     safeSetState(() {});
-  //   } else {
-  //     _model.pdf2 = await actions.pdfMultiImg(
-  //       _model.uploadedLocalFiles.toList(),
-  //       valueOrDefault<String>(
-  //         _model.filenameTextController.text,
-  //         'file',
-  //       ),
-  //       _model.filenameTextController.text,
-  //       true,
-  //       'contain',
-  //     );
-  //     _model.pdfFile = _model.pdf2;
-  //     _model.landscapeExists =
-  //         _model.checkLandscapeGallery;
-  //     safeSetState(() {});
-  //   }
-  //
-  //   safeSetState(() {});
-  // }
+//
+//   final selectedMedia = await selectMedia(
+//     // maxWidth: 880.00,
+//     // maxHeight: 660.00,
+//     imageQuality: 100,
+//     includeDimensions: true,
+//     mediaSource: MediaSource.photoGallery,
+//     multiImage: true,
+//   );
+//
+//   if (selectedMedia != null &&
+//       selectedMedia.every((m) =>
+//           validateFileFormat(
+//               m.storagePath, context))) {
+//
+//     safeSetState(
+//             () => _model.isDataUploading = true);
+//
+//     var selectedUploadedFiles =
+//     <FFUploadedFile>[];
+//
+//     var rotationCorrectedImages = await processAndRotateMedia(selectedMedia);
+//     //uploading selected files
+//
+//     try {
+//       selectedUploadedFiles = rotationCorrectedImages
+//           .map((m) => FFUploadedFile(
+//         name: m.storagePath
+//             .split('/')
+//             .last,
+//         bytes: m.bytes,
+//         height: m.dimensions?.height,
+//         width: m.dimensions?.width,
+//         blurHash: m.blurHash,
+//
+//       ))
+//           .toList();
+//     } finally {
+//       _model.isDataUploading = false;
+//     }
+//     if (selectedUploadedFiles.length ==
+//         selectedMedia.length) {
+//       safeSetState(() {
+//         _model.uploadedLocalFiles =
+//             selectedUploadedFiles;
+//       });
+//     } else {
+//       safeSetState(() {});
+//       return;
+//     }
+//   }
+//
+//   if (_model.uploadedLocalFiles.length > 1) {
+//     _model.fname =
+//     '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+//     safeSetState(() {});
+//   } else {
+//     _model.name = await actions.filename(
+//       _model.uploadedLocalFiles.firstOrNull!,
+//     );
+//     _model.fname = _model.name;
+//     safeSetState(() {});
+//   }
+//
+//   _model.checkLandscapeGallery =
+//       await actions.checkIfLandscape(
+//     _model.uploadedLocalFiles.toList(),
+//   );
+//   if (_model.checkLandscapeGallery!) {
+//     _model.pdf = await actions.pdfMultiImg(
+//       _model.uploadedLocalFiles.toList(),
+//       valueOrDefault<String>(
+//         _model.filenameTextController.text,
+//         'file',
+//       ),
+//       _model.filenameTextController.text,
+//       true,
+//       'contain',
+//     );
+//     _model.pdfFile = _model.pdf;
+//     _model.landscapeExists =
+//         _model.checkLandscapeGallery;
+//     safeSetState(() {});
+//   } else {
+//     _model.pdf2 = await actions.pdfMultiImg(
+//       _model.uploadedLocalFiles.toList(),
+//       valueOrDefault<String>(
+//         _model.filenameTextController.text,
+//         'file',
+//       ),
+//       _model.filenameTextController.text,
+//       true,
+//       'contain',
+//     );
+//     _model.pdfFile = _model.pdf2;
+//     _model.landscapeExists =
+//         _model.checkLandscapeGallery;
+//     safeSetState(() {});
+//   }
+//
+//   safeSetState(() {});
+// }
 }
 //
 // Future<List<SelectedFile>> processAndRotateMedia(List<SelectedFile> selectedMedia) async {

@@ -170,8 +170,8 @@ Future<List<SelectedFile>?> selectMedia({
         final pickedMediaFuture = picker.pickMultiImage(
             maxWidth: maxWidth,
             maxHeight: maxHeight,
-            requestFullMetadata: true
-          // imageQuality: imageQuality,
+            requestFullMetadata: true,
+            limit: 60
         );
 
         final pickedMedia = await pickedMediaFuture;
