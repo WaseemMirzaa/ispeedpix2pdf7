@@ -106,7 +106,7 @@ Future<FFUploadedFile> pdfMultiImg(
                   decoration: pw.BoxDecoration(
                     image: pw.DecorationImage(
                       image: image,
-                      fit: pw.BoxFit.contain,
+                      fit: pw.BoxFit.fitWidth,
                       alignment: pw.Alignment.center,
                     ),
                   ),
@@ -134,8 +134,8 @@ Future<FFUploadedFile> pdfMultiImg(
                   decoration: pw.BoxDecoration(
                     image: pw.DecorationImage(
                       image: image,
-                      fit: pw.BoxFit.contain,
-                      alignment: pw.Alignment.center,
+                      fit: pw.BoxFit.fitWidth,
+                      alignment: pw.Alignment.topCenter,
                     ),
                   ),
                   // Additional content (add other widgets here as needed)

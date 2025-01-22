@@ -166,6 +166,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                               onChanged: (String? newValue) {
                                 setState(() {
                                   _selectedOrientation = newValue!;
+                                  LoadingDialog.show(context);
                                   try {
                                     createPDF();
                                   } catch (e) {
@@ -210,7 +211,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
 
-                                    // LoadingDialog.show(context);
+                                    LoadingDialog.show(context);
 
                                     try {
 
@@ -685,7 +686,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
     if(selectedMedia == null) {
 
-      // LoadingDialog.hide(context);
+      LoadingDialog.hide(context);
 
       return;
 
@@ -696,9 +697,9 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
             validateFileFormat(
                 m.storagePath, context))) {
 
-      LoadingDialog.show(context);
       safeSetState(
               () => _model.isDataUploading = true);
+
       var selectedUploadedFiles =
       <FFUploadedFile>[];
 
