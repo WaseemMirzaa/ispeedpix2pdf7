@@ -53,7 +53,7 @@ Future<FFUploadedFile> pdfMultiImg(
         bool isLandscape = decodedImage.width > decodedImage.height;
         img.Image processedImage = decodedImage;
 
-        if (isLandscape) {
+        if (isLandscape && selectedIndex == 1) {
           // Handle landscape images based on the 'fit' parameter
           // if (fit == 'rotate' || selectedIndex == 1) {
             // Rotate the image 90 degrees
@@ -94,7 +94,7 @@ Future<FFUploadedFile> pdfMultiImg(
             pageFormat: isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4,
             margin: pw.EdgeInsets.all(16),
             build: (pw.Context context) {
-              if (isLandscape && fit == 'contain') {
+              if (isLandscape) {
                 // Contain the image and align it to the top of the page
                 return pw.Align(
                   alignment: pw.Alignment.center,
@@ -165,7 +165,7 @@ Future<FFUploadedFile> pdfMultiImg(
                   alignment: pw.Alignment.topCenter, // Ensure top-center alignment
                   child: pw.Image(
                     image,
-                    fit: pw.BoxFit.contain, // Cover the height properly in portrait mode
+                    fit: pw.BoxFit.fitWidth, // Cover the height properly in portrait mode
                   ),
                 );
               }

@@ -71,6 +71,8 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
   // List of options for the dropdown
   final List<String> _orientationOptions = ['DEFAULT - Mixed Orientation', 'Pages Fixed - Portrait', 'Landscape Photos - Top Aligned for easy viewing'];
 
+  // final List<String> _orientationOptions = ['PDF-Non.Oriented', 'PDF-Fixed.Portrait', 'PDF-DEFAULT.Portrait Consistency'];
+
   @override
   void dispose() {
     _model.dispose();
