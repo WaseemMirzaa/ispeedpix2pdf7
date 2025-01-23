@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
 
@@ -16,18 +17,20 @@ import 'converter_model.dart';
 export 'converter_model.dart';
 
 class ConverterWidget extends StatefulWidget {
-
   const ConverterWidget({super.key});
 
   @override
   State<ConverterWidget> createState() => _ConverterWidgetState();
 }
 
-class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderStateMixin {
-
+class _ConverterWidgetState extends State<ConverterWidget>
+    with TickerProviderStateMixin {
   late ConverterModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // late FocusNode _filenameFocusNode;
+  bool _isFocused = false;
 
   final animationsMap = <String, AnimationInfo>{};
 
@@ -35,19 +38,25 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
   @override
   void initState() {
-
     super.initState();
+
 
     _model = createModel(context, () => ConverterModel());
 
     _model.filenameTextController ??= TextEditingController();
-    _model.filenameFocusNode ??= FocusNode();
+
+    _model.filenameFocusNode = FocusNode();
+
+    _model.filenameFocusNode!.addListener(() {
+      setState(() {
+        _isFocused = _model.filenameFocusNode!.hasFocus;
+      });
+    });
 
     animationsMap.addAll({
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
-        effectsBuilder: () =>
-        [
+        effectsBuilder: () => [
           ScaleEffect(
             curve: Curves.easeInOut,
             delay: 0.0.ms,
@@ -62,7 +71,17 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
-  String _selectedOrientation = 'DEFAULT - Mixed Orientation'; // Default selection
+
+  @override
+  void dispose() {
+    // Don't forget to dispose of the FocusNode
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  String _selectedOrientation =
+      'DEFAULT - Mixed Orientation'; // Default selection
 
   // List of options for the dropdown
   final List<String> _orientationOptions = [
@@ -70,13 +89,6 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
     'Pages Fixed - Portrait',
     'Landscape Photos - Top Aligned for easy viewing'
   ];
-
-  @override
-  void dispose() {
-    _model.dispose();
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +99,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme
-            .of(context)
-            .primaryBackground,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Align(
@@ -105,49 +115,55 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-
                       GestureDetector(
-                        child:         Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 3.0, 0.0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 3.0, 0.0),
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.refresh, // Flutter's default refresh icon
-                                    color: const Color(0xFF4A90E2), // Match icon color with text
+                                    Icons.refresh,
+                                    // Flutter's default refresh icon
+                                    color: const Color(0xFF4A90E2),
+                                    // Match icon color with text
                                     size: 24.0, // Adjust size to fit the text
                                   ),
-                                  const SizedBox(width: 5.0), // Add spacing between icon and text
+                                  const SizedBox(width: 5.0),
+                                  // Add spacing between icon and text
                                   Text(
                                     'Reset',
                                     textAlign: TextAlign.center,
-                                    style: FlutterFlowTheme.of(context).displayMedium.override(
-                                      fontFamily: 'Poppins',
-                                      color: const Color(0xFF4A90E2),
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ).animateOnPageLoad(
-                                      animationsMap['textOnPageLoadAnimation']!),
+                                    style: FlutterFlowTheme.of(context)
+                                        .displayMedium
+                                        .override(
+                                          fontFamily: 'Poppins',
+                                          color: const Color(0xFF4A90E2),
+                                          fontSize: 18.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ).animateOnPageLoad(animationsMap[
+                                      'textOnPageLoadAnimation']!),
                                 ],
                               ),
                             ),
                           ],
-                        ),onTap: (){
+                        ),
+                        onTap: () {
+                          _selectedOrientation = 'DEFAULT - Mixed Orientation';
 
-                        _model.filenameTextController.text = '';
+                          _model.filenameTextController.text = '';
 
-                        _model.clearAllValues();
+                          _model.clearAllValues();
 
-                        selectedMedia = null;
+                          selectedMedia = null;
 
-                        safeSetState(() {});
-
-                      },),
-
+                          safeSetState(() {});
+                        },
+                      ),
                       Container(
                         width: 120.0,
                         height: 120.0,
@@ -161,39 +177,31 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                         ),
                       ),
                       Padding(
-                        padding:
-                        const EdgeInsetsDirectional.fromSTEB(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
                             3.0, 0.0, 0.0, 0.0),
                         child: Text(
                           'iSpeedPix2PDF',
                           textAlign: TextAlign.center,
-                          style: FlutterFlowTheme
-                              .of(context)
+                          style: FlutterFlowTheme.of(context)
                               .displayMedium
                               .override(
-                            fontFamily: 'Poppins',
-                            color: FlutterFlowTheme
-                                .of(context)
-                                .primaryText,
-                            fontSize: 24.0,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w600,
-                          ),
+                                fontFamily: 'Poppins',
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                fontSize: 24.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ).animateOnPageLoad(
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
                       Padding(
-                        padding:
-                        const EdgeInsetsDirectional.fromSTEB(4, 0, 4.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            4, 0, 4.0, 0.0),
                         child: Container(
-                          width:
-                          MediaQuery
-                              .sizeOf(context)
-                              .width * 1.0,
+                          width: MediaQuery.sizeOf(context).width * 1.0,
                           height: 40.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme
-                                .of(context)
+                            color: FlutterFlowTheme.of(context)
                                 .secondaryBackground,
                             borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(0.0),
@@ -203,9 +211,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                             ),
                             shape: BoxShape.rectangle,
                             border: Border.all(
-                              color: FlutterFlowTheme
-                                  .of(context)
-                                  .secondaryText,
+                              color: FlutterFlowTheme.of(context).secondaryText,
                               width: 2.0,
                             ),
                           ),
@@ -221,25 +227,186 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
                                   LoadingDialog.show(context);
 
-                                  try {
+                                  createPDF();
 
-                                    createPDF();
-
-                                  } catch (e) {
-
-                                    print('🔴🔴🔴Error While Creating PDF: $e');
-
-                                  }
                                 });
                               },
-                              items: _orientationOptions.map<
-                                  DropdownMenuItem<String>>((String value) {
+                              items: _orientationOptions
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(
                                     value,
-                                    style: FlutterFlowTheme
-                                        .of(context)
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily: 'Inter',
+                                          color: Colors.black,
+                                          fontSize: 12.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                );
+                              }).toList(),
+                              isExpanded:
+                                  true, // Makes the dropdown button fill the available width
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 16.0, 0.0, 0.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
+                                        4.0, 0.0, 4.0, 0.0),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        Timer(Duration(seconds: 1), () {
+
+                                          // if(!LoadingDialog.isAlreadyCancelled) {
+                                            LoadingDialog.show(context);
+                                          // }
+                                        });
+
+                                        LoadingDialog.isImagePickerCalled = true;
+                                        LoadingDialog.isAlreadyCancelled  = false;
+
+                                        try {
+                                          var media = await selectMedia(
+                                            maxWidth: 880.00,
+                                            maxHeight: 660.00,
+                                            imageQuality: 80,
+                                            includeDimensions: true,
+                                            mediaSource: MediaSource.photoGallery,
+                                            multiImage: true,
+                                          );
+
+                                          if (media != null) {
+                                            selectedMedia = media;
+                                          }
+
+
+                                          Timer(Duration(seconds: 1), () {
+
+                                            createPDF();
+
+                                          });
+
+
+                                        } catch (e) {
+                                          print(
+                                              '🔴🔴🔴Error While Creating PDF: $e');
+                                        }
+                                      },
+                                      child: Container(
+                                        width:
+                                            MediaQuery.sizeOf(context).width * 1.0,
+                                        height: 60.0,
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
+                                          borderRadius: const BorderRadius.only(
+                                            bottomLeft: Radius.circular(0.0),
+                                            bottomRight: Radius.circular(0.0),
+                                            topLeft: Radius.circular(0.0),
+                                            topRight: Radius.circular(0.0),
+                                          ),
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(
+                                            color: FlutterFlowTheme.of(context)
+                                                .secondaryText,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                        child: Align(
+                                          alignment:
+                                              const AlignmentDirectional(0.0, 0.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsetsDirectional
+                                                    .fromSTEB(4.0, 0.0, 0.0, 0.0),
+                                                child: Container(
+                                                  width: 100.0,
+                                                  height: 40.0,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        FlutterFlowTheme.of(context)
+                                                            .secondaryText,
+                                                    borderRadius:
+                                                        BorderRadius.circular(30.0),
+                                                  ),
+                                                  child: Align(
+                                                    alignment:
+                                                        const AlignmentDirectional(
+                                                            0.0, 0.0),
+                                                    child: Text(
+                                                      'Choose Files',
+                                                      style: FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .override(
+                                                            fontFamily: 'Inter',
+                                                            color:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondary,
+                                                            fontSize: 14.0,
+                                                            letterSpacing: 0.0,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsetsDirectional
+                                                    .fromSTEB(8.0, 0.0, 0.0, 0.0),
+                                                child: Text(
+                                                  valueOrDefault<String>(
+                                                    _model.fname,
+                                                    'no files selected',
+                                                  ),
+                                                  style:
+                                                      FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .override(
+                                                            fontFamily: 'Inter',
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2, left: 4g),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    '*You can select up to 60 Images per PDF.',
+                                    style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
                                       fontFamily: 'Inter',
@@ -249,229 +416,68 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                );
-                              }).toList(),
-                              isExpanded: true, // Makes the dropdown button fill the available width
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                        const EdgeInsetsDirectional.fromSTEB(
-                            0.0, 16.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    4.0, 0.0, 4.0, 0.0),
-                                child: InkWell(
-                                  splashColor: Colors.transparent,
-                                  focusColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  onTap: () async {
-
-                                    LoadingDialog.show(context);
-
-                                    try {
-                                      var media = await selectMedia(
-                                        maxWidth: 880.00,
-                                        maxHeight: 660.00,
-                                        imageQuality: 80,
-                                        includeDimensions: true,
-                                        mediaSource: MediaSource.photoGallery,
-                                        multiImage: true,
-
-                                      );
-
-                                      if (media != null) {
-                                        selectedMedia = media;
-                                      }
-
-                                      createPDF();
-                                    } catch (e) {
-                                      print('🔴🔴🔴Error While Creating PDF: $e');
-                                    }
-                                  },
-                                  child: Container(
-                                    width:
-                                    MediaQuery
-                                        .sizeOf(context)
-                                        .width * 1.0,
-                                    height: 60.0,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme
-                                          .of(context)
-                                          .secondaryBackground,
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(0.0),
-                                        bottomRight: Radius.circular(0.0),
-                                        topLeft: Radius.circular(0.0),
-                                        topRight: Radius.circular(0.0),
-                                      ),
-                                      shape: BoxShape.rectangle,
-                                      border: Border.all(
-                                        color: FlutterFlowTheme
-                                            .of(context)
-                                            .secondaryText,
-                                        width: 2.0,
-                                      ),
-                                    ),
-                                    child: Align(
-                                      alignment: const AlignmentDirectional(
-                                          0.0, 0.0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                            const EdgeInsetsDirectional
-                                                .fromSTEB(
-                                                4.0, 0.0, 0.0, 0.0),
-                                            child: Container(
-                                              width: 100.0,
-                                              height: 40.0,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                FlutterFlowTheme
-                                                    .of(context)
-                                                    .secondaryText,
-                                                borderRadius:
-                                                BorderRadius.circular(30.0),
-                                              ),
-                                              child: Align(
-                                                alignment: const AlignmentDirectional(
-                                                    0.0, 0.0),
-                                                child: Text(
-                                                  'Choose Files',
-                                                  style: FlutterFlowTheme
-                                                      .of(
-                                                      context)
-                                                      .bodyMedium
-                                                      .override(
-                                                    fontFamily: 'Inter',
-                                                    color:
-                                                    FlutterFlowTheme
-                                                        .of(
-                                                        context)
-                                                        .secondary,
-                                                    fontSize: 14.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                    FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                            const EdgeInsetsDirectional
-                                                .fromSTEB(
-                                                8.0, 0.0, 0.0, 0.0),
-                                            child: Text(
-                                              valueOrDefault<String>(
-                                                _model.fname,
-                                                'no files selected',
-                                              ),
-                                              style:
-                                              FlutterFlowTheme
-                                                  .of(context)
-                                                  .bodyMedium
-                                                  .override(
-                                                fontFamily: 'Inter',
-                                                letterSpacing: 0.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ],),
-                                    ),
-                                  ),
-                                ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
                       Padding(
-                        padding:
-                        const EdgeInsetsDirectional.fromSTEB(
-                            8.0, 16.0, 8.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(8.0, 16.0, 8.0, 0.0),
                         child: TextFormField(
                           controller: _model.filenameTextController,
-                          focusNode: _model.filenameFocusNode,
+                          focusNode: _model.filenameFocusNode, // Use the FocusNode here
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: 'Filename',
-                            labelStyle: FlutterFlowTheme
-                                .of(context)
-                                .labelMedium
-                                .override(
+                            labelText: _isFocused ? 'Filename' : 'Filename (Optional)',
+                            labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
                               fontFamily: 'Inter',
                               letterSpacing: 0.0,
                             ),
                             hintText: 'Enter custom file name (optional)',
-                            hintStyle: FlutterFlowTheme
-                                .of(context)
-                                .labelMedium
-                                .override(
+                            hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                               fontFamily: 'Inter',
                               letterSpacing: 0.0,
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme
-                                    .of(context)
-                                    .alternate,
+                                color: FlutterFlowTheme.of(context).alternate,
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme
-                                    .of(context)
-                                    .primary,
+                                color: FlutterFlowTheme.of(context).primary,
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             errorBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme
-                                    .of(context)
-                                    .error,
+                                color: FlutterFlowTheme.of(context).error,
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme
-                                    .of(context)
-                                    .error,
+                                color: FlutterFlowTheme.of(context).error,
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             filled: true,
                           ),
-                          style:
-                          FlutterFlowTheme
-                              .of(context)
-                              .bodyMedium
-                              .override(
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
                             fontFamily: 'Inter',
                             letterSpacing: 0.0,
                           ),
-                          validator: _model.filenameTextControllerValidator
-                              .asValidator(context),
+                          validator: _model.filenameTextControllerValidator.asValidator(context),
                         ),
-                      ),
+                      )
+,
                       Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -483,13 +489,11 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                               child: FFButtonWidget(
                                 onPressed: () async {
                                   _model.filenameDefaultDown =
-                                  await actions.generateFormattedDateTime();
+                                      await actions.generateFormattedDateTime();
                                   _model.download =
-                                  await actions.downloadFFUploadedFile(
+                                      await actions.downloadFFUploadedFile(
                                     _model.pdfFile!,
-                                    _model.filenameTextController
-                                        .text !=
-                                        ''
+                                    _model.filenameTextController.text != ''
                                         ? _model.filenameTextController.text
                                         : _model.filenameDefaultDown!,
                                   );
@@ -506,26 +510,21 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   height: 50.0,
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       24.0, 0.0, 24.0, 0.0),
-                                  iconPadding: const EdgeInsetsDirectional
-                                      .fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 0.0),
                                   color: const Color(0xFF4A90E2),
-                                  textStyle: FlutterFlowTheme
-                                      .of(context)
+                                  textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
-                                    fontFamily: 'Readex Pro',
-                                    color:
-                                    FlutterFlowTheme
-                                        .of(context)
-                                        .info,
-                                    fontSize: 18.0,
-                                    letterSpacing: 0.0,
-                                  ),
+                                        fontFamily: 'Readex Pro',
+                                        color:
+                                            FlutterFlowTheme.of(context).info,
+                                        fontSize: 18.0,
+                                        letterSpacing: 0.0,
+                                      ),
                                   borderSide: BorderSide(
-                                    color: FlutterFlowTheme
-                                        .of(context)
-                                        .primary,
+                                    color: FlutterFlowTheme.of(context).primary,
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
@@ -544,25 +543,22 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            PdfViewerScreen(
-                                              pdfBytes: _model.pdfFile!.bytes,
-                                              title: _model.filenameDefault!,
-                                            ),
+                                        builder: (context) => PdfViewerScreen(
+                                          pdfBytes: _model.pdfFile!.bytes,
+                                          title: _model.filenameDefault!,
+                                        ),
                                       ),
                                     );
                                   } else {
-                                    _model.filenameDefault =
-                                    await actions.generateFormattedDateTime();
+                                    _model.filenameDefault = await actions
+                                        .generateFormattedDateTime();
 
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            PdfViewerScreen(
-                                                pdfBytes: _model.pdfFile!.bytes,
-                                                title: _model.filenameDefault!
-                                            ),
+                                        builder: (context) => PdfViewerScreen(
+                                            pdfBytes: _model.pdfFile!.bytes,
+                                            title: _model.filenameDefault!),
                                       ),
                                     );
                                     // await showModalBottomSheet(
@@ -607,27 +603,22 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   height: 50.0,
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       24.0, 0.0, 24.0, 0.0),
-                                  iconPadding: const EdgeInsetsDirectional
-                                      .fromSTEB(
-                                      0.0, 0.0, 0.0, 0.0),
+                                  iconPadding:
+                                      const EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 0.0),
                                   color: const Color(0xFF4A90E2),
-                                  textStyle: FlutterFlowTheme
-                                      .of(context)
+                                  textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
-                                    fontFamily: 'Readex Pro',
-                                    color:
-                                    FlutterFlowTheme
-                                        .of(context)
-                                        .info,
-                                    fontSize: 18.0,
-                                    letterSpacing: 0.0,
-                                  ),
+                                        fontFamily: 'Readex Pro',
+                                        color:
+                                            FlutterFlowTheme.of(context).info,
+                                        fontSize: 18.0,
+                                        letterSpacing: 0.0,
+                                      ),
                                   elevation: 0.0,
                                   borderSide: BorderSide(
-                                    color: FlutterFlowTheme
-                                        .of(context)
-                                        .primary,
+                                    color: FlutterFlowTheme.of(context).primary,
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
@@ -651,27 +642,21 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                 height: 50.0,
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     24.0, 0.0, 24.0, 0.0),
-                                iconPadding: const EdgeInsetsDirectional
-                                    .fromSTEB(
-                                    0.0, 0.0, 0.0, 0.0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
                                 color: const Color(0xFF4A90E2),
-                                textStyle: FlutterFlowTheme
-                                    .of(context)
+                                textStyle: FlutterFlowTheme.of(context)
                                     .titleLarge
                                     .override(
-                                  fontFamily: 'Readex Pro',
-                                  color:
-                                  FlutterFlowTheme
-                                      .of(context)
-                                      .info,
-                                  fontSize: 18.0,
-                                  letterSpacing: 0.0,
-                                ),
+                                      fontFamily: 'Readex Pro',
+                                      color: FlutterFlowTheme.of(context).info,
+                                      fontSize: 18.0,
+                                      letterSpacing: 0.0,
+                                    ),
                                 elevation: 0.0,
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme
-                                      .of(context)
-                                      .primary,
+                                  color: FlutterFlowTheme.of(context).primary,
                                   width: 2.0,
                                 ),
                                 borderRadius: BorderRadius.circular(8.0),
@@ -721,33 +706,32 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Align(
-                                    alignment: const AlignmentDirectional(
-                                        0.0, 0.0),
+                                    alignment:
+                                        const AlignmentDirectional(0.0, 0.0),
                                     child: Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: RichText(
                                         textScaler:
-                                        MediaQuery
-                                            .of(context)
-                                            .textScaler,
+                                            MediaQuery.of(context).textScaler,
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
                                               text: 'Data Collection:',
-                                              style: FlutterFlowTheme
-                                                  .of(context)
-                                                  .bodyMedium
-                                                  .override(
-                                                fontFamily: 'Inter',
-                                                color: Colors.white,
-                                                fontSize: 12.0,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily: 'Inter',
+                                                        color: Colors.white,
+                                                        fontSize: 12.0,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                             ),
                                             const TextSpan(
                                               text:
-                                              ' We do not collect, store, or process any personal data from users. All data, including images and notes, is handled locally on your device. This means:',
+                                                  ' We do not collect, store, or process any personal data from users. All data is handled locally on your device. This means:',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 10.0,
@@ -755,20 +739,19 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                             ),
                                             const TextSpan(
                                               text:
-                                              '\n- No images are uploaded to a server.\n- No personal data is collected, stored, or shared by our mobile app.',
+                                                  '\n- No images are uploaded to a server.\n- No personal data is collected, stored, or shared by our mobile app.',
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
                                             )
                                           ],
-                                          style: FlutterFlowTheme
-                                              .of(context)
+                                          style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                            fontFamily: 'Inter',
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                          ),
+                                                fontFamily: 'Inter',
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -791,44 +774,37 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
   }
 
   Future<void> createPDF() async {
-
     if (selectedMedia == null) {
 
-      LoadingDialog.hide(context);
+      // Timer(Duration(seconds: 1), () {
+        LoadingDialog.hide(context);
+      // });
 
       return;
     }
 
     if (selectedMedia != null &&
-        selectedMedia!.every((m) =>
-            validateFileFormat(
-                m.storagePath, context))) {
-      safeSetState(
-              () => _model.isDataUploading = true);
-      var selectedUploadedFiles =
-      <FFUploadedFile>[];
+        selectedMedia!
+            .every((m) => validateFileFormat(m.storagePath, context))) {
+      safeSetState(() => _model.isDataUploading = true);
+      var selectedUploadedFiles = <FFUploadedFile>[];
 
       try {
         selectedUploadedFiles = selectedMedia!
-            .map((m) =>
-            FFUploadedFile(
-              name: m.storagePath
-                  .split('/')
-                  .last,
-              bytes: m.bytes,
-              height: m.dimensions?.height,
-              width: m.dimensions?.width,
-              blurHash: m.blurHash,
-            ))
+            .map((m) => FFUploadedFile(
+                  name: m.storagePath.split('/').last,
+                  bytes: m.bytes,
+                  height: m.dimensions?.height,
+                  width: m.dimensions?.width,
+                  blurHash: m.blurHash,
+                ))
             .toList();
       } finally {
         _model.isDataUploading = false;
       }
-      if (selectedUploadedFiles.length ==
-          selectedMedia!.length) {
+      if (selectedUploadedFiles.length == selectedMedia!.length) {
         safeSetState(() {
-          _model.uploadedLocalFiles =
-              selectedUploadedFiles;
+          _model.uploadedLocalFiles = selectedUploadedFiles;
         });
       } else {
         safeSetState(() {});
@@ -838,7 +814,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
     if (_model.uploadedLocalFiles.length > 1) {
       _model.fname =
-      '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+          '${_model.uploadedLocalFiles.length.toString()} Files Selected';
       safeSetState(() {});
     } else {
       _model.name = await actions.filename(
@@ -848,8 +824,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
       safeSetState(() {});
     }
 
-    _model.checkLandscapeGallery =
-    await actions.checkIfLandscape(
+    _model.checkLandscapeGallery = await actions.checkIfLandscape(
       _model.uploadedLocalFiles.toList(),
     );
     if (_model.checkLandscapeGallery!) {
@@ -877,8 +852,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
       _model.pdf2 = await pdfMultiImgWithIsolate(params);
       _model.pdfFile = _model.pdf2;
 
-      _model.landscapeExists =
-          _model.checkLandscapeGallery;
+      _model.landscapeExists = _model.checkLandscapeGallery;
 
       safeSetState(() {});
     } else {
@@ -906,8 +880,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
       // LoadingDialog.hide(context);
 
       _model.pdfFile = _model.pdf2;
-      _model.landscapeExists =
-          _model.checkLandscapeGallery;
+      _model.landscapeExists = _model.checkLandscapeGallery;
 
       safeSetState(() {});
     }
@@ -917,16 +890,28 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 }
 
 class LoadingDialog {
+  static bool isShowing = false;
+  static bool isImagePickerCalled = false;
+  static bool isAlreadyCancelled = false;
 
   static void show(BuildContext context, {String message = "Creating PDF..."}) {
+    if(isAlreadyCancelled)
+    {
+      isAlreadyCancelled = false;
+      return;
+    }
+
+    isShowing = true;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+      barrierDismissible: false,
+      // Prevent closing the dialog by tapping outside
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -943,7 +928,15 @@ class LoadingDialog {
     );
   }
 
-  static void hide(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).pop(); // Closes the dialog
+  static void hide(BuildContext context, {bool isImagePickerCalled = false}) {
+
+    // isShowing = false?
+
+    // Timer(Duration(seconds: 1), () {
+
+      Navigator.of(context, rootNavigator: true).pop(); // Closes the dialog
+    // });
+
+
   }
 }
