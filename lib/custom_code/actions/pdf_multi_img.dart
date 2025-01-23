@@ -43,22 +43,22 @@ Future<FFUploadedFile> pdfMultiImgWithIsolate(PdfMultiImgParams params) async {
   return result;
 }
 
-
-Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling landscape images
-) async {
-
+Future<void> pdfMultiImg(SendPort sendPort
+    // Nullable parameter for handling landscape images
+    ) async {
   final port = ReceivePort();
   sendPort.send(port.sendPort);
 
   await for (final message in port) {
-
     final params = PdfMultiImgParams.fromMap(message[0]);
     final replyTo = message[1] as SendPort;
 
     final pdf = pw.Document();
 
     // If first page is selected and notes are not null, add a notes page first
-    if (params.isFirstPageSelected && params.notes != null && params.notes!.isNotEmpty) {
+    if (params.isFirstPageSelected &&
+        params.notes != null &&
+        params.notes!.isNotEmpty) {
       pdf.addPage(pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(32),
@@ -67,8 +67,8 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text("Notes",
-                  style:
-                  pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  style: pw.TextStyle(
+                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
               pw.Text(
                 params.notes!,
@@ -82,7 +82,6 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
 
     // Iterate through the list of uploaded files and add each as an image
     for (var fileup in params.fileupList) {
-
       final serializableFile = SerializableFile.fromMap(fileup);
 
       Uint8List? fileupBytes = serializableFile.bytes;
@@ -125,16 +124,16 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
 
           // Convert to JPEG to avoid potential issues with PNG metadata and lower the quality (optimized)
           fileupBytes = img.encodeJpg(processedImage,
-              quality:90); // Reduce quality to 100%
+              quality: 90); // Reduce quality to 100%
 
           // Create a MemoryImage from the resized image bytes
           var image = pw.MemoryImage(fileupBytes);
 
-          if(params.selectedIndex == 0) {
-
+          if (params.selectedIndex == 0) {
             // Add the image as a page in the PDF
             pdf.addPage(pw.Page(
-              pageFormat: isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4,
+              pageFormat:
+                  isLandscape ? PdfPageFormat.a4.landscape : PdfPageFormat.a4,
               margin: pw.EdgeInsets.all(16),
               build: (pw.Context context) {
                 if (isLandscape) {
@@ -149,7 +148,7 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
                     decoration: pw.BoxDecoration(
                       image: pw.DecorationImage(
                         image: image,
-                        fit: pw.BoxFit.fitWidth,
+                        fit: pw.BoxFit.contain,
                         alignment: pw.Alignment.center,
                       ),
                     ),
@@ -157,12 +156,13 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
                     // pw.Spacer(),
                     // ],
                   );
-                }},
+                }
+              },
             ));
           } else if (params.selectedIndex == 1) {
             // Add the image as a page in the PDF
             pdf.addPage(pw.Page(
-              pageFormat:  PdfPageFormat.a4,
+              pageFormat: PdfPageFormat.a4,
               margin: pw.EdgeInsets.all(16),
               build: (pw.Context context) {
                 if (isLandscape) {
@@ -177,7 +177,7 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
                     decoration: pw.BoxDecoration(
                       image: pw.DecorationImage(
                         image: image,
-                        fit: pw.BoxFit.fitWidth,
+                        fit: pw.BoxFit.contain,
                         alignment: pw.Alignment.topCenter,
                       ),
                     ),
@@ -185,7 +185,8 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
                     // pw.Spacer(),
                     // ],
                   );
-                }},
+                }
+              },
             ));
           } else {
             // Add the image as a page in the PDF
@@ -196,19 +197,23 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
                 if (isLandscape) {
                   // Contain the image and align it to the top of the page
                   return pw.Container(
-                    alignment: pw.Alignment.topCenter, // Ensure top-center alignment
+                    alignment: pw.Alignment.topCenter,
+                    // Ensure top-center alignment
                     child: pw.Image(
                       image,
-                      fit: pw.BoxFit.scaleDown, // Scale down to fit the image properly
+                      fit: pw.BoxFit
+                          .scaleDown, // Scale down to fit the image properly
                     ),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins
                   return pw.Container(
-                    alignment: pw.Alignment.topCenter, // Ensure top-center alignment
+                    alignment: pw.Alignment.topCenter,
+                    // Ensure top-center alignment
                     child: pw.Image(
                       image,
-                      fit: pw.BoxFit.fitWidth, // Cover the height properly in portrait mode
+                      fit: pw.BoxFit
+                          .contain, // Cover the height properly in portrait mode
                     ),
                   );
                 }
@@ -219,14 +224,15 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
           // image = null;
           await Future.delayed(Duration(milliseconds: 50));
 
-
           // Add a small delay to allow garbage collection and avoid memory overload (optimized)
         }
       }
     }
 
     // If first page is not selected and notes are not null, add a notes page at the end
-    if (!params.isFirstPageSelected && params.notes != null && params.notes!.isNotEmpty) {
+    if (!params.isFirstPageSelected &&
+        params.notes != null &&
+        params.notes!.isNotEmpty) {
       pdf.addPage(pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.all(32),
@@ -235,8 +241,8 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text("Notes",
-                  style:
-                  pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  style: pw.TextStyle(
+                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
               pw.Text(
                 params.notes ?? '',
@@ -260,7 +266,6 @@ Future<void> pdfMultiImg(SendPort sendPort// Nullable parameter for handling lan
       name: '${params.filename}.pdf',
     ));
   }
-
 }
 
 //todo using isolate
@@ -273,7 +278,6 @@ class PdfMultiImgParams {
   final bool isFirstPageSelected;
   final String? fit;
   final int? selectedIndex;
-
 
   PdfMultiImgParams({
     required this.fileupList,
@@ -306,5 +310,3 @@ class PdfMultiImgParams {
     );
   }
 }
-
-

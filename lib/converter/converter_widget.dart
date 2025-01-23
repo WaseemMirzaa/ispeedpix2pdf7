@@ -35,6 +35,7 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
   @override
   void initState() {
+
     super.initState();
 
     _model = createModel(context, () => ConverterModel());
@@ -60,11 +61,6 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
-
-  // PLEASE: DROP DOWN NAMEs AND ORDER CHANGE
-  // PDF-Non.Oriented > REPLACE WITH = DEFAULT - Mixed Orientation
-  // PDF-Fixed.Portrait > REPLACE WITH = Pages Fixed - Portrait
-  // PDF-DEFAULT.Portrait Consistency > REPLACE WITH = Pages Portrait - Landscape Photos = Top Aligned for easy viewing
 
   String _selectedOrientation = 'DEFAULT - Mixed Orientation'; // Default selection
 
@@ -109,6 +105,49 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+
+                      GestureDetector(
+                        child:         Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 3.0, 0.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.refresh, // Flutter's default refresh icon
+                                    color: const Color(0xFF4A90E2), // Match icon color with text
+                                    size: 24.0, // Adjust size to fit the text
+                                  ),
+                                  const SizedBox(width: 5.0), // Add spacing between icon and text
+                                  Text(
+                                    'Reset',
+                                    textAlign: TextAlign.center,
+                                    style: FlutterFlowTheme.of(context).displayMedium.override(
+                                      fontFamily: 'Poppins',
+                                      color: const Color(0xFF4A90E2),
+                                      fontSize: 18.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ).animateOnPageLoad(
+                                      animationsMap['textOnPageLoadAnimation']!),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),onTap: (){
+
+                        _model.filenameTextController.text = '';
+
+                        _model.clearAllValues();
+
+                        selectedMedia = null;
+
+                        safeSetState(() {});
+
+                      },),
+
                       Container(
                         width: 120.0,
                         height: 120.0,
@@ -183,9 +222,13 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
                                   LoadingDialog.show(context);
 
                                   try {
+
                                     createPDF();
+
                                   } catch (e) {
+
                                     print('🔴🔴🔴Error While Creating PDF: $e');
+
                                   }
                                 });
                               },
@@ -748,7 +791,9 @@ class _ConverterWidgetState extends State<ConverterWidget> with TickerProviderSt
   }
 
   Future<void> createPDF() async {
+
     if (selectedMedia == null) {
+
       LoadingDialog.hide(context);
 
       return;

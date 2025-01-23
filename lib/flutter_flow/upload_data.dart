@@ -57,6 +57,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   bool includeDimensions = false,
   bool includeBlurHash = false,
 }) async {
+
   final createUploadMediaListTile =
       (String label, MediaSource mediaSource) => ListTile(
             title: Text(
@@ -76,6 +77,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
               mediaSource,
             ),
           );
+
   final mediaSource = await showModalBottomSheet<MediaSource>(
       context: context,
       backgroundColor: backgroundColor,
@@ -132,9 +134,11 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
           ],
         );
       });
+
   if (mediaSource == null) {
     return null;
   }
+
   return selectMedia(
     storageFolderPath: storageFolderPath,
     maxWidth: maxWidth,
@@ -161,9 +165,7 @@ Future<List<SelectedFile>?> selectMedia({
 }) async {
     try {
 
-
       final picker = ImagePicker();
-
 
       if (multiImage) {
 
@@ -171,7 +173,7 @@ Future<List<SelectedFile>?> selectMedia({
             maxWidth: maxWidth,
             maxHeight: maxHeight,
             requestFullMetadata: true,
-          limit: 60
+            limit: 60
           // imageQuality: imageQuality,
         );
 
@@ -221,7 +223,9 @@ Future<List<SelectedFile>?> selectMedia({
           : ImageSource.gallery;
 
       final pickedMediaFuture = isVideo
+
           ? picker.pickVideo(source: source)
+
           : picker.pickImage(
 
         maxWidth: maxWidth,
@@ -237,6 +241,7 @@ Future<List<SelectedFile>?> selectMedia({
       final pickedMedia = await pickedMediaFuture;
 
       final mediaBytes = await pickedMedia?.readAsBytes();
+
       if (mediaBytes == null) {
 
         return null;
@@ -252,6 +257,7 @@ Future<List<SelectedFile>?> selectMedia({
           : null;
 
       return [
+
         SelectedFile(
 
           storagePath: path,
