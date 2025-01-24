@@ -140,7 +140,7 @@ Future<void> pdfMultiImg(SendPort sendPort
                   // Contain the image and align it to the top of the page
                   return pw.Align(
                     alignment: pw.Alignment.center,
-                    child: pw.Image(image, fit: pw.BoxFit.fitWidth),
+                    child: pw.Image(image, fit: pw.BoxFit.contain),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins
@@ -169,7 +169,7 @@ Future<void> pdfMultiImg(SendPort sendPort
                   // Contain the image and align it to the top of the page
                   return pw.Align(
                     alignment: pw.Alignment.center,
-                    child: pw.Image(image, fit: pw.BoxFit.fitWidth),
+                    child: pw.Image(image, fit: pw.BoxFit.contain),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins

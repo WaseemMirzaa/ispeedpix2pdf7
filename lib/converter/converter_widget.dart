@@ -401,11 +401,11 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               ],
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(top: 2, left: 4g),
+                              padding: const EdgeInsets.only(top: 2, left: 4),
                               child: Row(
                                 children: [
                                   Text(
-                                    '*You can select up to 60 Images per PDF.',
+                                    '*You can select up to 60 Images.',
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
