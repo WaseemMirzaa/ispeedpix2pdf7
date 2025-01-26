@@ -40,11 +40,14 @@ Future<List<dynamic>> downloadFFUploadedFile(
       isBackwardSlash: Platform.isWindows);
   await download(stream, destinationPath);
 
+
   if (Platform.isIOS) {
     Share.shareFiles(
       [destinationPath],
     );
   }
+
+  print('🔴🔴🔴🔴🔴 ${destinationPath}');
 
   return [
     {'fileName': fileName},
@@ -58,13 +61,17 @@ Future<String> getDestinationPathName(String fileName, String pathName,
       pathName + "${isBackwardSlash ? "\\" : "/"}${fileName}";
   int i = 1;
   bool _isFileExists = await File(destinationPath).exists();
+  if(_isFileExists){
+    await File(destinationPath).delete();
+    _isFileExists = false;
+  }
   while (_isFileExists) {
     _isFileExists =
         await File(pathName + "${isBackwardSlash ? "\\" : "/"}($i)${fileName}")
             .exists();
     if (_isFileExists == false) {
       destinationPath =
-          pathName + "${isBackwardSlash ? "\\" : "/"}($i)${fileName}";
+          pathName + "${isBackwardSlash ? "\\" : "/"}${fileName}";
       break;
     }
     i++;

@@ -47,41 +47,18 @@ Future<void> pdfMultiImg(SendPort sendPort
     // Nullable parameter for handling landscape images
     ) async {
   final port = ReceivePort();
+
   sendPort.send(port.sendPort);
 
   await for (final message in port) {
     final params = PdfMultiImgParams.fromMap(message[0]);
+
     final replyTo = message[1] as SendPort;
 
     final pdf = pw.Document();
 
-    // If first page is selected and notes are not null, add a notes page first
-    if (params.isFirstPageSelected &&
-        params.notes != null &&
-        params.notes!.isNotEmpty) {
-      pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.all(32),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text("Notes",
-                  style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              pw.Text(
-                params.notes!,
-                style: pw.TextStyle(fontSize: 16, color: PdfColors.black),
-              ),
-            ],
-          );
-        },
-      ));
-    }
-
-    // Iterate through the list of uploaded files and add each as an image
     for (var fileup in params.fileupList) {
+
       final serializableFile = SerializableFile.fromMap(fileup);
 
       Uint8List? fileupBytes = serializableFile.bytes;
@@ -96,9 +73,6 @@ Future<void> pdfMultiImg(SendPort sendPort
           img.Image processedImage = decodedImage;
 
           if (isLandscape && params.selectedIndex == 1) {
-            // Handle landscape images based on the 'fit' parameter
-            // if (fit == 'rotate' || selectedIndex == 1) {
-            // Rotate the image 90 degrees
             processedImage = img.copyRotate(
               decodedImage,
               angle: 90,
@@ -107,22 +81,6 @@ Future<void> pdfMultiImg(SendPort sendPort
             // }
           }
 
-          const int pdfPageWidth = 595; // A4 width in points at 72 dpi
-          const int pdfPageHeight = 842; // A4 height in points at 72 dpi
-          // Resize the image to reduce memory usage (optimized)
-          // processedImage = img.copyResize(processedImage,
-          //     width: pdfPageWidth, height: pdfPageHeight); // Resize to 1024px width
-
-          // print('-----🔴🔴🔴 Decoded Width ${decodedImage.width}  height: ${decodedImage.height}');
-          // double scaleFactor = 0.95; // Reduce size by 50%
-          // int targetWidth = (decodedImage.width * scaleFactor).round();
-          // int targetHeight = (decodedImage.height * scaleFactor).round();
-          //
-          // print('-----🔴🔴🔴 Targeted Width ${targetWidth}  height: ${targetHeight}');
-          //
-          // processedImage = img.copyResize(processedImage, width: targetWidth, height: targetHeight);
-
-          // Convert to JPEG to avoid potential issues with PNG metadata and lower the quality (optimized)
           fileupBytes = img.encodeJpg(processedImage,
               quality: 90); // Reduce quality to 100%
 
@@ -140,7 +98,7 @@ Future<void> pdfMultiImg(SendPort sendPort
                   // Contain the image and align it to the top of the page
                   return pw.Align(
                     alignment: pw.Alignment.center,
-                    child: pw.Image(image, fit: pw.BoxFit.contain),
+                    child: pw.Image(image),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins
@@ -152,9 +110,6 @@ Future<void> pdfMultiImg(SendPort sendPort
                         alignment: pw.Alignment.center,
                       ),
                     ),
-                    // Additional content (add other widgets here as needed)
-                    // pw.Spacer(),
-                    // ],
                   );
                 }
               },
@@ -169,7 +124,7 @@ Future<void> pdfMultiImg(SendPort sendPort
                   // Contain the image and align it to the top of the page
                   return pw.Align(
                     alignment: pw.Alignment.center,
-                    child: pw.Image(image, fit: pw.BoxFit.contain),
+                    child: pw.Image(image),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins
@@ -181,9 +136,6 @@ Future<void> pdfMultiImg(SendPort sendPort
                         alignment: pw.Alignment.topCenter,
                       ),
                     ),
-                    // Additional content (add other widgets here as needed)
-                    // pw.Spacer(),
-                    // ],
                   );
                 }
               },
@@ -199,11 +151,9 @@ Future<void> pdfMultiImg(SendPort sendPort
                   return pw.Container(
                     alignment: pw.Alignment.topCenter,
                     // Ensure top-center alignment
-                    child: pw.Image(
-                      image,
-                      fit: pw.BoxFit
-                          .scaleDown, // Scale down to fit the image properly
-                    ),
+                    child:
+                        pw.Image(image // Scale down to fit the image properly
+                            ),
                   );
                 } else {
                   // Use cover fit for both rotated or portrait images with margins
@@ -229,37 +179,9 @@ Future<void> pdfMultiImg(SendPort sendPort
       }
     }
 
-    // If first page is not selected and notes are not null, add a notes page at the end
-    if (!params.isFirstPageSelected &&
-        params.notes != null &&
-        params.notes!.isNotEmpty) {
-      pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.all(32),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text("Notes",
-                  style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              pw.Text(
-                params.notes ?? '',
-                style: pw.TextStyle(fontSize: 16, color: PdfColors.black),
-              ),
-            ],
-          );
-        },
-      ));
-    }
-
     final Uint8List pdfBytes = await pdf.save();
 
-    final uploadedFile = FFUploadedFile(
-      bytes: pdfBytes,
-      name: '${params.filename}.pdf',
-    );
+    print('🔴🔴🔴🔴🔴 ${params.filename}');
 
     replyTo.send(FFUploadedFile(
       bytes: pdfBytes,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
 
 import '../custom_code/actions/pdf_multi_img.dart';
@@ -43,11 +44,18 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
     _model = createModel(context, () => ConverterModel());
 
-    _model.filenameTextController ??= TextEditingController();
+    _model.filenameTextController = TextEditingController();
 
     _model.filenameFocusNode = FocusNode();
 
     _model.filenameFocusNode!.addListener(() {
+      if(_isFocused && selectedMedia != null) {
+
+        LoadingDialog.show(context);
+
+        createPDF();
+
+      }
       setState(() {
         _isFocused = _model.filenameFocusNode!.hasFocus;
       });
@@ -153,15 +161,33 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           ],
                         ),
                         onTap: () {
-                          _selectedOrientation = 'DEFAULT - Mixed Orientation';
 
-                          _model.filenameTextController.text = '';
+                          _model = createModel(context, () => ConverterModel());
 
                           _model.clearAllValues();
 
+                          _model.filenameTextController = TextEditingController();
+
+                          // _model.filenameFocusNode = FocusNode();
+
+                          // _model.filenameFocusNode!.addListener(() {
+                          //   setState(() {
+                          //     _isFocused = _model.filenameFocusNode!.hasFocus;
+                          //   });
+                          // });
+                          _selectedOrientation = 'DEFAULT - Mixed Orientation';
+
+                          _model.filenameTextController  = TextEditingController();
+                          // _model.filenameTextControllerValidator.text = '';
+
+
                           selectedMedia = null;
 
+                          _model.filenameDefault = '';
                           safeSetState(() {});
+                          setState(() {
+
+                          });
                         },
                       ),
                       Container(
@@ -354,23 +380,33 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                     alignment:
                                                         const AlignmentDirectional(
                                                             0.0, 0.0),
-                                                    child: Text(
-                                                      'Choose Files',
-                                                      style: FlutterFlowTheme.of(
+                                                    child:
+
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: AutoSizeText(
+                                                        'Choose Files',
+                                                        style:  FlutterFlowTheme.of(
+                                                            context)
+                                                            .bodyMedium
+
+                                                            .override(
+
+                                                          fontFamily: 'Inter',
+                                                          color:
+                                                          FlutterFlowTheme.of(
                                                               context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            fontFamily: 'Inter',
-                                                            color:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondary,
-                                                            fontSize: 14.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                    ),
+                                                              .secondary,
+                                                          fontSize: 14.0,
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                          FontWeight.w500,
+
+                                                        ),
+                                                        minFontSize: 8,
+                                                        maxLines: 1,
+                                                      ),
+                                                    )
                                                   ),
                                                 ),
                                               ),
@@ -405,7 +441,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               child: Row(
                                 children: [
                                   Text(
-                                    '*You can select up to 60 Images.',
+                                    '*You can select up to 60 Images',
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -490,6 +526,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 onPressed: () async {
                                   _model.filenameDefaultDown =
                                       await actions.generateFormattedDateTime();
+
                                   _model.download =
                                       await actions.downloadFFUploadedFile(
                                     _model.pdfFile!,
@@ -538,14 +575,14 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   8.0, 0.0, 8.0, 0.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  if (_model.filenameTextController.text !=
-                                      '') {
+                                  if (_model.filenameTextController.text.isNotEmpty
+                                  ) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => PdfViewerScreen(
                                           pdfBytes: _model.pdfFile!.bytes,
-                                          title: _model.filenameDefault!,
+                                          title: _model.filenameTextController.text,
                                         ),
                                       ),
                                     );
@@ -632,7 +669,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               onPressed: () async {
                                 context.pushNamed('Mainmenu');
                               },
-                              text: 'Main Menu',
+                              text: 'About',
                               // icon: const Icon(
                               //   Icons.men,
                               //   size: 20.0,
@@ -703,11 +740,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Align(
-                                    alignment:
-                                        const AlignmentDirectional(0.0, 0.0),
+                                  Container(
                                     child: Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: RichText(
@@ -734,7 +770,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                   ' We do not collect, store, or process any personal data from users. All data is handled locally on your device. This means:',
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10.0,
+                                                fontSize: 12.0,
                                               ),
                                             ),
                                             const TextSpan(
@@ -774,11 +810,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   Future<void> createPDF() async {
+
     if (selectedMedia == null) {
 
-      // Timer(Duration(seconds: 1), () {
-        LoadingDialog.hide(context);
-      // });
+      LoadingDialog.hide(context);
 
       return;
     }
@@ -832,6 +867,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
         return SerializableFile(file.bytes!, file.name!).toMap();
       }).toList();
 
+      print('🔴🔴🔴🔴🔴 ${_model.filenameTextController.text}');
       final params = PdfMultiImgParams(
         fileupList: fileupList,
         filename: valueOrDefault<String>(
@@ -859,6 +895,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
       final fileupList = _model.uploadedLocalFiles.map((file) {
         return SerializableFile(file.bytes!, file.name!).toMap();
       }).toList();
+
+      print('🔴🔴🔴🔴🔴 ${_model.filenameTextController.text}');
 
       final params = PdfMultiImgParams(
         fileupList: fileupList,
