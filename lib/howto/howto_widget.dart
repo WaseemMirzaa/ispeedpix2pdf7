@@ -36,8 +36,8 @@ class _HowtoWidgetState extends State<HowtoWidget>
             curve: Curves.easeInOut,
             delay: 0.0.ms,
             duration: 600.0.ms,
-            begin: Offset(-100.0, 0.0),
-            end: Offset(0.0, 0.0),
+            begin: const Offset(-74.0, 0.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -112,8 +112,7 @@ class _HowtoWidgetState extends State<HowtoWidget>
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
                                       ),
-                                ).animateOnPageLoad(
-                                    animationsMap['textOnPageLoadAnimation']!),
+                                ),
                                 Align(
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Padding(
@@ -129,7 +128,8 @@ class _HowtoWidgetState extends State<HowtoWidget>
                                           ),
                                     ),
                                   ),
-                                ),
+                                ).animateOnPageLoad(
+                                    animationsMap['textOnPageLoadAnimation']!),
                               ],
                             ),
                           ),
@@ -142,7 +142,8 @@ class _HowtoWidgetState extends State<HowtoWidget>
                   padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: FFButtonWidget(
                     onPressed: () async {
-                      context.pushNamed('Mainmenu');
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     text: 'Main Menu',
                     options: FFButtonOptions(

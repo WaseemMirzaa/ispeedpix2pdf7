@@ -58,7 +58,6 @@ Future<void> pdfMultiImg(SendPort sendPort
     final pdf = pw.Document();
 
     for (var fileup in params.fileupList) {
-
       final serializableFile = SerializableFile.fromMap(fileup);
 
       Uint8List? fileupBytes = serializableFile.bytes;
@@ -75,14 +74,14 @@ Future<void> pdfMultiImg(SendPort sendPort
           if (isLandscape && params.selectedIndex == 1) {
             processedImage = img.copyRotate(
               decodedImage,
-              angle: 90,
+              angle: 92,
               interpolation: img.Interpolation.nearest,
             );
             // }
           }
 
           fileupBytes = img.encodeJpg(processedImage,
-              quality: 90); // Reduce quality to 100%
+              quality: 92); // Reduce quality to 100%
 
           // Create a MemoryImage from the resized image bytes
           var image = pw.MemoryImage(fileupBytes);

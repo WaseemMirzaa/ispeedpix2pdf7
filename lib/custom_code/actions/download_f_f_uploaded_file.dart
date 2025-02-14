@@ -1,80 +1,56 @@
 // Automatic FlutterFlow imports
+
 import '/flutter_flow/flutter_flow_util.dart';
 // Imports other custom actions
 // Imports custom functions
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
-
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 import 'package:download/download.dart';
 import 'dart:io';
-import 'package:share/share.dart';
 
 Future<List<dynamic>> downloadFFUploadedFile(
     FFUploadedFile pdfFile, String name) async {
-  final fileName = "$name.pdf";
+  try {
+    late String filePath;
 
-  Directory? appDir;
-
-  // Get the byte stream of the PDF file
-  List<int> bytes = pdfFile.bytes!;
-
-  Stream<int> stream = Stream.fromIterable(bytes);
-
-  if (kIsWeb) {
-    await download(stream, fileName);
-    return [
-      {'fileName': fileName},
-      {'filePath': fileName}
-    ];
-  } else if (Platform.isAndroid) {
-    appDir = appDir = Directory('/storage/emulated/0/Download');
-  } else if (Platform.isIOS) {
-    appDir = await getApplicationDocumentsDirectory();
-  } else {
-    appDir = await getDownloadsDirectory();
-  }
-  String pathName = appDir?.path ?? "";
-  String destinationPath = await getDestinationPathName(fileName, pathName,
-      isBackwardSlash: Platform.isWindows);
-  await download(stream, destinationPath);
-
-
-  if (Platform.isIOS) {
-    Share.shareFiles(
-      [destinationPath],
-    );
-  }
-
-  print('🔴🔴🔴🔴🔴 ${destinationPath}');
-
-  return [
-    {'fileName': fileName},
-    {'filePath': destinationPath}
-  ];
-}
-
-Future<String> getDestinationPathName(String fileName, String pathName,
-    {bool isBackwardSlash = true}) async {
-  String destinationPath =
-      pathName + "${isBackwardSlash ? "\\" : "/"}${fileName}";
-  int i = 1;
-  bool _isFileExists = await File(destinationPath).exists();
-  if(_isFileExists){
-    await File(destinationPath).delete();
-    _isFileExists = false;
-  }
-  while (_isFileExists) {
-    _isFileExists =
-        await File(pathName + "${isBackwardSlash ? "\\" : "/"}($i)${fileName}")
-            .exists();
-    if (_isFileExists == false) {
-      destinationPath =
-          pathName + "${isBackwardSlash ? "\\" : "/"}${fileName}";
-      break;
+    if (Platform.isAndroid) {
+      // Save to public Downloads directory on Android
+      final directory = Directory('/storage/emulated/0/Download');
+      filePath = '${directory.path}/$name';
+    } else if (Platform.isIOS) {
+      // Save to the temporary directory on iOS
+      final directory = await getTemporaryDirectory();
+      filePath = '${directory.path}/$name';
     }
-    i++;
+
+    // Write the PDF bytes to the file
+    final file = File(filePath);
+    await file.writeAsBytes(pdfFile.bytes!);
+
+    // Log file path for debugging
+    print('🟢 PDF saved to: $filePath');
+
+    // Share the PDF file using XFile
+    final xFile = XFile(filePath);
+
+    await Share.shareXFiles([xFile], subject: '$name');
+
+    return [
+      {'fileName': name},
+      {'filePath': filePath}
+    ];
+
+    print('File saved and ready to share.');
+  } catch (e) {
+    print('Error saving or sharing PDF: $e');
+
+    // Handle errors gracefully
+    return [
+      {'fileName': ''},
+      {'filePath': ''}
+    ];
   }
-  return destinationPath;
 }

@@ -31,12 +31,12 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
         effectsBuilder: () => [
-          ScaleEffect(
+          MoveEffect(
             curve: Curves.easeInOut,
             delay: 0.0.ms,
             duration: 600.0.ms,
-            begin: const Offset(3.0, 3.0),
-            end: const Offset(1.0, 1.0),
+            begin: const Offset(-74.0, 0.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -94,8 +94,8 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 10.0, 0.0, 0.0),
                         child: Text(
                           'Privacy and Security',
                           style:
@@ -128,18 +128,21 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: FFButtonWidget(
                     onPressed: () async {
-                      context.pushNamed('Mainmenu');
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      // context.pushReplacement('Mainmenu');
                     },
                     text: 'Main Menu',
                     options: FFButtonOptions(
                       height: 40.0,
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                      iconPadding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          24.0, 0.0, 24.0, 0.0),
+                      iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 0.0),
                       color: const Color(0xFF4A90E2),
                       textStyle:
                           FlutterFlowTheme.of(context).titleSmall.override(

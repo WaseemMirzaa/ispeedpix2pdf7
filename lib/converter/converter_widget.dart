@@ -41,7 +41,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
   void initState() {
     super.initState();
 
-
     _model = createModel(context, () => ConverterModel());
 
     _model.filenameTextController = TextEditingController();
@@ -49,12 +48,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
     _model.filenameFocusNode = FocusNode();
 
     _model.filenameFocusNode!.addListener(() {
-      if(_isFocused && selectedMedia != null) {
-
+      if (_isFocused && selectedMedia != null) {
         LoadingDialog.show(context);
 
         createPDF();
-
       }
       setState(() {
         _isFocused = _model.filenameFocusNode!.hasFocus;
@@ -76,13 +73,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
       ),
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      safeSetState(() {});
 
+      // Ensure that no text field is focused when the app starts
+      FocusScope.of(context).requestFocus(FocusNode());
+    });
+  }
 
   @override
   void dispose() {
-    // Don't forget to dispose of the FocusNode
     _model.dispose();
 
     super.dispose();
@@ -106,6 +106,70 @@ class _ConverterWidgetState extends State<ConverterWidget>
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF4A90E2),
+          automaticallyImplyLeading: false,
+          actions: [
+            GestureDetector(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 10.0, 0.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.refresh,
+                          // Flutter's default refresh icon
+                          color: Colors.white,
+                          // Match icon color with text
+                          size: 24.0, // Adjust size to fit the text
+                        ),
+                        const SizedBox(width: 5.0),
+                        // Add spacing between icon and text
+                        Text(
+                          'Reset',
+                          textAlign: TextAlign.center,
+                          style: FlutterFlowTheme.of(context)
+                              .displayMedium
+                              .override(
+                                fontFamily: 'Poppins',
+                                color: Colors.white,
+                                fontSize: 18.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ).animateOnPageLoad(
+                            animationsMap['textOnPageLoadAnimation']!),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              onTap: () {
+                _model = createModel(context, () => ConverterModel());
+
+                _model.clearAllValues();
+
+                _model.filenameTextController = TextEditingController();
+
+                _selectedOrientation = 'DEFAULT - Mixed Orientation';
+
+                _model.filenameTextController = TextEditingController();
+                // _model.filenameTextControllerValidator.text = '';
+
+                selectedMedia = null;
+
+                _model.filenameDefault = '';
+                safeSetState(() {});
+                setState(() {});
+              },
+            ),
+          ],
+          centerTitle: false,
+          elevation: 2.0,
+        ),
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
@@ -123,73 +187,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      GestureDetector(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 0.0, 3.0, 0.0),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.refresh,
-                                    // Flutter's default refresh icon
-                                    color: const Color(0xFF4A90E2),
-                                    // Match icon color with text
-                                    size: 24.0, // Adjust size to fit the text
-                                  ),
-                                  const SizedBox(width: 5.0),
-                                  // Add spacing between icon and text
-                                  Text(
-                                    'Reset',
-                                    textAlign: TextAlign.center,
-                                    style: FlutterFlowTheme.of(context)
-                                        .displayMedium
-                                        .override(
-                                          fontFamily: 'Poppins',
-                                          color: const Color(0xFF4A90E2),
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                  ).animateOnPageLoad(animationsMap[
-                                      'textOnPageLoadAnimation']!),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-
-                          _model = createModel(context, () => ConverterModel());
-
-                          _model.clearAllValues();
-
-                          _model.filenameTextController = TextEditingController();
-
-                          // _model.filenameFocusNode = FocusNode();
-
-                          // _model.filenameFocusNode!.addListener(() {
-                          //   setState(() {
-                          //     _isFocused = _model.filenameFocusNode!.hasFocus;
-                          //   });
-                          // });
-                          _selectedOrientation = 'DEFAULT - Mixed Orientation';
-
-                          _model.filenameTextController  = TextEditingController();
-                          // _model.filenameTextControllerValidator.text = '';
-
-
-                          selectedMedia = null;
-
-                          _model.filenameDefault = '';
-                          safeSetState(() {});
-                          setState(() {
-
-                          });
-                        },
-                      ),
                       Container(
                         width: 120.0,
                         height: 120.0,
@@ -254,7 +251,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   LoadingDialog.show(context);
 
                                   createPDF();
-
                                 });
                               },
                               items: _orientationOptions
@@ -292,8 +288,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               children: [
                                 Flexible(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        4.0, 0.0, 4.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            4.0, 0.0, 4.0, 0.0),
                                     child: InkWell(
                                       splashColor: Colors.transparent,
                                       focusColor: Colors.transparent,
@@ -301,22 +298,24 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         Timer(Duration(seconds: 1), () {
-
                                           // if(!LoadingDialog.isAlreadyCancelled) {
-                                            LoadingDialog.show(context);
+                                          LoadingDialog.show(context);
                                           // }
                                         });
 
-                                        LoadingDialog.isImagePickerCalled = true;
-                                        LoadingDialog.isAlreadyCancelled  = false;
+                                        LoadingDialog.isImagePickerCalled =
+                                            true;
+                                        LoadingDialog.isAlreadyCancelled =
+                                            false;
 
                                         try {
                                           var media = await selectMedia(
                                             maxWidth: 880.00,
                                             maxHeight: 660.00,
-                                            imageQuality: 80,
+                                            imageQuality: 81,
                                             includeDimensions: true,
-                                            mediaSource: MediaSource.photoGallery,
+                                            mediaSource:
+                                                MediaSource.photoGallery,
                                             multiImage: true,
                                           );
 
@@ -324,14 +323,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             selectedMedia = media;
                                           }
 
-
                                           Timer(Duration(seconds: 1), () {
-
                                             createPDF();
-
                                           });
-
-
                                         } catch (e) {
                                           print(
                                               '🔴🔴🔴Error While Creating PDF: $e');
@@ -339,7 +333,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       },
                                       child: Container(
                                         width:
-                                            MediaQuery.sizeOf(context).width * 1.0,
+                                            MediaQuery.sizeOf(context).width *
+                                                1.0,
                                         height: 60.0,
                                         decoration: BoxDecoration(
                                           color: FlutterFlowTheme.of(context)
@@ -358,73 +353,76 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                           ),
                                         ),
                                         child: Align(
-                                          alignment:
-                                              const AlignmentDirectional(0.0, 0.0),
+                                          alignment: const AlignmentDirectional(
+                                              0.0, 0.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsetsDirectional
-                                                    .fromSTEB(4.0, 0.0, 0.0, 0.0),
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                        4.0, 0.0, 0.0, 0.0),
                                                 child: Container(
                                                   width: 100.0,
                                                   height: 40.0,
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        FlutterFlowTheme.of(context)
-                                                            .secondaryText,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
                                                     borderRadius:
-                                                        BorderRadius.circular(30.0),
+                                                        BorderRadius.circular(
+                                                            30.0),
                                                   ),
                                                   child: Align(
-                                                    alignment:
-                                                        const AlignmentDirectional(
-                                                            0.0, 0.0),
-                                                    child:
-
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: AutoSizeText(
-                                                        'Choose Files',
-                                                        style:  FlutterFlowTheme.of(
-                                                            context)
-                                                            .bodyMedium
-
-                                                            .override(
-
-                                                          fontFamily: 'Inter',
-                                                          color:
-                                                          FlutterFlowTheme.of(
-                                                              context)
-                                                              .secondary,
-                                                          fontSize: 14.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                          FontWeight.w500,
-
+                                                      alignment:
+                                                          const AlignmentDirectional(
+                                                              0.0, 0.0),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2.0),
+                                                        child: AutoSizeText(
+                                                          'Choose Files',
+                                                          style: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .bodyMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Inter',
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondary,
+                                                                fontSize: 14.0,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                          minFontSize: 8,
+                                                          maxLines: 1,
                                                         ),
-                                                        minFontSize: 8,
-                                                        maxLines: 1,
-                                                      ),
-                                                    )
-                                                  ),
+                                                      )),
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsetsDirectional
-                                                    .fromSTEB(8.0, 0.0, 0.0, 0.0),
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                        8.0, 0.0, 0.0, 0.0),
                                                 child: Text(
                                                   valueOrDefault<String>(
                                                     _model.fname,
                                                     'no files selected',
                                                   ),
-                                                  style:
-                                                      FlutterFlowTheme.of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            fontFamily: 'Inter',
-                                                            letterSpacing: 0.0,
-                                                          ),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily: 'Inter',
+                                                        letterSpacing: 0.0,
+                                                      ),
                                                 ),
                                               ),
                                             ],
@@ -445,12 +443,12 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
-                                      fontFamily: 'Inter',
-                                      color: Colors.black,
-                                      fontSize: 12.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                          fontFamily: 'Inter',
+                                          color: Colors.black,
+                                          fontSize: 12.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -459,23 +457,30 @@ class _ConverterWidgetState extends State<ConverterWidget>
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(8.0, 16.0, 8.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            8.0, 16.0, 8.0, 0.0),
                         child: TextFormField(
                           controller: _model.filenameTextController,
-                          focusNode: _model.filenameFocusNode, // Use the FocusNode here
+                          focusNode: _model
+                              .filenameFocusNode, // Use the FocusNode here
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: _isFocused ? 'Filename' : 'Filename (Optional)',
-                            labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                              fontFamily: 'Inter',
-                              letterSpacing: 0.0,
-                            ),
+                            labelText:
+                                _isFocused ? 'Filename' : 'Filename (Optional)',
+                            labelStyle: FlutterFlowTheme.of(context)
+                                .labelMedium
+                                .override(
+                                  fontFamily: 'Inter',
+                                  letterSpacing: 0.0,
+                                ),
                             hintText: 'Enter custom file name (optional)',
-                            hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                              fontFamily: 'Inter',
-                              letterSpacing: 0.0,
-                            ),
+                            hintStyle: FlutterFlowTheme.of(context)
+                                .labelMedium
+                                .override(
+                                  fontFamily: 'Inter',
+                                  letterSpacing: 0.0,
+                                ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: FlutterFlowTheme.of(context).alternate,
@@ -506,14 +511,15 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             ),
                             filled: true,
                           ),
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'Inter',
-                            letterSpacing: 0.0,
-                          ),
-                          validator: _model.filenameTextControllerValidator.asValidator(context),
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                          validator: _model.filenameTextControllerValidator
+                              .asValidator(context),
                         ),
-                      )
-,
+                      ),
                       Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -575,14 +581,15 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   8.0, 0.0, 8.0, 0.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  if (_model.filenameTextController.text.isNotEmpty
-                                  ) {
+                                  if (_model
+                                      .filenameTextController.text.isNotEmpty) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => PdfViewerScreen(
                                           pdfBytes: _model.pdfFile!.bytes,
-                                          title: _model.filenameTextController.text,
+                                          title: _model
+                                              .filenameTextController.text,
                                         ),
                                       ),
                                     );
@@ -810,9 +817,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   Future<void> createPDF() async {
-
     if (selectedMedia == null) {
-
       LoadingDialog.hide(context);
 
       return;
@@ -933,8 +938,7 @@ class LoadingDialog {
   static bool isAlreadyCancelled = false;
 
   static void show(BuildContext context, {String message = "Creating PDF..."}) {
-    if(isAlreadyCancelled)
-    {
+    if (isAlreadyCancelled) {
       isAlreadyCancelled = false;
       return;
     }
@@ -967,14 +971,11 @@ class LoadingDialog {
   }
 
   static void hide(BuildContext context, {bool isImagePickerCalled = false}) {
-
     // isShowing = false?
 
     // Timer(Duration(seconds: 1), () {
 
-      Navigator.of(context, rootNavigator: true).pop(); // Closes the dialog
+    Navigator.of(context, rootNavigator: true).pop(); // Closes the dialog
     // });
-
-
   }
 }

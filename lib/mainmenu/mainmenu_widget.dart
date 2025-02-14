@@ -107,6 +107,27 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      appBar: AppBar(
+        backgroundColor: Color(0xFF4A90E2),
+        automaticallyImplyLeading: false,
+        leading: InkWell(
+          splashColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () async {
+            context.safePop();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_rounded,
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            size: 30.0,
+          ),
+        ),
+        actions: [],
+        centerTitle: false,
+        elevation: 2.0,
+      ),
       body: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 0.0),
         child: SingleChildScrollView(
@@ -117,16 +138,9 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Container(
-                      width: MediaQuery.sizeOf(context).width * 1.0,
-                      height: 82.0,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF4A90E2),
-                      ),
-                    ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 25.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 25.0, 0.0, 0.0),
                       child: Text(
                         'iSpeedPix2PDF',
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -139,8 +153,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                           animationsMap['textOnPageLoadAnimation']!),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 30.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 30.0, 0.0, 0.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,13 +231,14 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                   onTap: () async {
                                     context.pushNamed(
                                       'Howto',
-                                      extra: <String, dynamic>{
-                                        kTransitionInfoKey: const TransitionInfo(
-                                          hasTransition: true,
-                                          transitionType:
-                                              PageTransitionType.topToBottom,
-                                        ),
-                                      },
+                                      // extra: <String, dynamic>{
+                                      //   kTransitionInfoKey:
+                                      //       const TransitionInfo(
+                                      //     hasTransition: true,
+                                      //     transitionType:
+                                      //         PageTransitionType.topToBottom,
+                                      //   ),
+                                      // },
                                     );
                                   },
                                   child: Row(
@@ -231,9 +246,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
                                             'How to Use Pix to Pdf',
                                             style: FlutterFlowTheme.of(context)
@@ -246,8 +260,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -299,9 +313,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
                                             'Simplicity and Efficiency',
                                             style: FlutterFlowTheme.of(context)
@@ -314,8 +327,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -367,9 +380,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
                                             'Privacy and Security',
                                             style: FlutterFlowTheme.of(context)
@@ -382,8 +394,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -435,9 +447,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: AutoSizeText(
                                             'About Tevin Eigh Designs',
                                             style: FlutterFlowTheme.of(context)
@@ -466,8 +477,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                       ),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 25.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 25.0, 0.0, 0.0),
                       child: FFButtonWidget(
                         onPressed: () async {
                           context.pushNamed('converter');
