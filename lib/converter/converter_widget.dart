@@ -107,7 +107,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFF4A90E2),
+          backgroundColor: Color(0xFF173F5A),
           automaticallyImplyLeading: false,
           actions: [
             GestureDetector(
@@ -119,7 +119,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                         0.0, 0.0, 10.0, 0.0),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.refresh,
                           // Flutter's default refresh icon
                           color: Colors.white,
@@ -367,9 +367,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                   width: 100.0,
                                                   height: 40.0,
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryText,
+                                                    color: Color(0xFF173F5A),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             30.0),
@@ -390,9 +388,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                               .override(
                                                                 fontFamily:
                                                                     'Inter',
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondary,
+                                                                color: Colors
+                                                                    .white,
                                                                 fontSize: 14.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -490,7 +487,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).primary,
+                                color: Color(0xFF173F5A),
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
@@ -556,7 +553,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   iconPadding:
                                       const EdgeInsetsDirectional.fromSTEB(
                                           0.0, 0.0, 0.0, 0.0),
-                                  color: const Color(0xFF4A90E2),
+                                  color: Color(0xFF173F5A),
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
@@ -567,7 +564,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         letterSpacing: 0.0,
                                       ),
                                   borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
+                                    color: Color(0xFF173F5A),
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
@@ -650,7 +647,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   iconPadding:
                                       const EdgeInsetsDirectional.fromSTEB(
                                           0.0, 0.0, 0.0, 0.0),
-                                  color: const Color(0xFF4A90E2),
+                                  color: Color(0xFF173F5A),
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleLarge
                                       .override(
@@ -662,7 +659,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       ),
                                   elevation: 0.0,
                                   borderSide: BorderSide(
-                                    color: FlutterFlowTheme.of(context).primary,
+                                    color: Color(0xFF173F5A),
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
@@ -689,7 +686,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 iconPadding:
                                     const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
-                                color: const Color(0xFF4A90E2),
+                                color: Color(0xFF173F5A),
                                 textStyle: FlutterFlowTheme.of(context)
                                     .titleLarge
                                     .override(
@@ -700,7 +697,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     ),
                                 elevation: 0.0,
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: Color(0xFF173F5A),
                                   width: 2.0,
                                 ),
                                 borderRadius: BorderRadius.circular(8.0),
@@ -743,7 +740,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             child: Container(
                               width: double.infinity,
                               decoration: const BoxDecoration(
-                                color: Color(0xFF094300),
+                                color: const Color(0xFF8ca9cf),
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,

@@ -63,7 +63,7 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF4A90E2),
+          backgroundColor: const Color(0xFF173F5A),
           automaticallyImplyLeading: false,
           leading: InkWell(
             splashColor: Colors.transparent,
@@ -197,7 +197,7 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                         24.0, 0.0, 24.0, 0.0),
                     iconPadding: const EdgeInsetsDirectional.fromSTEB(
                         0.0, 0.0, 0.0, 0.0),
-                    color: const Color(0xFF4A90E2),
+                    color: const Color(0xFF173F5A),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily: 'Inter',
                           color: Colors.white,

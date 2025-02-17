@@ -74,7 +74,7 @@ Future<void> pdfMultiImg(SendPort sendPort
           if (isLandscape && params.selectedIndex == 1) {
             processedImage = img.copyRotate(
               decodedImage,
-              angle: 92,
+              angle: 90,
               interpolation: img.Interpolation.nearest,
             );
             // }

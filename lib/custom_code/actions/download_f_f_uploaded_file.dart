@@ -14,6 +14,7 @@ import 'dart:io';
 Future<List<dynamic>> downloadFFUploadedFile(
     FFUploadedFile pdfFile, String name) async {
   try {
+    name = '$name.pdf';
     late String filePath;
 
     if (Platform.isAndroid) {
