@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 
 import '../custom_code/actions/pdf_multi_img.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -527,6 +530,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   8.0, 12.0, 8.0, 0.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
+                                  var isPermissionEnabled =
+                                      await _requestStoragePermission(context);
+
+                                  if (!isPermissionEnabled) {
+                                    return;
+                                  }
+
                                   _model.filenameDefaultDown =
                                       await actions.generateFormattedDateTime();
 
@@ -927,6 +937,35 @@ class _ConverterWidgetState extends State<ConverterWidget>
     safeSetState(() {});
     LoadingDialog.hide(context);
   }
+
+  Future<bool> _requestStoragePermission(BuildContext context) async {
+    if (Platform.isAndroid) {
+      PermissionStatus status;
+      if (Platform.version.contains("11") ||
+          Platform.version.contains("12") ||
+          Platform.version.contains("13") ||
+          Platform.version.contains("14") ||
+          Platform.version.contains("15")) {
+        status = await Permission.manageExternalStorage.request();
+      } else {
+        status = await Permission.storage.request();
+      }
+
+      if (status.isDenied) {
+        _showPermissionDialog(context,
+            "Storage permission is required to generate and save the image.");
+        return false;
+      }
+
+      if (status.isPermanentlyDenied) {
+        _showPermissionDialog(context,
+            "Storage permission is permanently denied. Please enable it in app settings.",
+            openSettings: true);
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 class LoadingDialog {
@@ -975,4 +1014,34 @@ class LoadingDialog {
     Navigator.of(context, rootNavigator: true).pop(); // Closes the dialog
     // });
   }
+}
+
+// Function to show an AlertDialog for permissions
+void _showPermissionDialog(BuildContext context, String message,
+    {bool openSettings = false}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Permission Required"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          if (openSettings)
+            TextButton(
+              child: Text("Open Settings"),
+              onPressed: () {
+                openAppSettings();
+                Navigator.of(context).pop();
+              },
+            ),
+        ],
+      );
+    },
+  );
 }
