@@ -22,6 +22,12 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
 
   final animationsMap = <String, AnimationInfo>{};
 
+  var point0 = 'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.';
+  var point1 = '1. Information Collection and Use - iSpeedPix2PDF is a client-side app; all data processed by the app remains local to your device, with no data sent to external servers for processing.\n-Photo Gallery Access: iSpeedPix2PDF requires access to your device’s photo gallery to allow you to select images for conversion into PDFs.\n-Once a PDF is generated, the app does not store or retain any files. Users have full control over their PDFs and can choose to share, email, save, or upload them as they prefer.';
+  var point2= '2. No Data Transmission - As a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.';
+  var point3= '3. One-Time Lifetime Subscription - iSpeedPix2PDF operates on a one-time lifetime subscription model, meaning you only need to pay once for full access to all features—no recurring charges, no hidden fees. Payment processing is handled securely through a service to verify and manage purchases. Once purchased, the app remains fully functional without requiring additional payments.';
+  var point4= '4. No Advertisements - We do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.';
+
   @override
   void initState() {
     super.initState();
@@ -110,7 +116,7 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             20.0, 20.0, 20.0, 0.0),
                         child: Text(
-                          'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.\n \n1. Information Collection and Use\niSpeedPix2PDF is a client-side app, designed to function without collecting, storing, or processing any personal information externally. The app operates entirely on your device, meaning all data processed by the app remains local to your device, with no data sent to external servers.\nPhoto Gallery Access: iSpeedPix2PDF requires access to your device\'s photo gallery to allow you to select images for conversion into PDFs and to save the generated PDFs.\nAll actions are performed locally, and the app does not access or modify any existing photos—only the images you select are used for PDF creation.\nOnce a PDF is generated, it is stored securely in your device\'s gallery without any data leaving your device.\n \n2. No Data Transmission\nAs a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating and saving PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.\n \n3. No Advertisements or In-App Purchases\nWe do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements or unnecessary in-app purchases. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.',
+                          '$point0\n\n$point1\n\n$point2\n\n$point3\n\n$point4',
                           textAlign: TextAlign.start,
                           style: FlutterFlowTheme.of(context)
                               .labelLarge

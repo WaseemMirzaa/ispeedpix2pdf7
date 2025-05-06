@@ -5,4 +5,4 @@ export '/tevineigh/tevineigh_widget.dart' show TevineighWidget;
 export '/howto/howto_widget.dart' show HowtoWidget;
 export '/privacy/privacy_widget.dart' show PrivacyWidget;
 export '/simplicity/simplicity_widget.dart' show SimplicityWidget;
-export '/test/test_widget.dart' show TestWidget;
+// export '/test/test_widget.dart' show TestWidget;

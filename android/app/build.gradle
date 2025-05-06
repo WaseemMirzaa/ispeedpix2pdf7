@@ -69,10 +69,20 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
+        debug {
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
+        }
+    }
+
+    packagingOptions {
+        doNotStrip "**/*.so"
     }
 }
 
@@ -82,4 +92,25 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10"
+}
+
+// Add this task to extract debug symbols
+task extractNativeDebugSymbols(type: Copy) {
+    dependsOn 'bundleRelease'
+    
+    from file("${buildDir}/intermediates/stripped_native_libs/release/out/lib")
+    into file("${buildDir}/symbols")
+    
+    doLast {
+        // Create ZIP files for each ABI
+        file("${buildDir}/symbols").listFiles().each { abiDir ->
+            if (abiDir.isDirectory()) {
+                exec {
+                    workingDir abiDir
+                    commandLine 'zip', '-r', "${rootProject.projectDir}/native_symbols_${abiDir.name}.zip", '.'
+                }
+                println "Created native_symbols_${abiDir.name}.zip"
+            }
+        }
+    }
 }

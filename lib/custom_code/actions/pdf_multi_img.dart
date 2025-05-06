@@ -1,4 +1,5 @@
 // Automatic FlutterFlow imports
+import 'dart:io';
 import 'dart:isolate';
 
 import '/flutter_flow/flutter_flow_util.dart';
@@ -69,19 +70,21 @@ Future<void> pdfMultiImg(SendPort sendPort
         if (decodedImage != null) {
           // Check the orientation of the image
           bool isLandscape = decodedImage.width > decodedImage.height;
+
           img.Image processedImage = decodedImage;
 
           if (isLandscape && params.selectedIndex == 1) {
+
             processedImage = img.copyRotate(
               decodedImage,
               angle: 90,
               interpolation: img.Interpolation.nearest,
             );
-            // }
+
           }
 
           fileupBytes = img.encodeJpg(processedImage,
-              quality: 92); // Reduce quality to 100%
+              quality: (Platform.isAndroid) ? 92 : 92); // Reduce quality to 100%
 
           // Create a MemoryImage from the resized image bytes
           var image = pw.MemoryImage(fileupBytes);

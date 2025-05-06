@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ispeedpix2pdf7/converter/subscription_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
+import '../../tevineigh/more_apps.dart';
 import '/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -82,9 +84,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => MainmenuWidget(),
         ),
         FFRoute(
+          name: 'MoreApps',
+          path: '/MoreApps',
+          builder: (context, params) => MoreAppsWidget(),
+        ),
+        FFRoute(
           name: 'Tevineigh',
           path: '/tevineigh',
           builder: (context, params) => TevineighWidget(),
+        ),
+        FFRoute(
+          name: 'Subscription',
+          path: '/subscription',
+          builder: (context, params) => SubscriptionWidget(),
         ),
         FFRoute(
           name: 'Howto',
@@ -101,11 +113,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: '/simplicity',
           builder: (context, params) => SimplicityWidget(),
         ),
-        FFRoute(
-          name: 'test',
-          path: '/test',
-          builder: (context, params) => TestWidget(),
-        )
+        // FFRoute(
+        //   name: 'test',
+        //   path: '/test',
+        //   builder: (context, params) => TestWidget(),
+        // )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
 

@@ -162,6 +162,8 @@ Future<List<SelectedFile>?> selectMedia({
   bool multiImage = false,
   bool includeDimensions = false,
   bool includeBlurHash = false,
+  bool isSubscribed = false,
+  bool are7DaysPassed = false,
 }) async {
     try {
 
@@ -173,8 +175,8 @@ Future<List<SelectedFile>?> selectMedia({
             maxWidth: maxWidth,
             maxHeight: maxHeight,
             requestFullMetadata: true,
-            limit: 60
-          // imageQuality: imageQuality,
+            imageQuality: imageQuality,
+            limit:(!isSubscribed && are7DaysPassed) ? 3 : 60,
         );
 
         final pickedMedia = await pickedMediaFuture;
