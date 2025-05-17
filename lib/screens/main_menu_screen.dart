@@ -1,18 +1,18 @@
 // import 'package:flutter/material.dart';
 // import 'package:ispeedpix2pdf7/widgets/language_selector.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
-// // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // class MainMenuScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
-//     // final l10n = AppLocalizations.of(context)!;
+//     final l10n = AppLocalizations.of(context) ?? _FallbackLocalizations();
 
 //     return Scaffold(
 //       appBar: AppBar(
 //         title: Text(l10n.mainMenuTitle),
 //         actions: [
-//           LanguageSelector(),
+//         //   LanguageSelector(),
 //         ],
 //       ),
 //       body: ListView(
@@ -51,4 +51,34 @@
 //       ),
 //     );
 //   }
+// }
+
+// class _FallbackLocalizations implements AppLocalizations {
+//   @override
+//   String get mainMenuTitle => 'Main Menu';
+  
+//   @override
+//   String get selectImages => 'Select Images';
+  
+//   @override
+//   String get createPDF => 'Create PDF';
+  
+//   @override
+//   String get settings => 'Settings';
+  
+//   @override
+//   String get subscription => 'Subscription';
+  
+//   @override
+//   String get howTo => 'How To';
+  
+//   @override
+//   String get privacy => 'Privacy';
+  
+//   // Implement other required methods with fallback strings
+//   // You'll need to implement all methods from AppLocalizations
+//   // This is just a temporary solution
+  
+//   @override
+//   noSuchMethod(Invocation invocation) => 'Missing translation';
 // }

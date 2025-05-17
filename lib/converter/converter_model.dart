@@ -32,18 +32,15 @@ class ConverterModel extends FlutterFlowModel<ConverterWidget> {
   FocusNode? filenameFocusNode;
   TextEditingController? filenameTextController;
 
-
   String? filenameTextControllerValidator(String? value) {
     // if (value == null || value.isEmpty) {
     //   return null; // Allow empty field since it's optional
     // }
     // if (value.contains('\\') || value.contains('/')) {
-      return 'Filename cannot contain backslashes (\\) or forward slashes (/)';
+    return 'Filename cannot contain backslashes (\\) or forward slashes (/)';
     // }
     // return null; // Return null if the input is valid
   }
-
-
 
   // Stores action output result for [Custom Action - generateFormattedDateTime] action in Setting widget.
   String? filenameDefaultDown;
@@ -75,11 +72,12 @@ class ConverterModel extends FlutterFlowModel<ConverterWidget> {
 
     uploadedLocalFiles = []; // Reset list to empty
     isDataUploading = false; // Reset boolean to default state
-
   }
 
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    // AppLocalizations.of(context)!.filenameCannotContainCharacters;
+  }
 
   @override
   void dispose() {

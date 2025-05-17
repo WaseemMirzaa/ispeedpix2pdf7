@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'mainmenu_model.dart';
 export 'mainmenu_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MainmenuWidget extends StatefulWidget {
   const MainmenuWidget({super.key});
@@ -23,6 +24,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final animationsMap = <String, AnimationInfo>{};
+
+  AppLocalizations? l10n;
 
   @override
   void initState() {
@@ -104,12 +107,13 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
       appBar: AppBar(
-        backgroundColor: Color(0xFF173F5A)
-,
+        backgroundColor: Color(0xFF173F5A),
         automaticallyImplyLeading: false,
         leading: InkWell(
           splashColor: Colors.transparent,
@@ -143,7 +147,7 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                       padding: const EdgeInsetsDirectional.fromSTEB(
                           0.0, 25.0, 0.0, 0.0),
                       child: Text(
-                        'iSpeedPix2PDF',
+                        l10n!.appTitle,
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Inter',
                               fontSize: 24.0,
@@ -250,7 +254,9 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'How to Use',
+                                            l10n!.howToUse
+                                            // 'How to Use'
+                                            ,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -317,7 +323,10 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'Simplicity and Efficiency',
+                                            l10n!.simplicityAndEfficiency
+
+                                            // 'Simplicity and Efficiency'
+                                            ,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -384,7 +393,9 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'Privacy and Security',
+                                            l10n!.privacyAndSecurity,
+
+                                            // 'Privacy and Security',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -451,7 +462,9 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'More Apps By Tevin Eigh Designs',
+                                            l10n!.moreAppsByTevinEighDesigns,
+
+                                            // 'More Apps By Tevin Eigh Designs',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -518,7 +531,9 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: AutoSizeText(
-                                            'About Tevin Eigh Designs',
+                                            l10n!.aboutTevinEighDesigns,
+
+                                            // 'About Tevin Eigh Designs',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -541,6 +556,73 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                               ),
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16.0, 12.0, 16.0, 0.0),
+                            child: Container(
+                              width: double.infinity,
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 5.0,
+                                    color: Color(0x3416202A),
+                                    offset: Offset(
+                                      0.0,
+                                      2.0,
+                                    ),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(12.0),
+                                shape: BoxShape.rectangle,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    context.push('/language-selection');
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
+                                          child: Text(
+                                            l10n!.selectLanguage ?? '',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  fontFamily: 'Inter',
+                                                  letterSpacing: 0.0,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
+                                        child: Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          size: 18.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ).animateOnPageLoad(
+                                    animationsMap['rowOnPageLoadAnimation4']!),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -551,15 +633,16 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                         onPressed: () async {
                           context.pushNamed('converter');
                         },
-                        text: 'Return to Converter',
+                        text: l10n!.returnToConverter,
+
+                        // 'Return to Converter',
                         options: FFButtonOptions(
                           height: 40.0,
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               24.0, 0.0, 24.0, 0.0),
                           iconPadding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 0.0, 0.0),
-                          color: const Color(0xFF173F5A)
-,
+                          color: const Color(0xFF173F5A),
                           textStyle:
                               FlutterFlowTheme.of(context).titleSmall.override(
                                     fontFamily: 'Inter',

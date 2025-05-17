@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:http/http.dart' as http;
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
@@ -36,6 +39,8 @@ class SubscriptionWidget extends StatefulWidget {
 class _ConverterWidgetState extends State<SubscriptionWidget>
     with TickerProviderStateMixin {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  AppLocalizations? l10n;
 
   Offerings? offerings;
   bool _isSubscribed = false;
@@ -85,6 +90,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -158,8 +164,12 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                     if (_isSubscribed)
                                       Text(
                                         _isSubscribed
-                                            ? 'Current Plan : Full Access'
-                                            : 'Current Plan : Free Trial',
+                                            ? l10n!.currentPlanFullAccess
+                                            :
+                                            // 'Current Plan : Full Access'
+                                            l10n!.currentPlanFreeTrial
+                                        // 'Current Plan : Free Trial'
+                                        ,
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -172,7 +182,6 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                               fontWeight: FontWeight.w700,
                                             ),
                                       ),
-
                                     Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: RichText(
@@ -182,7 +191,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                           children: [
                                             TextSpan(
                                               text:
-                                                  'FREE TRIAL – 1 Week – Unlimited Use\n\n',
+                                                  '${l10n!.freeTrialOneWeekUnlimitedUse}\n\n',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -196,7 +205,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                             ),
                                             TextSpan(
                                               text:
-                                                  'FREE VERSION – After Trial Expires\n\n',
+                                                  '${l10n!.freeVersionTrialAfterTrialExpires}\n\n',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -208,26 +217,30 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                                             FontWeight.bold,
                                                       ),
                                             ),
-                                            const TextSpan(
-                                              text:
-                                                  ' ✔ Create up to 5 PDFs every 7 days\n',
+                                            TextSpan(
+                                              text: l10n!
+                                                  .createUpToFivePDFsEverySevenDays,
+                                              // ' ✔ Create up to 5 PDFs every 7 days\n',
                                               style: TextStyle(
                                                 fontSize: 14.0,
                                               ),
                                             ),
-                                            const TextSpan(
-                                              text:
-                                                  ' ✔ Each PDF can have up to 3 pages\n',
-                                              style: TextStyle(),
-                                            ),
-                                            const TextSpan(
-                                              text:
-                                                  ' ✔ Auto-reset every 7 days',
+                                            TextSpan(
+                                              text: l10n!
+                                                  .eachPDFCanHaveUpToThreePages,
+                                              // ' ✔ Each PDF can have up to 3 pages\n',
                                               style: TextStyle(),
                                             ),
                                             TextSpan(
                                               text:
-                                                  '\n\nOne Time Purchase (Unlock Full Access)\n\n',
+                                                  l10n!.autoResetEverySevenDays,
+                                              // ' ✔ Auto-reset every 7 days',
+                                              style: TextStyle(),
+                                            ),
+                                            TextSpan(
+                                              text: l10n!
+                                                  .oneTimePurchaseUnlockFullAccess,
+                                              // '\n\nOne Time Purchase (Unlock Full Access)\n\n',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -239,23 +252,27 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                                             FontWeight.bold,
                                                       ),
                                             ),
-                                            const TextSpan(
-                                              text:
-                                                  ' ✔ Unlimited PDF creation\n',
-                                              style: TextStyle(
-                                                fontSize: 14.0,
-                                              ),
-                                            ),
-                                            const TextSpan(
-                                              text:
-                                                  ' ✔ A single purchase for lifetime access\n\n',
+                                            TextSpan(
+                                              text: l10n!.unlimitedPDFCreation,
+
+                                              // ' ✔ Unlimited PDF creation\n',
                                               style: TextStyle(
                                                 fontSize: 14.0,
                                               ),
                                             ),
                                             TextSpan(
-                                              text:
-                                                  'Upgrade today to unlock the complete potential of iSpeedPix2Pdf with a lifetime subscription 🚀',
+                                              text: l10n!
+                                                  .singlePurchaseLifetimeAccess,
+
+                                              // ' ✔ A single purchase for lifetime access\n\n',
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: l10n!
+                                                  .upgradeTodayToUnlockCompletePotential,
+                                              // 'Upgrade today to unlock the complete potential of iSpeedPix2Pdf with a lifetime subscription 🚀',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -291,7 +308,9 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                               // _cancelSubscription();
                                               Navigator.of(context).pop();
                                             },
-                                            text: 'Enjoy Your Full Access',
+                                            text: l10n!.enjoyFullAccess,
+                                            // 'Enjoy Your Full Access'
+                                            // ,
                                             options: FFButtonOptions(
                                               width: double.infinity,
                                               height: 50.0,
@@ -337,8 +356,8 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                           child: FFButtonWidget(
                                             onPressed: () async {
                                               LoadingDialog.show(context,
-                                                  message:
-                                                      'Checking Active Purchase');
+                                                  message: l10n!
+                                                      .checkingActivePurchase);
                                               try {
                                                 await checkAndRestorePurchases();
                                                 // await getSubscriptionsData();
@@ -346,8 +365,9 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                                 // LoadingDialog.hide(context);
                                               }
                                             },
-                                            text:
-                                                'Already Purchased? Restore Here',
+                                            text: l10n!
+                                                .alreadyPurchasedRestoreHere,
+                                            // 'Already Purchased? Restore Here',
                                             options: FFButtonOptions(
                                               width: double.infinity,
                                               height: 50.0,
@@ -456,7 +476,9 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                   // offering
                                 }
                               },
-                              text: 'Buy Now in 4.99\$',
+                              text: l10n!.buyNowInFourNineNine,
+                              // 'Buy Now in 4.99\$'
+                              // ,
                               options: FFButtonOptions(
                                 width: double.infinity,
                                 height: 50.0,
@@ -516,12 +538,11 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text("Success"),
-              content:
-                  const Text("Your purchase has been successfully restored!"),
+              title: Text(l10n!.success),
+              content: Text(l10n!.yourPurchaseHasBeenSuccessfullyRestored),
               actions: [
                 TextButton(
-                  child: const Text("OK"),
+                  child: Text(l10n!.ok),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -536,12 +557,11 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text("No Purchases Found"),
-              content: const Text(
-                  "We couldn't find any previous purchases to restore."),
+              title: Text(l10n!.noPurchasesFound),
+              content: Text(l10n!.weCouldNotFindAnyPreviousPurchasesToRestore),
               actions: [
                 TextButton(
-                  child: const Text("OK"),
+                  child: Text(l10n!.ok),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -557,12 +577,11 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text(
-                "Failed to restore purchases. Please try again later."),
+            title: Text(l10n!.error),
+            content: Text(l10n!.failedToRestorePurchasesPleaseTryAgainLater),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(l10n!.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -774,22 +793,24 @@ class LoadingDialog {
 // Function to show an AlertDialog for permissions
 void _showPermissionDialog(BuildContext context, String message,
     {bool openSettings = false}) {
+  final l10n = AppLocalizations.of(context)!;
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text("Permission Required"),
+        title: Text(l10n.permissionRequired),
         content: Text(message),
         actions: [
           TextButton(
-            child: Text("Cancel"),
+            child: Text(l10n.cancelButton),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           if (openSettings)
             TextButton(
-              child: const Text("Open Settings"),
+              child: Text(l10n.openSettingsButton),
               onPressed: () {
                 openAppSettings();
                 Navigator.of(context).pop();

@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'tevineigh_model.dart';
 export 'tevineigh_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class MoreAppsWidget extends StatefulWidget {
   const MoreAppsWidget({super.key});
@@ -21,6 +23,8 @@ class MoreAppsWidget extends StatefulWidget {
 class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
     with TickerProviderStateMixin {
   late TevineighModel _model;
+
+  AppLocalizations? l10n;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -70,6 +74,7 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -173,7 +178,7 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
                                         }
 
                                       },
-                                      text: 'View',
+                                      text: l10n.view ,
                                       options: FFButtonOptions(
                                         // height: 20.0,
                                         padding: const EdgeInsetsDirectional.fromSTEB(

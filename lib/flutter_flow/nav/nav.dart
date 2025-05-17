@@ -11,6 +11,7 @@ import '/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
+import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -112,6 +113,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'Simplicity',
           path: '/simplicity',
           builder: (context, params) => SimplicityWidget(),
+        ),
+        FFRoute(
+          name: 'LanguageSelection',
+          path: '/language-selection',
+          builder: (context, params) => LanguageSelectionScreen(),
         ),
         // FFRoute(
         //   name: 'test',

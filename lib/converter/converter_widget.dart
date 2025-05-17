@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -27,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'converter_model.dart';
 export 'converter_model.dart';
+import 'package:ispeedpix2pdf7/app_globals.dart';
 
 class ConverterWidget extends StatefulWidget {
   const ConverterWidget({super.key});
@@ -53,7 +55,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   final animationsMap = <String, AnimationInfo>{};
 
-  // final l10n = AppLocalizations.of(context)!;
+  AppLocalizations? l10n;
   List<SelectedFile>? selectedMedia;
 
   @override
@@ -71,7 +73,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
     _model.filenameFocusNode!.addListener(() {
       if (_isFocused && selectedMedia != null) {
-        LoadingDialog.show(context);
+        LoadingDialog.show(context, message: l10n!.creatingPdf);
 
         createPDF();
       }
@@ -114,18 +116,26 @@ class _ConverterWidgetState extends State<ConverterWidget>
     super.dispose();
   }
 
-  String _selectedOrientation =
-      'DEFAULT - Mixed Orientation'; // Default selection
+  String _selectedOrientation = ''; // Default selection
 
   // List of options for the dropdown
-  final List<String> _orientationOptions = [
-    'DEFAULT - Mixed Orientation',
-    'Pages Fixed - Portrait',
-    'Landscape Photos - Top Aligned for easy viewing'
-  ];
+  List<String> _orientationOptions = [];
+
+  generateOrientationOptions() {
+    _orientationOptions = [
+      l10n!.defaultMixedOrientation,
+      l10n!.pagesFixedPortrait,
+      l10n!.landscapePhotosTopAlignedForEasyViewing,
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+    _model.fname = l10n!.noFilesSelected;
+    generateOrientationOptions();
+    _selectedOrientation = l10n!.defaultMixedOrientation;
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -155,7 +165,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                         const SizedBox(width: 5.0),
                         // Add spacing between icon and text
                         Text(
-                          'Reset',
+                          l10n!.reset,
                           textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context)
                               .displayMedium
@@ -180,7 +190,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
                 _model.filenameTextController = TextEditingController();
 
-                _selectedOrientation = 'DEFAULT - Mixed Orientation';
+                // _selectedOrientation = 'DEFAULT - Mixed Orientation';
+                _selectedOrientation = l10n!.defaultMixedOrientation;
 
                 _model.filenameTextController = TextEditingController();
 
@@ -230,7 +241,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             3.0, 0.0, 0.0, 0.0),
                         child: Text(
-                          'iSpeedPix2PDF',
+                          l10n!.appTitle
+                          // 'iSpeedPix2PDF'
+                          ,
                           textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context)
                               .displayMedium
@@ -275,7 +288,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 setState(() {
                                   _selectedOrientation = newValue!;
 
-                                  LoadingDialog.show(context);
+                                  LoadingDialog.show(context,
+                                      message: l10n!.creatingPdf);
 
                                   createPDF();
                                 });
@@ -340,7 +354,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         }
 
                                         Timer(Duration(seconds: 1), () {
-                                          LoadingDialog.show(context);
+                                          LoadingDialog.show(context,
+                                              message: l10n!.creatingPdf);
                                         });
 
                                         LoadingDialog.isImagePickerCalled =
@@ -428,7 +443,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                             const EdgeInsets
                                                                 .all(2.0),
                                                         child: AutoSizeText(
-                                                          'Choose Files',
+                                                          l10n!.chooseFiles,
                                                           style: FlutterFlowTheme
                                                                   .of(context)
                                                               .bodyMedium
@@ -458,7 +473,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                 child: Text(
                                                   valueOrDefault<String>(
                                                     _model.fname,
-                                                    'no files selected',
+                                                    l10n!.noFilesSelected,
                                                   ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
@@ -484,8 +499,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 children: [
                                   Text(
                                     (!_isSubscribed && _is7DaysPassed)
-                                        ? '*You can select up to 3 Images in free version'
-                                        : '*You can select up to 60 Images',
+                                        ? l10n!
+                                            .youCanSelectUpTo3ImagesInFreeVersion
+                                        : l10n!.youCanSelectUpTo60Images,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -588,15 +604,18 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           autofocus: true,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText:
-                                _isFocused ? 'Filename' : 'Filename (Optional)',
+                            labelText: _isFocused
+                                ? l10n!.filename
+                                : l10n!.filenameOptional,
                             labelStyle: FlutterFlowTheme.of(context)
                                 .labelMedium
                                 .override(
                                   fontFamily: 'Inter',
                                   letterSpacing: 0.0,
                                 ),
-                            hintText: 'Enter custom file name (optional)',
+                            hintText: l10n!.enterCustomFileNameOptional
+                            // 'Enter custom file name (optional)'
+                            ,
                             hintStyle: FlutterFlowTheme.of(context)
                                 .labelMedium
                                 .override(
@@ -647,7 +666,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               8.0, 0, 8.0, 16.0),
                           child: Text(
-                            'Filename cannot contain any of the following characters: \\ / : * ? " < > |',
+                            l10n!.filenameCannotContainCharacters,
                             style: FlutterFlowTheme.of(context)
                                 .labelMedium
                                 .override(
@@ -692,7 +711,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     safeSetState(() {});
                                   }
                                 },
-                                text: 'Download PDF',
+                                text: l10n!.downloadPDF
+                                // 'Download PDF'
+                                ,
                                 icon: const Icon(
                                   Icons.sim_card_download_sharp,
                                   size: 20.0,
@@ -761,7 +782,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     safeSetState(() {});
                                   }
                                 },
-                                text: 'View PDF',
+                                text: l10n!.viewPdf,
                                 icon: const Icon(
                                   Icons.visibility,
                                   size: 20.0,
@@ -800,7 +821,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               onPressed: () async {
                                 context.pushNamed('Mainmenu');
                               },
-                              text: 'About',
+                              text: l10n!.about,
                               options: FFButtonOptions(
                                 width: double.infinity,
                                 height: 50.0,
@@ -840,8 +861,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 });
                               },
                               text: !_isSubscribed
-                                  ? 'Get Full Lifetime Access in 4.99\$'
-                                  : 'View Purchase Details',
+                                  ? '${l10n!.getFullLifetimeAccess}\$'
+                                  : l10n!.viewPurchaseDetails,
                               options: FFButtonOptions(
                                 width: double.infinity,
                                 height: 50.0,
@@ -920,7 +941,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: 'Data Collection:',
+                                              text: l10n!.dataCollection
+                                              // 'Data Collection:'
+                                              ,
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -933,17 +956,17 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                             FontWeight.bold,
                                                       ),
                                             ),
-                                            const TextSpan(
+                                            TextSpan(
                                               text:
-                                                  ' We do not collect, store, or process any personal data from users. All data is handled locally on your device. This means:',
+                                                  ' ${l10n!.weDoNotCollectAnyPersonalData}:',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12.0,
                                               ),
                                             ),
-                                            const TextSpan(
+                                            TextSpan(
                                               text:
-                                                  '\n- No images are uploaded to a server.\n- No personal data is collected, stored, or shared by our mobile app.',
+                                                  '\n- ${l10n!.noImagesAreShared}',
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
@@ -1021,7 +1044,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
     if (_model.uploadedLocalFiles.length > 1) {
       _model.fname =
-          '${_model.uploadedLocalFiles.length.toString()} Files Selected';
+          '${_model.uploadedLocalFiles.length.toString()} ${l10n!.filesSelected}';
 
       safeSetState(() {});
     } else {
@@ -1203,15 +1226,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
       if (status.isDenied) {
         _showPermissionDialog(
           context,
-          'This app needs storage permission to save PDFs',
+          l10n!.storagePermissionMessageRequired
+          // 'This app needs storage permission to save PDFs'
+          ,
           // AppLocalizations.of(context)!.storagePermissionMessageRequired
         );
         return false;
       }
 
       if (status.isPermanentlyDenied) {
-        _showPermissionDialog(
-            context, 'This app needs storage permission to save PDFs',
+        _showPermissionDialog(context, l10n!.storagePermissionMessageRequired,
             openSettings: true);
         return false;
       }
@@ -1262,12 +1286,12 @@ class _ConverterWidgetState extends State<ConverterWidget>
       if (rateMyApp.shouldOpenDialog) {
         rateMyApp.showRateDialog(
           context,
-          title: 'Rate this app', // The dialog title.
-          message:
-              'If you enjoy using this app, we’d really appreciate it if you could take a minute to leave a review! Your feedback helps us improve and won’t take more than a minute of your time.', // The dialog message.
-          rateButton: 'RATE', // The dialog "rate" button text.
-          noButton: 'NO THANKS', // The dialog "no" button text.
-          laterButton: 'MAYBE LATER', // The dialog "later" button text.
+          title: '${l10n!.rateThisApp}', // The dialog title.
+          message: '${l10n!.rateThisAppMessage}', // The dialog message.
+          rateButton: '${l10n!.rate}', // The dialog "rate" button text.
+          noButton:
+              '${l10n!.noThanks}', // iTHANKS', // The dialog "no" button text.
+          laterButton: '${l10n!.maybeLater}', // The dialog "later" button text.
           listener: (button) {
             // The button click listener (useful if you want to cancel the click event).
             switch (button) {
@@ -1302,7 +1326,8 @@ class LoadingDialog {
   static bool isImagePickerCalled = false;
   static bool isAlreadyCancelled = false;
 
-  static void show(BuildContext context, {String message = "Creating PDF..."}) {
+  static void show(BuildContext context,
+      {String message = "{Creating PDF}..."}) {
     if (isAlreadyCancelled) {
       isAlreadyCancelled = false;
       return;
@@ -1343,22 +1368,24 @@ class LoadingDialog {
 // Function to show an AlertDialog for permissions
 void _showPermissionDialog(BuildContext context, String message,
     {bool openSettings = false}) {
+  final l10n = AppLocalizations.of(context)!;
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text("Permission Required"),
+        title: Text(l10n.permissionRequired),
         content: Text(message),
         actions: [
           TextButton(
-            child: Text("Cancel"),
+            child: Text(l10n.cancelButton),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           if (openSettings)
             TextButton(
-              child: const Text("Open Settings"),
+              child: Text(l10n.openSettingsButton), // Text("Open Settings"),
               onPressed: () {
                 openAppSettings();
                 Navigator.of(context).pop();
@@ -1371,6 +1398,8 @@ void _showPermissionDialog(BuildContext context, String message,
 }
 
 void showTrialLimitDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -1381,7 +1410,7 @@ void showTrialLimitDialog(BuildContext context) {
         title: Center(
           child: Text(
             textAlign: TextAlign.center,
-            "FREE TRIAL EXPIRED or FREE FEATURES EXHAUSTED",
+            l10n!.freeTrialExpiredMessage,
             style: FlutterFlowTheme.of(context).displayMedium.override(
                   fontFamily: 'Poppins',
                   color: Color(0xFF173F5A),
@@ -1401,7 +1430,7 @@ void showTrialLimitDialog(BuildContext context) {
             SizedBox(height: 20),
             Text(
               textAlign: TextAlign.justify,
-              "FREE FEATURES RENEW EVERY 7 DAYS",
+              l10n.freeFeatureRenewal,
               // textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
@@ -1414,7 +1443,7 @@ void showTrialLimitDialog(BuildContext context) {
             SizedBox(height: 10),
             Text(
               textAlign: TextAlign.justify,
-              'UPGRADE NOW WITH A ONE TIME PURCHASE & UNLOCK THE FULL POWER OF iSpeedPix2PDF 🚀.',
+              '${l10n.upgradePrompt}',
               // textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
@@ -1431,7 +1460,7 @@ void showTrialLimitDialog(BuildContext context) {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text("Cancel",
+            child: Text("${l10n.cancelButton}",
                 style: FlutterFlowTheme.of(context).displayMedium.override(
                       fontFamily: 'Poppins',
                       color: Colors.black,
@@ -1452,7 +1481,7 @@ void showTrialLimitDialog(BuildContext context) {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text("Upgrade Now",
+            child: Text("${l10n.upgradePrompt}",
                 style: FlutterFlowTheme.of(context).displayMedium.override(
                       fontFamily: 'Poppins',
                       color: Colors.white,
@@ -1468,19 +1497,20 @@ void showTrialLimitDialog(BuildContext context) {
 }
 
 void showFilenameErrorDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Invalid Filename'),
-        content: Text(
-            'Filename cannot contain any of the following characters: \\ / : * ? " < > |'),
+        title: Text(l10n.invalidFilename),
+        content: Text('${l10n.filenameCannotContainCharacters}'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // Close the dialog
             },
-            child: const Text('OK'),
+            child: Text('${l10n.ok}'),
           ),
         ],
       );

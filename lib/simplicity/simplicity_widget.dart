@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'simplicity_model.dart';
 export 'simplicity_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SimplicityWidget extends StatefulWidget {
   const SimplicityWidget({super.key});
@@ -17,6 +18,8 @@ class SimplicityWidget extends StatefulWidget {
 
 class _SimplicityWidgetState extends State<SimplicityWidget> {
   late SimplicityModel _model;
+
+  AppLocalizations? l10n;
 
   final animationsMap = <String, AnimationInfo>{};
 
@@ -54,6 +57,8 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -103,7 +108,8 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 25.0, 0.0, 0.0),
                           child: Text(
-                            'Simplicity and Efficiency',
+                            l10n!.simplicityAndEfficiency,
+                            // 'Simplicity and Efficiency',
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -127,7 +133,8 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   5.0, 25.0, 5.0, 0.0),
                               child: Text(
-                                'Our Philosophy\n-Simplicity: Our apps are designed to be intuitive and straightforward, making them easy to use for everyone.\n\n-Security: By keeping all processing on the client side, we ensure your data remains private and secure.\n-Efficiency: We continually refine our apps to remove unnecessary steps while preserving their core functionality.',
+                                l10n!.simplicityAndPrivacyDetail,
+                                // 'Our Philosophy\n-Simplicity: Our apps are designed to be intuitive and straightforward, making them easy to use for everyone.\n\n-Security: By keeping all processing on the client side, we ensure your data remains private and secure.\n-Efficiency: We continually refine our apps to remove unnecessary steps while preserving their core functionality.',
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .labelLarge
@@ -147,7 +154,8 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   5.0, 15.0, 5.0, 0.0),
                               child: Text(
-                                'We believe in providing just what you need, nothing more, nothing less. As we evolve, our commitment remains to enhance efficiency without compromising on the primary purpose of our applications.',
+                                l10n!.simplicityAndPrivacyDetailTwo,
+                                // 'We believe in providing just what you need, nothing more, nothing less. As we evolve, our commitment remains to enhance efficiency without compromising on the primary purpose of our applications.',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -161,7 +169,8 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 5.0, 15.0, 5.0, 0.0),
                             child: Text(
-                              'Explore our range of client-side apps and experience the difference simplicity, efficiency, and security can make in your daily tasks.',
+                              l10n!.simplicityAndPrivacyDetailThree,
+                              // 'Explore our range of client-side apps and experience the difference simplicity, efficiency, and security can make in your daily tasks.',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -190,7 +199,7 @@ class _SimplicityWidgetState extends State<SimplicityWidget> {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
-                  text: 'Main Menu',
+                  text: l10n!.mainMenu,
                   options: FFButtonOptions(
                     height: 40.0,
                     padding: const EdgeInsetsDirectional.fromSTEB(

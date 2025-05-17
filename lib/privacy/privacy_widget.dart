@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'privacy_model.dart';
 export 'privacy_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PrivacyWidget extends StatefulWidget {
   const PrivacyWidget({super.key});
@@ -22,11 +23,7 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
 
   final animationsMap = <String, AnimationInfo>{};
 
-  var point0 = 'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.';
-  var point1 = '1. Information Collection and Use - iSpeedPix2PDF is a client-side app; all data processed by the app remains local to your device, with no data sent to external servers for processing.\n-Photo Gallery Access: iSpeedPix2PDF requires access to your device’s photo gallery to allow you to select images for conversion into PDFs.\n-Once a PDF is generated, the app does not store or retain any files. Users have full control over their PDFs and can choose to share, email, save, or upload them as they prefer.';
-  var point2= '2. No Data Transmission - As a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.';
-  var point3= '3. One-Time Lifetime Subscription - iSpeedPix2PDF operates on a one-time lifetime subscription model, meaning you only need to pay once for full access to all features—no recurring charges, no hidden fees. Payment processing is handled securely through a service to verify and manage purchases. Once purchased, the app remains fully functional without requiring additional payments.';
-  var point4= '4. No Advertisements - We do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.';
+  AppLocalizations? l10n;
 
   @override
   void initState() {
@@ -60,6 +57,19 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+
+    var point0 = l10n!.privacyAndSecurityDetailTitle;
+    // 'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.';
+    var point1 = l10n!.privacyAndSecurityDetailOne;
+    '1. Information Collection and Use - iSpeedPix2PDF is a client-side app; all data processed by the app remains local to your device, with no data sent to external servers for processing.\n-Photo Gallery Access: iSpeedPix2PDF requires access to your device’s photo gallery to allow you to select images for conversion into PDFs.\n-Once a PDF is generated, the app does not store or retain any files. Users have full control over their PDFs and can choose to share, email, save, or upload them as they prefer.';
+    var point2 = l10n!.privacyAndSecurityDetailTwo;
+    // '2. No Data Transmission - As a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.';
+    var point3 = l10n!.privacyAndSecurityDetailThree;
+    // '3. One-Time Lifetime Subscription - iSpeedPix2PDF operates on a one-time lifetime subscription model, meaning you only need to pay once for full access to all features—no recurring charges, no hidden fees. Payment processing is handled securely through a service to verify and manage purchases. Once purchased, the app remains fully functional without requiring additional payments.';
+    var point4 = l10n!.privacyAndSecurityDetailFour;
+    // '4. No Advertisements - We do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.';
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
