@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "466315140538",
+    "project_id": "tevin-eigh---ispeed-apps",
+    "storage_bucket": "tevin-eigh---ispeed-apps.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466315140538:android:212424e0a379183fed9183",
+        "android_client_info": {
+          "package_name": "com.mycompany.ispeedpix2pdf7"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV9O1cNRA5X_gvaI7auep9jhdkmNA_GT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

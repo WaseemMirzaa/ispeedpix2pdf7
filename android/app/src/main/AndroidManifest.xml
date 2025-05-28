@@ -1,10 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mycompany.ispeedpix2pdf7"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Make sure this package name matches the one in google-services.json -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/> -->
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"/> -->
     <!-- Removed MANAGE_EXTERNAL_STORAGE permission -->
     
     <!-- For Android 13+ (API 33+), add these permissions -->
@@ -32,6 +36,10 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+              <meta-data
+    android:name="firebase_analytics_collection_deactivated"
+    android:value="false"/>
+
             <!-- Displays an Android View that continues showing the launch screen
                  Drawable until Flutter paints its first frame, then this splash
                  screen fades out. A splash screen is useful to avoid any visual
@@ -53,6 +61,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="ispeedpix2pdf7" android:host="ispeedpix2pdf7.com" />
             </intent-filter>
+<meta-data
+    android:name="com.google.firebase.analytics.analyticsCollectionEnabled"
+    android:value="true" />
 
 
         </activity>

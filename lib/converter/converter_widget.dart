@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,6 +32,10 @@ import 'converter_model.dart';
 export 'converter_model.dart';
 import 'package:ispeedpix2pdf7/app_globals.dart';
 
+class ConstValues {
+  static int previousSelectedIndex = 0;
+}
+
 class ConverterWidget extends StatefulWidget {
   const ConverterWidget({super.key});
 
@@ -42,7 +48,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
   late ConverterModel _model;
 
   late SharedPreferenceService preferenceService;
-
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Offerings? offerings;
@@ -57,6 +63,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   AppLocalizations? l10n;
   List<SelectedFile>? selectedMedia;
+  var hideCurrentDropdown = false;
 
   @override
   void initState() {
@@ -100,6 +107,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
     checkSubscriptionStatus();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      l10n = AppLocalizations.of(context);
+
+      generateOrientationOptions();
+
+      // If selected orientation is empty or doesn't exist in the current options list, reset it
+      if (_selectedOrientation.isEmpty) {
+        _selectedOrientation = _orientationOptions[0];
+        // setState(() {});
+      }
+
       safeSetState(() {});
 
       // Ensure that no text field is focused when the app starts
@@ -132,9 +149,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
   @override
   Widget build(BuildContext context) {
     l10n = AppLocalizations.of(context);
-    _model.fname = l10n!.noFilesSelected;
-    generateOrientationOptions();
-    _selectedOrientation = l10n!.defaultMixedOrientation;
 
     return GestureDetector(
       onTap: () {
@@ -183,7 +197,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                   ),
                 ],
               ),
-              onTap: () {
+              onTap: () async {
                 _model = createModel(context, () => ConverterModel());
 
                 _model.clearAllValues();
@@ -285,12 +299,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               underline: Container(),
                               value: _selectedOrientation,
                               onChanged: (String? newValue) {
+                                _selectedOrientation = newValue!;
+
+                                ConstValues.previousSelectedIndex =
+                                    _orientationOptions
+                                        .indexOf(_selectedOrientation);
+
+                                LoadingDialog.show(context,
+                                    message: l10n!.creatingPdf);
+
                                 setState(() {
-                                  _selectedOrientation = newValue!;
-
-                                  LoadingDialog.show(context,
-                                      message: l10n!.creatingPdf);
-
                                   createPDF();
                                 });
                               },
@@ -338,6 +356,35 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
+                                        try {
+                                          LogHelper.logErrorMessage(
+                                              'Analytics Error', 'None');
+                                          await analytics.logEvent(
+                                            name:
+                                                'event_on_choose_files_button_pressed',
+                                            parameters: {
+                                                'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                              'timestamp': DateTime.now()
+                                                  .toIso8601String(),
+                                            },
+                                          );
+                                          // LogHelper.logErrorMessage(
+                                          //     'Analytics Error',
+                                          //     'Successfully Logged');
+                                        } catch (e) {
+                                          LogHelper.logErrorMessage(
+                                              'Analytics Error', e);
+                                          print('Failed to log event: $e');
+                                        }
+                                        // await AnalyticsService.logButtonTap(
+                                        //     'event_on_choose_files_button_pressed',
+                                        //     additionalParams: {
+                                        //       //   'source_format': 'jpg',
+                                        //       //   'target_format': 'pdf',
+                                        //       //   'file_count': imageFiles.length.toString(),
+                                        //     });
                                         var pdfCreatedCount =
                                             await preferenceService
                                                 .getPdfCreatedCount();
@@ -347,6 +394,25 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
                                         if (pdfCreatedCount > 5 &&
                                             !_isSubscribed) {
+                                          await analytics.logEvent(
+                                            name: 'event_trial_limit_reached',
+                                            parameters: {
+                                                'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                              'timestamp': DateTime.now()
+                                                  .toIso8601String(),
+                                              'pdfCreatedCount':
+                                                  pdfCreatedCount.toString(),
+                                            },
+                                          );
+                                          // await AnalyticsService.logButtonTap(
+                                          //     'showing_trial_limit_dialog',
+                                          //     additionalParams: {
+                                          //       'pdfCreatedCount':
+                                          //           pdfCreatedCount.toString(),
+                                          //       //   'subscribed': 'false',
+                                          //     });
                                           //
                                           showTrialLimitDialog(context);
 
@@ -689,13 +755,36 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   if (_hasBackSlash) {
                                     showFilenameErrorDialog(context);
                                   } else {
+                                    print(
+                                        'ConverterWidget: isPermissionEnabled Calling...');
                                     var isPermissionEnabled =
                                         await _requestStoragePermission(
                                             context);
 
+                                    print(
+                                        'ConverterWidget: isPermissionEnabled Called...');
+
                                     if (!isPermissionEnabled) {
+                                      print(
+                                          'ConverterWidget: isPermissionEnabled False Returning...');
+
                                       return;
                                     }
+
+                                    analytics.logEvent(
+                                      name:
+                                          'event_on_download_pdf_button_pressed',
+                                      parameters: {
+                                          'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                        'timestamp':
+                                            DateTime.now().toIso8601String(),
+                                        // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                                      },
+                                    );
+
+                                    // print('ConverterWidget: isPermissionEnabled Called...');
 
                                     _model.filenameDefaultDown = await actions
                                         .generateFormattedDateTime();
@@ -754,6 +843,18 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   if (_hasBackSlash) {
                                     showFilenameErrorDialog(context);
                                   } else {
+                                    await analytics.logEvent(
+                                      name:
+                                          'event_on_view_pdf_button_purchased',
+                                      parameters: {
+                                        'timestamp':
+                                            DateTime.now().toIso8601String(),
+                                            'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                        // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                                      },
+                                    );
                                     if (_model.filenameTextController.text
                                         .isNotEmpty) {
                                       Navigator.push(
@@ -819,7 +920,26 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 8.0, 4, 8.0, 0.0),
                             child: FFButtonWidget(
                               onPressed: () async {
-                                context.pushNamed('Mainmenu');
+                                await analytics.logEvent(
+                                  name: 'event_on_about_button_purchased',
+                                  parameters: {
+                                    'timestamp':
+                                        DateTime.now().toIso8601String(),
+                                          'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                    // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                                  },
+                                );
+                                context.pushNamed('Mainmenu').then((_) {
+                                  l10n = AppLocalizations.of(context);
+                                  generateOrientationOptions();
+                                  if (!_orientationOptions
+                                      .contains(_selectedOrientation)) {
+                                    _selectedOrientation = _orientationOptions[
+                                        ConstValues.previousSelectedIndex];
+                                  }
+                                });
                               },
                               text: l10n!.about,
                               options: FFButtonOptions(
@@ -848,12 +968,126 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               ),
                             ),
                           ),
-                          // if( !_isSubscribed )
+                          // Padding(
+                          //   padding: const EdgeInsetsDirectional.fromSTEB(
+                          //       8.0, 4, 8.0, 0.0),
+                          //   child: FFButtonWidget(
+                          //     onPressed: () async {
+                          //       showTrialLimitDialog(context);
+                          //     },
+                          //     text: 'ShowTrialButtonDialog',
+                          //     options: FFButtonOptions(
+                          //       width: double.infinity,
+                          //       height: 50.0,
+                          //       padding: const EdgeInsetsDirectional.fromSTEB(
+                          //           24.0, 0.0, 24.0, 0.0),
+                          //       iconPadding:
+                          //           const EdgeInsetsDirectional.fromSTEB(
+                          //               0.0, 0.0, 0.0, 0.0),
+                          //       color: Color(0xFF173F5A),
+                          //       textStyle: FlutterFlowTheme.of(context)
+                          //           .titleLarge
+                          //           .override(
+                          //             fontFamily: 'Readex Pro',
+                          //             color: FlutterFlowTheme.of(context).info,
+                          //             fontSize: 18.0,
+                          //             letterSpacing: 0.0,
+                          //           ),
+                          //       elevation: 0.0,
+                          //       borderSide: BorderSide(
+                          //         color: Color(0xFF173F5A),
+                          //         width: 2.0,
+                          //       ),
+                          //       borderRadius: BorderRadius.circular(8.0),
+                          //     ),
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsetsDirectional.fromSTEB(
+                          //       8.0, 4, 8.0, 0.0),
+                          //   child: FFButtonWidget(
+                          //     onPressed: () async {
+                          //       _showPermissionDialog(context,
+                          //           l10n!.storagePermissionMessageRequired);
+                          //     },
+                          //     text: 'showPermissionsDialog',
+                          //     options: FFButtonOptions(
+                          //       width: double.infinity,
+                          //       height: 50.0,
+                          //       padding: const EdgeInsetsDirectional.fromSTEB(
+                          //           24.0, 0.0, 24.0, 0.0),
+                          //       iconPadding:
+                          //           const EdgeInsetsDirectional.fromSTEB(
+                          //               0.0, 0.0, 0.0, 0.0),
+                          //       color: Color(0xFF173F5A),
+                          //       textStyle: FlutterFlowTheme.of(context)
+                          //           .titleLarge
+                          //           .override(
+                          //             fontFamily: 'Readex Pro',
+                          //             color: FlutterFlowTheme.of(context).info,
+                          //             fontSize: 18.0,
+                          //             letterSpacing: 0.0,
+                          //           ),
+                          //       elevation: 0.0,
+                          //       borderSide: BorderSide(
+                          //         color: Color(0xFF173F5A),
+                          //         width: 2.0,
+                          //       ),
+                          //       borderRadius: BorderRadius.circular(8.0),
+                          //     ),
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsetsDirectional.fromSTEB(
+                          //       8.0, 4, 8.0, 0.0),
+                          //   child: FFButtonWidget(
+                          //     onPressed: () async {
+                          //       showFilenameErrorDialog(context);
+                          //     },
+                          //     text: 'showFilenameErrorDialog',
+                          //     options: FFButtonOptions(
+                          //       width: double.infinity,
+                          //       height: 50.0,
+                          //       padding: const EdgeInsetsDirectional.fromSTEB(
+                          //           24.0, 0.0, 24.0, 0.0),
+                          //       iconPadding:
+                          //           const EdgeInsetsDirectional.fromSTEB(
+                          //               0.0, 0.0, 0.0, 0.0),
+                          //       color: Color(0xFF173F5A),
+                          //       textStyle: FlutterFlowTheme.of(context)
+                          //           .titleLarge
+                          //           .override(
+                          //             fontFamily: 'Readex Pro',
+                          //             color: FlutterFlowTheme.of(context).info,
+                          //             fontSize: 18.0,
+                          //             letterSpacing: 0.0,
+                          //           ),
+                          //       elevation: 0.0,
+                          //       borderSide: BorderSide(
+                          //         color: Color(0xFF173F5A),
+                          //         width: 2.0,
+                          //       ),
+                          //       borderRadius: BorderRadius.circular(8.0),
+                          //     ),
+                          //   ),
+                          // ),
+                          // // if( !_isSubscribed )
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8.0, 4.0, 8.0, 0.0),
                             child: FFButtonWidget(
                               onPressed: () async {
+                                await analytics.logEvent(
+                                  name:
+                                      'event_on_view_subscription_page_button_pressed',
+                                  parameters: {
+                                      'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                    'timestamp':
+                                        DateTime.now().toIso8601String(),
+                                  },
+                                );
                                 context.pushNamed('Subscription').then((_) {
                                   checkSubscriptionStatus();
                                   setState(
@@ -1001,24 +1235,36 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   Future<void> createPDF() async {
-    if (selectedMedia == null) {
-      LoadingDialog.hide(context);
+    const String LOG_TAG = "PDF_CREATION";
+    print('[$LOG_TAG] Starting PDF creation process');
 
+    if (selectedMedia == null) {
+      print(
+          '[$LOG_TAG] No media selected, hiding loading dialog and returning');
+      LoadingDialog.hide(context);
       return;
     }
+
+    print('[$LOG_TAG] Selected media count: ${selectedMedia!.length}');
 
     if (selectedMedia != null &&
         selectedMedia!
             .every((m) => validateFileFormat(m.storagePath, context))) {
+      print('[$LOG_TAG] All selected files have valid format');
+
       if (!_isSubscribed) {
+        print(
+            '[$LOG_TAG] User is not subscribed, incrementing PDF created count');
         preferenceService.incrementAndReturnPdfCreatedCount();
       }
 
+      print('[$LOG_TAG] Setting isDataUploading to true');
       safeSetState(() => _model.isDataUploading = true);
 
       var selectedUploadedFiles = <FFUploadedFile>[];
 
       try {
+        print('[$LOG_TAG] Converting selected media to FFUploadedFile objects');
         selectedUploadedFiles = selectedMedia!
             .map((m) => FFUploadedFile(
                   name: m.storagePath.split('/').last,
@@ -1028,45 +1274,81 @@ class _ConverterWidgetState extends State<ConverterWidget>
                   blurHash: m.blurHash,
                 ))
             .toList();
+
+        await analytics.logEvent(
+          name: 'event_on_create_pdf_called',
+          parameters: {
+              'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+            'timestamp': DateTime.now().toIso8601String(),
+            'selectedFileCount': selectedUploadedFiles!.length.toString(),
+          },
+        );
+        print(
+            '[$LOG_TAG] Successfully converted ${selectedUploadedFiles.length} files');
+      } catch (e) {
+        print('[$LOG_TAG] Error converting media files: $e');
       } finally {
+        print('[$LOG_TAG] Setting isDataUploading to false');
         _model.isDataUploading = false;
       }
+
       if (selectedUploadedFiles.length == selectedMedia!.length) {
+        print('[$LOG_TAG] All files converted successfully, updating model');
         safeSetState(() {
           _model.uploadedLocalFiles = selectedUploadedFiles;
         });
       } else {
+        print('[$LOG_TAG] Not all files were converted, returning');
         safeSetState(() {});
-
         return;
+      }
+    } else {
+      print('[$LOG_TAG] Some files have invalid format');
+    }
+
+    print(
+        '[$LOG_TAG] Uploaded local files count: ${_model.uploadedLocalFiles.length}');
+
+    if (_model.uploadedLocalFiles.length > 1) {
+      print('[$LOG_TAG] Multiple files selected, updating display name');
+      _model.fname =
+          '${_model.uploadedLocalFiles.length.toString()} ${l10n!.filesSelected}';
+      print('[$LOG_TAG] Display name set to: ${_model.fname}');
+      safeSetState(() {});
+    } else {
+      if (_model.uploadedLocalFiles.length == 1) {
+        print('[$LOG_TAG] Single file selected, getting filename');
+        _model.name = await actions.filename(
+          _model.uploadedLocalFiles.firstOrNull!,
+        );
+        print('[$LOG_TAG] Filename retrieved: ${_model.name}');
+        _model.fname = _model.name;
+        safeSetState(() {});
+      } else {
+        _model.fname = l10n!.noFilesSelected;
+        safeSetState(() {});
       }
     }
 
-    if (_model.uploadedLocalFiles.length > 1) {
-      _model.fname =
-          '${_model.uploadedLocalFiles.length.toString()} ${l10n!.filesSelected}';
-
-      safeSetState(() {});
-    } else {
-      _model.name = await actions.filename(
-        _model.uploadedLocalFiles.firstOrNull!,
-      );
-
-      _model.fname = _model.name;
-
-      safeSetState(() {});
-    }
-
+    print('[$LOG_TAG] Checking for landscape images');
     _model.checkLandscapeGallery = await actions.checkIfLandscape(
       _model.uploadedLocalFiles.toList(),
     );
+    print(
+        '[$LOG_TAG] Landscape images detected: ${_model.checkLandscapeGallery}');
 
     if (_model.checkLandscapeGallery!) {
+      print('[$LOG_TAG] Processing landscape images');
       final pileupList = _model.uploadedLocalFiles.map((file) {
         return SerializableFile(file.bytes!, file.name!).toMap();
       }).toList();
+      print(
+          '[$LOG_TAG] Created serializable file list with ${pileupList.length} items');
 
-      print('🔴🔴🔴🔴🔴 ${_model.filenameTextController.text}');
+      print(
+          '[$LOG_TAG] Filename from text controller: ${_model.filenameTextController.text}');
 
       final params = PdfMultiImgParams(
         fileupList: pileupList,
@@ -1079,20 +1361,29 @@ class _ConverterWidgetState extends State<ConverterWidget>
         fit: 'contain',
         selectedIndex: _orientationOptions.indexOf(_selectedOrientation),
       );
+      print(
+          '[$LOG_TAG] Created PDF parameters with orientation: $_selectedOrientation (index: ${_orientationOptions.indexOf(_selectedOrientation)})');
 
+      print('[$LOG_TAG] Starting PDF generation with isolate');
       _model.pdf2 = await pdfMultiImgWithIsolate(params);
+      print(
+          '[$LOG_TAG] PDF generation completed, PDF size: ${_model.pdf2?.bytes?.length ?? 0} bytes');
 
       _model.pdfFile = _model.pdf2;
-
       _model.landscapeExists = _model.checkLandscapeGallery;
+      print('[$LOG_TAG] PDF file assigned to model');
 
       safeSetState(() {});
     } else {
+      print('[$LOG_TAG] Processing portrait/mixed images');
       final pileupList = _model.uploadedLocalFiles.map((file) {
         return SerializableFile(file.bytes!, file.name!).toMap();
       }).toList();
+      print(
+          '[$LOG_TAG] Created serializable file list with ${pileupList.length} items');
 
-      print('🔴🔴🔴🔴🔴 ${_model.filenameTextController.text}');
+      print(
+          '[$LOG_TAG] Filename from text controller: ${_model.filenameTextController.text}');
 
       final params = PdfMultiImgParams(
         fileupList: pileupList,
@@ -1102,23 +1393,29 @@ class _ConverterWidgetState extends State<ConverterWidget>
         ),
         notes: _model.filenameTextController.text,
         isFirstPageSelected: true,
-        // Pass 'true' as specified
         fit: 'contain',
-        // Pass 'contain' as specified
-        selectedIndex: _orientationOptions.indexOf(
-            _selectedOrientation), // Use the index of the selected orientation
+        selectedIndex: _orientationOptions.indexOf(_selectedOrientation),
       );
+      print(
+          '[$LOG_TAG] Created PDF parameters with orientation: $_selectedOrientation (index: ${_orientationOptions.indexOf(_selectedOrientation)})');
 
+      print('[$LOG_TAG] Starting PDF generation with isolate');
       _model.pdf2 = await pdfMultiImgWithIsolate(params);
+      print(
+          '[$LOG_TAG] PDF generation completed, PDF size: ${_model.pdf2?.bytes?.length ?? 0} bytes');
 
       _model.pdfFile = _model.pdf2;
       _model.landscapeExists = _model.checkLandscapeGallery;
+      print('[$LOG_TAG] PDF file assigned to model');
 
       safeSetState(() {});
     }
 
+    print('[$LOG_TAG] Updating UI state');
     safeSetState(() {});
+    print('[$LOG_TAG] Hiding loading dialog');
     LoadingDialog.hide(context);
+    print('[$LOG_TAG] PDF creation process completed successfully');
   }
 
   Future<bool> checkPreviousAppPurchase() async {
@@ -1260,6 +1557,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
     if (_customerInfo?.entitlements.all['sub_lifetime'] != null &&
         _customerInfo?.entitlements.all['sub_lifetime']?.isActive == true) {
       // User has subscription, show them the feature
+      await analytics.logEvent(
+        name: 'event_on_subscription_already_purchased',
+        parameters: {
+            'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+          'timestamp': DateTime.now().toIso8601String(),
+          // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+        },
+      );
       setState(() {
         _isSubscribed = true;
       });
@@ -1272,12 +1579,23 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   void initRateMyApp() {
+    // todo revert this commeted function
+    // RateMyApp rateMyApp = RateMyApp(
+    //   preferencesPrefix: 'rateMyApp_',
+    //   minDays: 7,
+    //   minLaunches: 7,
+    //   remindDays: 7,
+    //   remindLaunches: 10,
+    //   googlePlayIdentifier: 'com.mycompany.ispeedpix2pdf7',
+    //   appStoreIdentifier: '6667115897',
+    // );
+
     RateMyApp rateMyApp = RateMyApp(
       preferencesPrefix: 'rateMyApp_',
-      minDays: 7,
-      minLaunches: 7,
-      remindDays: 7,
-      remindLaunches: 10,
+      minDays: 1,
+      minLaunches: 1,
+      remindDays: 1,
+      remindLaunches: 1,
       googlePlayIdentifier: 'com.mycompany.ispeedpix2pdf7',
       appStoreIdentifier: '6667115897',
     );
@@ -1481,7 +1799,7 @@ void showTrialLimitDialog(BuildContext context) {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text("${l10n.upgradePrompt}",
+            child: Text("${l10n.subscribeNowButton}",
                 style: FlutterFlowTheme.of(context).displayMedium.override(
                       fontFamily: 'Poppins',
                       color: Colors.white,

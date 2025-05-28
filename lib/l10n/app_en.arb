@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "rest": "Reset",
   "appTitle": "iSpeedPix2PDF",
   "defaultMixedOrientation": "DEFAULT - Mixed Orientation",
   "pagesFixedPortrait": "Pages Fixed - Portrait",
@@ -151,5 +152,7 @@
   "aboutAppDescription": "Convert images to PDF quickly and easily",
   "privacyPolicy": "Privacy Policy",
   "settings": "Settings",
-  "selectLanguage": "Select Language"
+  "selectLanguage": "Select Language",
+  "save": "Save",
+  "privacyAndSecurityDetailFive": "5. Privacy Policy - Our apps use Google Firebase for App Store Optimization (ASO) and Search Engine Optimization (SEO) purposes only. We do not collect, sell, or use this information for any other purposes.\n\nFor more information about Google Firebase’s data practices, please refer to their Privacy Policy:"
 }

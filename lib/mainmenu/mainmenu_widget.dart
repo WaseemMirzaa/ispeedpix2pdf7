@@ -1,3 +1,5 @@
+import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -134,7 +136,7 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
         elevation: 2.0,
       ),
       body: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 0.0),
+        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -556,79 +558,100 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                16.0, 12.0, 16.0, 0.0),
-                            child: Container(
-                              width: double.infinity,
-                              height: 60.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 5.0,
-                                    color: Color(0x3416202A),
-                                    offset: Offset(
-                                      0.0,
-                                      2.0,
-                                    ),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(12.0),
-                                shape: BoxShape.rectangle,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: InkWell(
-                                  splashColor: Colors.transparent,
-                                  focusColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  onTap: () async {
-                                    context.push('/language-selection');
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            l10n!.selectLanguage ?? '',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyLarge
-                                                .override(
-                                                  fontFamily: 'Inter',
-                                                  letterSpacing: 0.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: const AlignmentDirectional(
-                                            0.9, 0.0),
-                                        child: Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          size: 18.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ).animateOnPageLoad(
-                                    animationsMap['rowOnPageLoadAnimation4']!),
-                              ),
-                            ),
-                          ),
+//                           Padding(
+//                             padding: const EdgeInsetsDirectional.fromSTEB(
+//                                 16.0, 12.0, 16.0, 0.0),
+//                             child: Container(
+//                               width: double.infinity,
+//                               height: 60.0,
+//                               decoration: BoxDecoration(
+//                                 color: FlutterFlowTheme.of(context)
+//                                     .secondaryBackground,
+//                                 boxShadow: const [
+//                                   BoxShadow(
+//                                     blurRadius: 5.0,
+//                                     color: Color(0x3416202A),
+//                                     offset: Offset(
+//                                       0.0,
+//                                       2.0,
+//                                     ),
+//                                   )
+//                                 ],
+//                                 borderRadius: BorderRadius.circular(12.0),
+//                                 shape: BoxShape.rectangle,
+//                               ),
+//                               child: Padding(
+//                                 padding: const EdgeInsets.all(8.0),
+//                                 child: InkWell(
+//                                   splashColor: Colors.transparent,
+//                                   focusColor: Colors.transparent,
+//                                   hoverColor: Colors.transparent,
+//                                   highlightColor: Colors.transparent,
+//                                   onTap: () async {
+//                                     // Navigate to language selection screen
+//                                     final result = await Navigator.push(
+//                                       context,
+//                                       MaterialPageRoute(
+//                                           builder: (context) =>
+//                                               LanguageSelectionScreen()),
+//                                     );
+
+//                                     print('ResultPopLanguage $result');
+//                                     // Check if language was changed (result is true)
+//                                     if (result == true) {
+//                                       // Refresh the UI with the new language
+//                                       // setState(() {
+//                                       // l10n = AppLocalizations.of(context);
+//                                       // });
+
+//                                       print('ResultPopLanguage $result');
+// // c                          context.pushNamed('co/nverter');
+
+//                                       // Navigator.of(context).pop(true);
+//                                     }
+//                                   },
+//                                   child: Row(
+//                                     mainAxisSize: MainAxisSize.max,
+//                                     children: [
+//                                       Expanded(
+//                                         child: Padding(
+//                                           padding: const EdgeInsetsDirectional
+//                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
+//                                           child: Text(
+//                                             l10n!.selectLanguage ?? '',
+//                                             style: FlutterFlowTheme.of(context)
+//                                                 .bodyLarge
+//                                                 .override(
+//                                                   fontFamily: 'Inter',
+//                                                   letterSpacing: 0.0,
+//                                                 ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                       Align(
+//                                         alignment: const AlignmentDirectional(
+//                                             0.9, 0.0),
+//                                         child: Icon(
+//                                           Icons.arrow_forward_ios,
+//                                           color: FlutterFlowTheme.of(context)
+//                                               .secondaryText,
+//                                           size: 18.0,
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ).animateOnPageLoad(
+//                                     animationsMap['rowOnPageLoadAnimation4']!),
+//                               ),
+//                             ),
+//                           ),
+//
                         ],
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(
-                          0.0, 25.0, 0.0, 0.0),
+                          0.0, 25.0, 0.0, 25.0),
                       child: FFButtonWidget(
                         onPressed: () async {
                           context.pushNamed('converter');

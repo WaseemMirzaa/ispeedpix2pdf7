@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ConverterModel extends FlutterFlowModel<ConverterWidget> {
   ///  Local state fields for this page.
 
-  String? fname = 'No Files Selected';
+  String? fname;
 
   FFUploadedFile? pdfFile;
 

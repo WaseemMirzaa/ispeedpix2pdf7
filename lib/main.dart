@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:ispeedpix2pdf7/firebase_service';
+import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/constants.dart';
 import 'package:ispeedpix2pdf7/helper/language_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
@@ -14,8 +18,50 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/nav/nav.dart';
 
+// Global variable to track if Firebase is initialized
+bool _isFirebaseInitialized = false;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // Check if Firebase is already initialized
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      print('Firebase initialized successfully');
+    } else {
+      print('Firebase was already initialized');
+    }
+
+    final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+    // Enable analytics collection
+    await analytics.setAnalyticsCollectionEnabled(true);
+    
+    // Enable debug mode specifically for Android
+    if (Platform.isAndroid) {
+      // Set debug mode for Android
+      await analytics.setAnalyticsCollectionEnabled(true);
+      print('Android analytics debug mode enabled');
+      
+      // Log a test event for Android
+      await analytics.logEvent(
+        name: 'android_test_event',
+        parameters: {
+          'platform': 'android',
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+      print('Android test event logged');
+    }
+    
+    await analytics.logAppOpen();
+    print('Logged app_open event');
+  } catch (e) {
+    debugPrint('Failed to initialize Firebase: $e');
+  }
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
@@ -105,20 +151,20 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [
         Locale('en', ''), // English
-        Locale('es', ''), // Spanish
-        Locale('zh', ''), // Simplified Chinese
-        Locale('fr', ''), // French
-        Locale('de', ''), // German
-        Locale('pt', ''), // Portuguese
-        Locale('ar', ''), // Arabic
-        Locale('hi', ''), // Hindi
-        Locale('ja', ''), // Japanese
-        Locale('ko', ''), // Korean
-        Locale('ru', ''), // Russian
-        Locale('it', ''), // Italian
-        Locale('tr', ''), // Turkish
-        Locale('vi', ''), // Vietnamese
-        Locale('th', ''), // Thai
+        // Locale('es', ''), // Spanish
+        // Locale('zh', ''), // Simplified Chinese
+        // Locale('fr', ''), // French
+        // Locale('de', ''), // German
+        // Locale('pt', ''), // Portuguese
+        // Locale('ar', ''), // Arabic
+        // Locale('hi', ''), // Hindi
+        // Locale('ja', ''), // Japanese
+        // Locale('ko', ''), // Korean
+        // Locale('ru', ''), // Russian
+        // Locale('it', ''), // Italian
+        // Locale('tr', ''), // Turkish
+        // Locale('vi', ''), // Vietnamese
+        // Locale('th', ''), // Thai
       ],
       theme: ThemeData(
         brightness: Brightness.light,
@@ -129,7 +175,8 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) {
         // Get the current locale
         final locale = Localizations.localeOf(context);
-        final isRtl = locale.languageCode == 'ar';
+        final isRtl =
+            locale.languageCode == 'ar' || locale.languageCode == 'hi';
 
         // Apply the correct text direction based on language
         return Directionality(

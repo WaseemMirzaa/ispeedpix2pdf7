@@ -17,126 +17,109 @@ import 'dart:io';
 
 Future<List<dynamic>> downloadFFUploadedFile(
     FFUploadedFile pdfFile, String name) async {
+  const String LOG_TAG = "PDF_DOWNLOAD";
   try {
+    print('[$LOG_TAG] Starting download for file: $name');
     name = '$name.pdf';
+    print('[$LOG_TAG] File name with extension: $name');
 
     Directory? directory;
 
     String? filePath;
 
     if (Platform.isAndroid) {
-       try {
-      final directory = await getExternalStorageDirectory();
-      final filePath = '${directory!.path}/$name';
-      
-      // Write the PDF bytes to the file
-      final file = File(filePath);
-      await file.writeAsBytes(pdfFile.bytes!);
-      
-      // For Android 10+ (API 29+), use MediaStore API
-      if (int.parse(Platform.version.split('.')[0]) >= 10) {
-        const MethodChannel channel = MethodChannel('com.mycompany.ispeedpix2pdf7/file');
-        
-        try {
-          // Call the native code (Kotlin) via MethodChannel
-          await channel.invokeMethod('saveToMediaStore', {
-            'filePath': filePath,
-            'fileName': name,
-            'mimeType': 'application/pdf'
-          });
-        } on PlatformException catch (e) {
-          print("Error saving file to MediaStore: ${e.message}");
-        }
-      }
-      
-      // Share the PDF file
-      const MethodChannel channel = MethodChannel('com.mycompany.ispeedpix2pdf7/file');
       try {
-        await channel.invokeMethod('shareFile', {'filePath': filePath});
-      } on PlatformException catch (e) {
-        print("Error sharing file: ${e.message}");
+        print('[$LOG_TAG] Android platform detected');
+        final directory = await getExternalStorageDirectory();
+        print('[$LOG_TAG] External storage directory: ${directory?.path}');
+        final filePath = '${directory!.path}/$name';
+        print('[$LOG_TAG] File will be saved to: $filePath');
+
+        // Write the PDF bytes to the file
+        final file = File(filePath);
+        print('[$LOG_TAG] Writing ${pdfFile.bytes?.length ?? 0} bytes to file');
+        await file.writeAsBytes(pdfFile.bytes!);
+        print('[$LOG_TAG] File written successfully');
+
+        // For Android 10+ (API 29+), use MediaStore API
+        final androidVersion = int.parse(Platform.version.split('.')[0]);
+        print('[$LOG_TAG] Android version: $androidVersion');
+
+        if (int.parse(Platform.version.split('.')[0]) >= 10) {
+          print('[$LOG_TAG] Using MediaStore API for Android 10+');
+          const MethodChannel channel =
+              MethodChannel('com.mycompany.ispeedpix2pdf7/file');
+
+          try {
+            // Call the native code (Kotlin) via MethodChannel
+            print('[$LOG_TAG] Calling saveToMediaStore method');
+            await channel.invokeMethod('saveToMediaStore', {
+              'filePath': filePath,
+              'fileName': name,
+              'mimeType': 'application/pdf'
+            });
+            print('[$LOG_TAG] File saved to MediaStore successfully');
+          } on PlatformException catch (e) {
+            print("[$LOG_TAG] Error saving file to MediaStore: ${e.message}");
+          }
+        }
+
+        // Share the PDF file
+        print('[$LOG_TAG] Preparing to share file');
+        const MethodChannel channel =
+            MethodChannel('com.mycompany.ispeedpix2pdf7/file');
+        try {
+          print('[$LOG_TAG] Calling shareFile method');
+          await channel.invokeMethod('shareFile', {'filePath': filePath});
+          print('[$LOG_TAG] File shared successfully');
+        } on PlatformException catch (e) {
+          print("[$LOG_TAG] Error sharing file: ${e.message}");
+        }
+
+        print('[$LOG_TAG] Android download and share completed successfully');
+        return [
+          {'fileName': name},
+          {'filePath': filePath}
+        ];
+      } catch (e) {
+        print('[$LOG_TAG] Error saving PDF: $e');
+        rethrow;
       }
-      
-      return [
-        {'fileName': name},
-        {'filePath': filePath}
-      ];
-    } catch (e) {
-      print('Error saving PDF: $e');
-      rethrow;
-    }
-    //   directory = await getTemporaryDirectory();
-    //   filePath = '${directory.path}/$name';
-
-    //   if (!await directory.exists()) {
-    //     await directory.create(recursive: true);
-    //   }
-
-    //   final file = File(filePath);
-    //   if (await file.exists()) {
-    //     await file.delete();
-    //   }
-    // } else if (Platform.isIOS) {
-    //   // Save to the temporary directory on iOS
-    //   final directory = await getTemporaryDirectory();
-
-    //   filePath = '${directory.path}/$name';
-    // }
-
-    // // Write the PDF bytes to the file
-    // final file = File(filePath);
-
-    // await file.writeAsBytes(pdfFile.bytes!);
-
-    // // Log file path for debugging
-    // print('🟢 PDF saved to: $filePath');
-
-    // // Share the PDF file using XFile
-
-    // if (Platform.isAndroid) {
-    //   // final Uri uri = Uri.file(file.path);
-    //   // final xFile = XFile(uri.toString());
-
-    //   const MethodChannel channel =
-    //       MethodChannel('com.mycompany.ispeedpix2pdf7/file');
-
-    //   try {
-    //     // Call the native code (Kotlin) via MethodChannel
-    //     await channel.invokeMethod('shareFile', {'filePath': filePath});
-    //   } on PlatformException catch (e) {
-    //     print("Error sharing file: ${e.message}");
-    //   }
     } else {
+      print('[$LOG_TAG] iOS platform detected');
       final bool isIpad = await _isIpad();
+      print('[$LOG_TAG] Device is iPad: $isIpad');
 
       if (isIpad) {
-
         try {
-          print('📱 Attempting to share on iPad');
+          print('[$LOG_TAG] 📱 Attempting to share on iPad');
 
           final file = File(filePath!);
+          print('[$LOG_TAG] Checking if file exists at path: $filePath');
           if (!await file.exists()) {
-            // LogHelper.logErrorMessage(
-            // 'iPad Sharing', 'File does not exist at path: $filePath');
+            print('[$LOG_TAG] File does not exist at path: $filePath');
             throw Exception('File does not exist');
           }
 
           // Move file to Documents directory for better iOS compatibility
           final documentsDir = await getApplicationDocumentsDirectory();
+          print('[$LOG_TAG] Documents directory: ${documentsDir.path}');
           final newFilePath = '${documentsDir.path}/$name';
+          print('[$LOG_TAG] Copying file to: $newFilePath');
           await file.copy(newFilePath);
-
-          // LogHelper.logMessage('iPad Sharing', 'File copied to: $newFilePath');
+          print('[$LOG_TAG] File copied successfully');
 
           // Ensure the file exists and is readable
-          // final file = File(newFilePath);
+          print('[$LOG_TAG] Verifying file exists after copy');
           if (!await file.exists()) {
+            print('[$LOG_TAG] File does not exist at path: $newFilePath');
             throw Exception('File does not exist at path: $newFilePath');
           }
 
           const platform = MethodChannel('com.mycompany.ispeedpix2pdf7/share');
 
-          print('📱 Invoking shareFileOnIpad method with path: $newFilePath');
+          print(
+              '[$LOG_TAG] 📱 Invoking shareFileOnIpad method with path: $newFilePath');
 
           final bool result = await platform.invokeMethod('shareFileOnIpad', {
             'filePath': newFilePath,
@@ -144,31 +127,48 @@ Future<List<dynamic>> downloadFFUploadedFile(
             'fileName': name,
           });
 
-          print('📱 Share result: $result');
+          print('[$LOG_TAG] 📱 Share result: $result');
 
           if (!result) {
+            print('[$LOG_TAG] Share failed with result: false');
             throw Exception('Failed to share on iPad');
           }
         } catch (e) {
-          print('🔴 Error sharing on iPad: $e');
+          print('[$LOG_TAG] 🔴 Error sharing on iPad: $e');
           throw Exception('Failed to share on iPad: $e');
         }
         // Use native iOS sharing for iPad
-
       } else {
+        // Save to the temporary directory on iOS
+        final directory = await getTemporaryDirectory();
+
+        filePath = '${directory.path}/$name';
+
+        // }
+
+        // Write the PDF bytes to the file
+        final file = File(filePath);
+
+        await file.writeAsBytes(pdfFile.bytes!);
+
+        print('[$LOG_TAG] Using Share.shareXFiles for iOS (non-iPad)');
         final xFile = XFile(filePath!);
+        print('[$LOG_TAG] Created XFile from path: $filePath');
         await Share.shareXFiles([xFile], subject: '$name');
+        print('[$LOG_TAG] File shared successfully via shareXFiles');
       }
     }
 
+    print('[$LOG_TAG] Download and share process completed');
     return [
       {'fileName': name},
       {'filePath': filePath}
     ];
 
-    print('File saved and ready to share.');
+    print('[$LOG_TAG] File saved and ready to share.');
   } catch (e) {
-    print('Error saving or sharing PDF: $e');
+    print('[$LOG_TAG] Error saving or sharing PDF: $e');
+    print('[$LOG_TAG] Stack trace: ${StackTrace.current}');
 
     // Handle errors gracefully
     return [

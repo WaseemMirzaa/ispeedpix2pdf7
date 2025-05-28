@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -41,6 +42,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   AppLocalizations? l10n;
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   Offerings? offerings;
   bool _isSubscribed = false;
@@ -53,7 +55,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
     super.initState();
 
     try {
-      getSubscriptionsData();
+      getSubscriptionsData(null);
     } catch (e) {
       LogHelper.logMessage('Subscription Error', e);
     }
@@ -99,8 +101,20 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFF173F5A),
-          automaticallyImplyLeading: true,
-          actions: [],
+          leading: InkWell(
+            splashColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: () async {
+              Navigator.of(context).pop();
+            },
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: FlutterFlowTheme.of(context).secondaryBackground,
+              size: 30.0,
+            ),
+          ),
           centerTitle: false,
           elevation: 2.0,
         ),
@@ -452,6 +466,17 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                 8.0, 16.0, 8.0, 0.0),
                             child: FFButtonWidget(
                               onPressed: () async {
+                                await analytics.logEvent(
+                                  name: 'event_on_buy_now_button_purchased',
+                                  parameters: {
+                                      'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                                    'timestamp':
+                                        DateTime.now().toIso8601String(),
+                                    // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                                  },
+                                );
                                 var offering =
                                     offerings?.getOffering('sub_lifetime');
 
@@ -462,12 +487,13 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                             offering.availablePackages[0]
                                                 .storeProduct);
 
-                                    getSubscriptionsData();
+                                    getSubscriptionsData(
+                                        'event_on_subscription_purchased');
 
                                     LogHelper.logSuccessMessage(
                                         'Purchase Package', customerInfo);
 
-                                    getSubscriptionsData();
+                                    // getSubscriptionsData();
                                   } catch (e) {
                                     LogHelper.logErrorMessage(
                                         'Subscription Purchase Error ', e);
@@ -529,6 +555,17 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
       LoadingDialog.hide(context);
 
       if (hasActiveEntitlement) {
+        await analytics.logEvent(
+          name: 'event_on_subscription_restored',
+          parameters: {
+              'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+            'timestamp': DateTime.now().toIso8601String(),
+            // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+          },
+        );
+
         setState(() {
           _isSubscribed = true;
         });
@@ -629,6 +666,16 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
 
           if (receipt != null) {
             // isPurchased = true;
+            await analytics.logEvent(
+              name: 'event_on_subscription_restored',
+              parameters: {
+                  'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                'timestamp': DateTime.now().toIso8601String(),
+                // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+              },
+            );
             setState(() {
               // isPurchased = true;
               _isSubscribed = true;
@@ -640,6 +687,16 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
             // First try production URL
             final prodResponse = await _verifyReceipt(receipt, false);
             if (prodResponse != null && prodResponse['status'] == 0) {
+              await analytics.logEvent(
+                name: 'event_on_subscription_restored',
+                parameters: {
+                    'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+                  'timestamp': DateTime.now().toIso8601String(),
+                  // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                },
+              );
               setState(() {
                 // isPurchased = true;
                 _isSubscribed = true;
@@ -712,13 +769,13 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
     if (await canLaunch(url)) {
       await launch(url);
 
-      getSubscriptionsData();
+      getSubscriptionsData(null);
     } else {
       print('Could not open the subscription management page.');
     }
   }
 
-  Future<void> getSubscriptionsData() async {
+  Future<void> getSubscriptionsData(String? message) async {
     _customerInfo = await Purchases.getCustomerInfo();
 
     offerings = await Purchases.getOfferings();
@@ -730,6 +787,16 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
     if (_customerInfo?.entitlements.all['sub_lifetime'] != null &&
         _customerInfo?.entitlements.all['sub_lifetime']?.isActive == true) {
       // User has subscription, show them the featureGet lifetime access to iSpeedScan with a one-time purchase & unlock its full power today 🚀
+      await analytics.logEvent(
+        name: message ?? 'event_on_subscription_already_purchased',
+        parameters: {
+            'os': Platform.isAndroid
+                                                ? 'android'
+                                                : 'ios',
+          'timestamp': DateTime.now().toIso8601String(),
+          // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+        },
+      );
       setState(() {
         _isSubscribed = true;
       });

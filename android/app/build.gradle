@@ -2,8 +2,7 @@ plugins {
    id "com.android.application"
    id "kotlin-android"
    id "dev.flutter.flutter-gradle-plugin"
-   
-   
+   id "com.google.gms.google-services"  // Make sure this is present
 }
 
 def localProperties = new Properties()
@@ -84,6 +83,11 @@ android {
     packagingOptions {
         doNotStrip "**/*.so"
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
 }
 
 flutter {
@@ -92,6 +96,8 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10"
+    implementation platform('com.google.firebase:firebase-bom:32.7.4')
+    implementation 'com.google.firebase:firebase-analytics'
 }
 
 // Add this task to extract debug symbols
@@ -114,3 +120,6 @@ task extractNativeDebugSymbols(type: Copy) {
         }
     }
 }
+
+// apply plugin: 'com.google.gms.google-services' is now in the plugins block
+apply plugin: 'com.google.gms.google-services'  // Add this at the bottom of the file
