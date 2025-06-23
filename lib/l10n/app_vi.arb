@@ -151,5 +151,24 @@
   "aboutAppDescription": "Chuyển đổi ảnh sang PDF nhanh chóng và dễ dàng",
   "privacyPolicy": "Chính sách bảo mật",
   "settings": "Cài đặt",
-  "selectLanguage": "Chọn ngôn ngữ"
+  "selectLanguage": "Chọn ngôn ngữ",
+  "save": "Lưu",
+  "privacyAndSecurityDetailFive": "5. Chính sách quyền riêng tư - Ứng dụng của chúng tôi chỉ sử dụng Google Firebase cho mục đích Tối ưu hóa trên App Store (ASO) và Tối ưu hóa công cụ tìm kiếm (SEO). Chúng tôi không thu thập, bán hoặc sử dụng thông tin này cho bất kỳ mục đích nào khác.\n\nĐể biết thêm thông tin về cách Google Firebase xử lý dữ liệu, vui lòng tham khảo Chính sách quyền riêng tư của họ:",
+  "monthlyUsageLimitReached": "Đã đạt giới hạn sử dụng hàng tháng",
+  "monthlyUsageLimitDescription": "Bạn đã sử dụng hết 3 phút miễn phí trong tháng này. Thời gian sử dụng sẽ được đặt lại vào đầu tháng sau.",
+  "unlockUnlimitedUsageWithSubscription": "Mở khóa thời gian sử dụng không giới hạn với một lần mua gói đăng ký trọn đời.",
+  "laterButton": "Để sau",
+  "remainingUsageTime": "Thời gian sử dụng còn lại: {minutes} phút {seconds} giây",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 3 phút sử dụng mỗi tháng\n",
+  "usageTimeResetMonthly": "✔ Thời gian sử dụng được đặt lại hàng tháng\n\n"
 }

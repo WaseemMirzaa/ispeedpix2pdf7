@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
+import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:purchases_flutter/models/customer_info_wrapper.dart';
@@ -41,10 +42,13 @@ class ConverterWidget extends StatefulWidget {
 
   @override
   State<ConverterWidget> createState() => _ConverterWidgetState();
+
 }
+  bool _hasShownSubscriptionDialogThisSession = false;
+
 
 class _ConverterWidgetState extends State<ConverterWidget>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late ConverterModel _model;
 
   late SharedPreferenceService preferenceService;
@@ -65,12 +69,30 @@ class _ConverterWidgetState extends State<ConverterWidget>
   List<SelectedFile>? selectedMedia;
   var hideCurrentDropdown = false;
 
+  Timer? _usageTimer;
+  int _usageSeconds = 0;
+  bool _isTimerActive = false;
+  DateTime? _lastActiveTime;
+
+  // Add this property to track if we've shown the dialog this session
+
   @override
   void initState() {
     super.initState();
 
+    // Register the observer
+    WidgetsBinding.instance.addObserver(this);
+
     preferenceService = SharedPreferenceService();
-    preferenceService.resetPdfCreatedCount();
+
+    // Set trial end date if this is the first time
+    preferenceService.setTrialEndDate();
+
+    // Check if this is the first time the app is opened
+    _checkFirstTimeAppOpen();
+
+    // Reset the dialog shown flag at the start of each session
+    _hasShownSubscriptionDialogThisSession = false;
 
     _model = createModel(context, () => ConverterModel());
 
@@ -126,9 +148,38 @@ class _ConverterWidgetState extends State<ConverterWidget>
     initRateMyApp();
   }
 
+  // Add this method to check and handle first-time app open
+  Future<void> _checkFirstTimeAppOpen() async {
+    bool isFirstTimeAppOpened = await preferenceService.isFirstTimeAppOpened();
+
+    if (isFirstTimeAppOpened) {
+      // Log first-time open event
+      try {
+        await analytics.logEvent(
+          name: 'event_on_first_open',
+          parameters: {
+            'timestamp': DateTime.now().toIso8601String(),
+            'os': Platform.isAndroid ? 'android' : 'ios',
+          },
+        );
+        print('✅ Logged first-time app open event');
+      } catch (e) { 
+        print('❌ Failed to log first-time app open event: $e');
+      }
+
+      // Set the flag to false for future app opens
+      await preferenceService.setFirstTimeAppOpened(false);
+    }
+  }
+
   @override
   void dispose() {
     _model.dispose();
+    _usageTimer?.cancel();
+    _pauseUsageTracking();
+
+    // Remove the observer when disposing
+    WidgetsBinding.instance.removeObserver(this);
 
     super.dispose();
   }
@@ -363,9 +414,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             name:
                                                 'event_on_choose_files_button_pressed',
                                             parameters: {
-                                                'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                              'os': Platform.isAndroid
+                                                  ? 'android'
+                                                  : 'ios',
                                               'timestamp': DateTime.now()
                                                   .toIso8601String(),
                                             },
@@ -392,31 +443,32 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         LogHelper.logMessage(
                                             'pdfCreatedCount', pdfCreatedCount);
 
-                                        if (pdfCreatedCount > 5 &&
-                                            !_isSubscribed) {
-                                          await analytics.logEvent(
-                                            name: 'event_trial_limit_reached',
-                                            parameters: {
-                                                'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
-                                              'timestamp': DateTime.now()
-                                                  .toIso8601String(),
-                                              'pdfCreatedCount':
-                                                  pdfCreatedCount.toString(),
-                                            },
-                                          );
-                                          // await AnalyticsService.logButtonTap(
-                                          //     'showing_trial_limit_dialog',
-                                          //     additionalParams: {
-                                          //       'pdfCreatedCount':
-                                          //           pdfCreatedCount.toString(),
-                                          //       //   'subscribed': 'false',
-                                          //     });
-                                          //
-                                          showTrialLimitDialog(context);
+                                        // Check if user is not subscribed and trial has ended
+                                        if (!_isSubscribed && _is7DaysPassed) {
+                                          // Get remaining usage time
+                                          int remainingTime =
+                                              await preferenceService
+                                                  .getRemainingUsageTime();
 
-                                          return;
+                                          // If no time remaining, show limit dialog (only once per session)
+                                          if (remainingTime <= 0 &&
+                                              !_hasShownSubscriptionDialogThisSession) {
+                                            _hasShownSubscriptionDialogThisSession =
+                                                true;
+                                            await analytics.logEvent(
+                                              name: 'event_usage_limit_reached',
+                                              parameters: {
+                                                'os': Platform.isAndroid
+                                                    ? 'android'
+                                                    : 'ios',
+                                                'timestamp': DateTime.now()
+                                                    .toIso8601String(),
+                                                'remaining_time': '0',
+                                              },
+                                            );
+                                            showUsageLimitDialog(context);
+                                            return;
+                                          }
                                         }
 
                                         Timer(Duration(seconds: 1), () {
@@ -428,6 +480,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             true;
                                         LoadingDialog.isAlreadyCancelled =
                                             false;
+
+                                        bool hasRemainingTime =
+                                            await preferenceService
+                                                .hasRemainingUsageTime();
 
                                         try {
                                           var media = await selectMedia(
@@ -445,6 +501,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             multiImage: true,
                                             isSubscribed: _isSubscribed,
                                             are7DaysPassed: _is7DaysPassed,
+                                            remainingTime:
+                                                hasRemainingTime ? 10 : 0,
                                           );
 
                                           if (media != null) {
@@ -757,27 +815,27 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   } else {
                                     print(
                                         'ConverterWidget: isPermissionEnabled Calling...');
-                                    var isPermissionEnabled =
-                                        await _requestStoragePermission(
-                                            context);
+                                    // var isPermissionEnabled =
+                                    //     await _requestStoragePermission(
+                                    //         context);
 
                                     print(
                                         'ConverterWidget: isPermissionEnabled Called...');
 
-                                    if (!isPermissionEnabled) {
-                                      print(
-                                          'ConverterWidget: isPermissionEnabled False Returning...');
+                                    // if (!isPermissionEnabled) {
+                                    //   print(
+                                    //       'ConverterWidget: isPermissionEnabled False Returning...');
 
-                                      return;
-                                    }
+                                    //   return;
+                                    // }
 
                                     analytics.logEvent(
                                       name:
                                           'event_on_download_pdf_button_pressed',
                                       parameters: {
-                                          'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                        'os': Platform.isAndroid
+                                            ? 'android'
+                                            : 'ios',
                                         'timestamp':
                                             DateTime.now().toIso8601String(),
                                         // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
@@ -849,9 +907,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       parameters: {
                                         'timestamp':
                                             DateTime.now().toIso8601String(),
-                                            'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                        'os': Platform.isAndroid
+                                            ? 'android'
+                                            : 'ios',
                                         // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
                                       },
                                     );
@@ -925,9 +983,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   parameters: {
                                     'timestamp':
                                         DateTime.now().toIso8601String(),
-                                          'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                    'os':
+                                        Platform.isAndroid ? 'android' : 'ios',
                                     // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
                                   },
                                 );
@@ -1071,7 +1128,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           //     ),
                           //   ),
                           // ),
-                          // // if( !_isSubscribed )
+                          // if( !_isSubscribed )
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8.0, 4.0, 8.0, 0.0),
@@ -1081,9 +1138,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   name:
                                       'event_on_view_subscription_page_button_pressed',
                                   parameters: {
-                                      'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                    'os':
+                                        Platform.isAndroid ? 'android' : 'ios',
                                     'timestamp':
                                         DateTime.now().toIso8601String(),
                                   },
@@ -1123,6 +1179,84 @@ class _ConverterWidgetState extends State<ConverterWidget>
                               ),
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8.0, 4, 8.0, 0.0),
+                            child: FFButtonWidget(
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                LanguageSelectionScreen()))
+                                    .then((_) {
+                                  l10n = AppLocalizations.of(context);
+                                  generateOrientationOptions();
+
+                                  // // Log the language change event
+                                  // await analytics.logEvent(
+                                  //   name: 'event_on_language_changed',
+                                  //   parameters: {
+                                  //     'os': Platform.isAndroid ? 'android' : 'ios',
+                                  //     'timestamp': DateTime.now().toIso8601String(),
+                                  //     'new_language': Localizations.localeOf(context).languageCode,
+                                  //   },
+                                  // );
+
+                                  // Store current index before regenerating options
+                                  int currentIndex =
+                                      ConstValues.previousSelectedIndex;
+
+                                  // Ensure the index is valid for the new list of options
+                                  if (currentIndex >=
+                                      _orientationOptions.length) {
+                                    currentIndex = 0;
+                                    ConstValues.previousSelectedIndex = 0;
+                                  }
+
+                                  // Set the orientation to the corresponding option in the new language
+                                  _selectedOrientation =
+                                      _orientationOptions[currentIndex];
+
+                                  // Force a complete rebuild of the widget
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    if (mounted) {
+                                      setState(() {});
+                                    }
+                                  });
+                                });
+
+                                // If language was changed, rebuild the screen
+                              },
+                              text: l10n!.selectLanguage,
+                              options: FFButtonOptions(
+                                width: double.infinity,
+                                height: 50.0,
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    24.0, 0.0, 24.0, 0.0),
+                                iconPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                color: Color(0xFF173F5A),
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleLarge
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: FlutterFlowTheme.of(context).info,
+                                      fontSize: 18.0,
+                                      letterSpacing: 0.0,
+                                    ),
+                                elevation: 0.0,
+                                borderSide: BorderSide(
+                                  color: Color(0xFF173F5A),
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                          ),
+
                           // Padding(
                           //   padding: const EdgeInsetsDirectional.fromSTEB(
                           //       0.0, 20.0, 0.0, 0.0),
@@ -1278,9 +1412,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
         await analytics.logEvent(
           name: 'event_on_create_pdf_called',
           parameters: {
-              'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+            'os': Platform.isAndroid ? 'android' : 'ios',
             'timestamp': DateTime.now().toIso8601String(),
             'selectedFileCount': selectedUploadedFiles!.length.toString(),
           },
@@ -1506,75 +1638,94 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   Future<bool> _requestStoragePermission(BuildContext context) async {
-    if (Platform.isAndroid) {
-      PermissionStatus status;
+    // if (Platform.isAndroid) {
+    //   PermissionStatus status;
 
-      if (int.parse(Platform.version.split('.')[0]) >= 13) {
-        // For Android 13+ (API 33+)
-        status = await Permission.photos.request();
-      } else if (int.parse(Platform.version.split('.')[0]) >= 11) {
-        // For Android 11 and 12 (API 30, 31, 32)
-        status = await Permission.storage.request();
-      } else {
-        // For Android 10 and below
-        status = await Permission.storage.request();
-      }
+    //   if (int.parse(Platform.version.split('.')[0]) >= 13) {
+    //     // For Android 13+ (API 33+)
+    //     status = await Permission.photos.request();
+    //   } else if (int.parse(Platform.version.split('.')[0]) >= 11) {
+    //     // For Android 11 and 12 (API 30, 31, 32)
+    //     status = await Permission.storage.request();
+    //   } else {
+    //     // For Android 10 and below
+    //     status = await Permission.storage.request();
+    //   }
 
-      if (status.isDenied) {
-        _showPermissionDialog(
-          context,
-          l10n!.storagePermissionMessageRequired
-          // 'This app needs storage permission to save PDFs'
-          ,
-          // AppLocalizations.of(context)!.storagePermissionMessageRequired
-        );
-        return false;
-      }
+    //   if (status.isDenied) {
+    //     _showPermissionDialog(
+    //       context,
+    //       l10n!.storagePermissionMessageRequired
+    //       // 'This app needs storage permission to save PDFs'
+    //       ,
+    //       // AppLocalizations.of(context)!.storagePermissionMessageRequired
+    //     );
+    //     return false;
+    //   }
 
-      if (status.isPermanentlyDenied) {
-        _showPermissionDialog(context, l10n!.storagePermissionMessageRequired,
-            openSettings: true);
-        return false;
-      }
-    }
+    //   if (status.isPermanentlyDenied) {
+    //     _showPermissionDialog(context, l10n!.storagePermissionMessageRequired,
+    //         openSettings: true);
+    //     return false;
+    //   }
+    // }
     return true;
   }
 
   Future<void> checkSubscriptionStatus() async {
-    _is7DaysPassed =
-        await SharedPreferenceService().isFirstOpenDateOlderThan7Days();
+    // Check if trial has ended
+    _is7DaysPassed = await preferenceService.hasTrialEnded();
 
-    LogHelper.logErrorMessage('7DaysPassed', _is7DaysPassed);
+    // Set trial end date if not already set
+    await preferenceService.setTrialEndDate();
 
-    _customerInfo = await Purchases.getCustomerInfo();
+    try {
+      _customerInfo = await Purchases.getCustomerInfo();
 
-    offerings = await Purchases.getOfferings();
+      if (_customerInfo?.entitlements.all['sub_lifetime'] != null &&
+          _customerInfo?.entitlements.all['sub_lifetime']?.isActive == true) {
+        // User has subscription
+        await analytics.logEvent(
+          name: 'event_on_subscription_already_purchased',
+          parameters: {
+            'os': Platform.isAndroid ? 'android' : 'ios',
+            'timestamp': DateTime.now().toIso8601String(),
+          },
+        );
+        setState(() {
+          _isSubscribed = true;
+        });
+      } else {
+        _isSubscribed = false;
+        setState(() {});
 
-    LogHelper.logSuccessMessage('Customer Info', _customerInfo);
+        // Check for previous purchases
+        bool hasPreviousPurchase = await checkPreviousAppPurchase();
+        if (hasPreviousPurchase) {
+          setState(() {
+            _isSubscribed = true;
+          });
+        }
 
-    LogHelper.logSuccessMessage('Offerings', offerings);
-
-    if (_customerInfo?.entitlements.all['sub_lifetime'] != null &&
-        _customerInfo?.entitlements.all['sub_lifetime']?.isActive == true) {
-      // User has subscription, show them the feature
-      await analytics.logEvent(
-        name: 'event_on_subscription_already_purchased',
-        parameters: {
-            'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
-          'timestamp': DateTime.now().toIso8601String(),
-          // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
-        },
-      );
-      setState(() {
-        _isSubscribed = true;
-      });
-    } else {
-      _isSubscribed = false;
-
-      setState(() {});
-      checkPreviousAppPurchase();
+        // If not subscribed and trial has ended, check remaining usage time
+        if (!_isSubscribed &&
+            _is7DaysPassed &&
+            !_hasShownSubscriptionDialogThisSession) {
+          bool hasRemainingTime =
+              await preferenceService.hasRemainingUsageTime();
+          if (!hasRemainingTime) {
+            // Show usage limit dialog after a short delay
+            Future.delayed(Duration(seconds: 1), () {
+              if (mounted) {
+                _hasShownSubscriptionDialogThisSession = true;
+                showUsageLimitDialog(context);
+              }
+            });
+          }
+        }
+      }
+    } catch (e) {
+      LogHelper.logErrorMessage('Subscription Check Error', e);
     }
   }
 
@@ -1636,6 +1787,88 @@ class _ConverterWidgetState extends State<ConverterWidget>
         );
       }
     });
+  }
+
+  // Add this method to start tracking usage time
+  void _startUsageTracking() {
+    if (_isSubscribed) return; // No need to track for subscribers
+
+    _lastActiveTime = DateTime.now();
+    _isTimerActive = true;
+
+    // Create a timer that fires every second
+    _usageTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      if (!_isTimerActive) return;
+
+      _usageSeconds++;
+
+      // Every 10 seconds, record the usage time
+      if (_usageSeconds % 10 == 0) {
+        await preferenceService.recordUsageTime(10);
+
+        // Check if we've exceeded the monthly limit
+        bool hasRemainingTime = await preferenceService.hasRemainingUsageTime();
+        if (!hasRemainingTime) {
+          _pauseUsageTracking();
+          showUsageLimitDialog(context);
+
+          // Log the event
+          await analytics.logEvent(
+            name: 'event_usage_limit_reached',
+            parameters: {
+              'os': Platform.isAndroid ? 'android' : 'ios',
+              'timestamp': DateTime.now().toIso8601String(),
+              'usage_seconds': _usageSeconds.toString(),
+            },
+          );
+        }
+      }
+    });
+  }
+
+  // Pause the usage tracking
+  void _pauseUsageTracking() {
+    _isTimerActive = false;
+
+    // Record the final seconds since last checkpoint
+    if (_lastActiveTime != null) {
+      final now = DateTime.now();
+      final secondsSinceLastActive = now.difference(_lastActiveTime!).inSeconds;
+      if (secondsSinceLastActive > 0 && secondsSinceLastActive < 10) {
+        preferenceService.recordUsageTime(secondsSinceLastActive);
+      }
+    }
+  }
+
+  // Resume the usage tracking
+  void _resumeUsageTracking() {
+    if (_isSubscribed) return; // No need to track for subscribers
+    _lastActiveTime = DateTime.now();
+    _isTimerActive = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _startUsageTracking();
+  }
+
+  // Add this method to handle app lifecycle changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      // App has been resumed from background
+      _resumeUsageTracking();
+
+      // Check subscription status again but don't reset the dialog flag
+      // This ensures the dialog only shows once per app session
+      checkSubscriptionStatus();
+    } else if (state == AppLifecycleState.paused) {
+      // App is going to background
+      _pauseUsageTracking();
+    }
   }
 }
 
@@ -1800,6 +2033,91 @@ void showTrialLimitDialog(BuildContext context) {
               ),
             ),
             child: Text("${l10n.subscribeNowButton}",
+                style: FlutterFlowTheme.of(context).displayMedium.override(
+                      fontFamily: 'Poppins',
+                      color: Colors.white,
+                      fontSize: 14.0,
+                      letterSpacing: 0.0,
+                      fontWeight: FontWeight.w500,
+                    )),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showUsageLimitDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false, // User must tap a button to dismiss
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Center(
+          child: Text(
+            textAlign: TextAlign.center,
+            l10n.monthlyUsageLimitReached,
+            style: FlutterFlowTheme.of(context).displayMedium.override(
+                  fontFamily: 'Poppins',
+                  color: Color(0xFF173F5A),
+                  fontSize: 14.0,
+                  letterSpacing: 0.0,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.monthlyUsageLimitDescription,
+              textAlign: TextAlign.center,
+              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Colors.black,
+                    fontSize: 12.0,
+                    letterSpacing: 0.0,
+                  ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              l10n.unlockUnlimitedUsageWithSubscription,
+              textAlign: TextAlign.center,
+              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Colors.black,
+                    fontSize: 12.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(l10n.laterButton),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to subscription page
+              Navigator.pop(context);
+              context.pushNamed('Subscription');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF173F5A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(l10n.subscribeNowButton,
                 style: FlutterFlowTheme.of(context).displayMedium.override(
                       fontFamily: 'Poppins',
                       color: Colors.white,

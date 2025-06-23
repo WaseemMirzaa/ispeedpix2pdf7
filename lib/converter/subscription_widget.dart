@@ -233,24 +233,35 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                             ),
                                             TextSpan(
                                               text: l10n!
-                                                  .createUpToFivePDFsEverySevenDays,
-                                              // ' ✔ Create up to 5 PDFs every 7 days\n',
+                                                  .threeMinutesUsagePerMonth,
                                               style: TextStyle(
                                                 fontSize: 14.0,
                                               ),
                                             ),
                                             TextSpan(
-                                              text: l10n!
-                                                  .eachPDFCanHaveUpToThreePages,
-                                              // ' ✔ Each PDF can have up to 3 pages\n',
+                                              text: l10n!.usageTimeResetMonthly,
                                               style: TextStyle(),
                                             ),
-                                            TextSpan(
-                                              text:
-                                                  l10n!.autoResetEverySevenDays,
-                                              // ' ✔ Auto-reset every 7 days',
-                                              style: TextStyle(),
-                                            ),
+                                            // TextSpan(
+                                            //   text: l10n!
+                                            //       .createUpToFivePDFsEverySevenDays,
+                                            //   // ' ✔ Create up to 5 PDFs every 7 days\n',
+                                            //   style: TextStyle(
+                                            //     fontSize: 14.0,
+                                            //   ),
+                                            // ),
+                                            // TextSpan(
+                                            //   text: l10n!
+                                            //       .eachPDFCanHaveUpToThreePages,
+                                            //   // ' ✔ Each PDF can have up to 3 pages\n',
+                                            //   style: TextStyle(),
+                                            // ),
+                                            // TextSpan(
+                                            //   text:
+                                            //       l10n!.autoResetEverySevenDays,
+                                            //   // ' ✔ Auto-reset every 7 days',
+                                            //   style: TextStyle(),
+                                            // ),
                                             TextSpan(
                                               text: l10n!
                                                   .oneTimePurchaseUnlockFullAccess,
@@ -469,9 +480,8 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                 await analytics.logEvent(
                                   name: 'event_on_buy_now_button_purchased',
                                   parameters: {
-                                      'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                                    'os':
+                                        Platform.isAndroid ? 'android' : 'ios',
                                     'timestamp':
                                         DateTime.now().toIso8601String(),
                                     // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
@@ -488,7 +498,8 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                                 .storeProduct);
 
                                     getSubscriptionsData(
-                                        'event_on_subscription_purchased');
+                                      'event_on_subscription_purchased',
+                                    );
 
                                     LogHelper.logSuccessMessage(
                                         'Purchase Package', customerInfo);
@@ -558,9 +569,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
         await analytics.logEvent(
           name: 'event_on_subscription_restored',
           parameters: {
-              'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+            'os': Platform.isAndroid ? 'android' : 'ios',
             'timestamp': DateTime.now().toIso8601String(),
             // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
           },
@@ -669,9 +678,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
             await analytics.logEvent(
               name: 'event_on_subscription_restored',
               parameters: {
-                  'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                'os': Platform.isAndroid ? 'android' : 'ios',
                 'timestamp': DateTime.now().toIso8601String(),
                 // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
               },
@@ -690,9 +697,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
               await analytics.logEvent(
                 name: 'event_on_subscription_restored',
                 parameters: {
-                    'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
+                  'os': Platform.isAndroid ? 'android' : 'ios',
                   'timestamp': DateTime.now().toIso8601String(),
                   // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
                 },
@@ -760,9 +765,8 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
   Future<void> _openSubscriptionManagementPage() async {
     var url = "https://apps.apple.com/account/subscriptions";
 
-    if (AppGlobals.subscriptionType == SubscriptionType.sandbox) {
-      url = 'itms-apps://sandbox.itunes.apple.com/account/subscriptions';
-    }
+    if (AppGlobals.subscriptionType == SubscriptionType.sandbox) {}
+    url = 'itms-apps://sandbox.itunes.apple.com/account/subscriptions';
 
     print(LogHelper.logMessage('Url', url));
 
@@ -779,6 +783,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
     _customerInfo = await Purchases.getCustomerInfo();
 
     offerings = await Purchases.getOfferings();
+    var offering = offerings?.getOffering('sub_lifetime');
 
     LogHelper.logSuccessMessage('Customer Info', _customerInfo);
 
@@ -789,13 +794,21 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
       // User has subscription, show them the featureGet lifetime access to iSpeedScan with a one-time purchase & unlock its full power today 🚀
       await analytics.logEvent(
         name: message ?? 'event_on_subscription_already_purchased',
-        parameters: {
-            'os': Platform.isAndroid
-                                                ? 'android'
-                                                : 'ios',
-          'timestamp': DateTime.now().toIso8601String(),
-          // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
-        },
+        parameters: (message != null)
+            ? {
+                'price': offering?.availablePackages[0].storeProduct.price
+                    .toString(),
+                'currencyCode':
+                    offering?.availablePackages[0].storeProduct.currencyCode,
+                'os': Platform.isAndroid ? 'android' : 'ios',
+                'timestamp': DateTime.now().toIso8601String(),
+                // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+              }
+            : {
+                'os': Platform.isAndroid ? 'android' : 'ios',
+                'timestamp': DateTime.now().toIso8601String(),
+                // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+              },
       );
       setState(() {
         _isSubscribed = true;

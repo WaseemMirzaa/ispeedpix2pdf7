@@ -151,5 +151,24 @@
   "aboutAppDescription": "画像を素早く簡単にPDFに変換",
   "privacyPolicy": "プライバシーポリシー",
   "settings": "設定",
-  "selectLanguage": "言語を選択"
+  "selectLanguage": "言語を選択",
+  "save": "保存",
+  "privacyAndSecurityDetailFive": "5. プライバシーポリシー - 当社のアプリは、アプリストア最適化（ASO）および検索エンジン最適化（SEO）の目的のみで Google Firebase を使用しています。これらの情報を他の目的で収集、販売、使用することはありません。\n\nGoogle Firebase のデータ処理に関する詳細は、プライバシーポリシーをご参照ください：",
+  "monthlyUsageLimitReached": "月間利用制限に達しました",
+  "monthlyUsageLimitDescription": "今月の無料利用時間（3分）をすでに使い切りました。利用時間は翌月初めにリセットされます。",
+  "unlockUnlimitedUsageWithSubscription": "生涯サブスクリプションを一度購入すると、無制限の利用時間がアンロックされます。",
+  "laterButton": "後で",
+  "remainingUsageTime": "残りの利用時間：{minutes}分 {seconds}秒",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 月に3分の利用時間\n",
+  "usageTimeResetMonthly": "✔ 利用時間は毎月リセットされます\n\n"
 }

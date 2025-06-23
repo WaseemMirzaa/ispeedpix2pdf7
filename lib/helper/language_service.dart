@@ -7,8 +7,18 @@ class LanguageService {
   
   // List of supported language codes in the app
   static const List<String> supportedLanguages = [
-    'en', 'es', 'zh', 'fr', 'de', 'pt', 'ar', 'hi', 'ja', 'ko', 'ru', 'it', 'tr', 'vi', 'th'
+    'en', 'es', 'zh', 'fr', 'de', 'pt', 'ar', 'hi', 'ja', 'ko', 'ru', 'it', 'tr', 'vi', 'th', 'he'
   ];
+
+  // Add a method to check if a language is RTL
+  static bool isRtlLanguage(String languageCode) {
+    return languageCode == 'ar' || languageCode == 'he' || languageCode == 'hi';
+  }
+
+  // Add a method to get text direction
+  static TextDirection getTextDirectionForLanguage(String languageCode) {
+    return isRtlLanguage(languageCode) ? TextDirection.rtl : TextDirection.ltr;
+  }
   
   static final ValueNotifier<Locale> localeNotifier = ValueNotifier<Locale>(Locale('en', ''));
   

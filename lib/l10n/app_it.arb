@@ -1,6 +1,6 @@
 {
   "@@locale": "it",
-  "appTitle": "ispeedpix2pdf",
+  "appTitle": "iSpeedPix2PDF",
   "defaultMixedOrientation": "Predefinito - Orientamento misto",
   "pagesFixedPortrait": "Pagine fisse: ritratto",
   "landscapePhotosTopAlignedForEasyViewing": "Landsape Foto - Top allineato per una facile visualizzazione",
@@ -116,7 +116,7 @@
   "oneTimePurchaseUnlockFullAccess": "One Time Acquista (sblocca il pieno accesso)\n\n",
   "unlimitedPDFCreation": "✔ Creazione PDF illimitata\n",
   "singlePurchaseLifetimeAccess": "✔ Un singolo acquisto per l'accesso a vita\n\n",
-  "upgradeTodayToUnlockCompletePotential": "Aggiorna oggi per sbloccare il potenziale completo di ispeedpix2pdf con un abbonamento a vita 🚀",
+  "upgradeTodayToUnlockCompletePotential": "Aggiorna oggi per sbloccare il potenziale completo di iSpeedPix2PDF con un abbonamento a vita 🚀",
   "enjoyFullAccess": "Goditi il ​​tuo pieno accesso",
   "checkingActivePurchase": "Controllo dell'acquisto attivo",
   "alreadyPurchasedRestoreHere": "Verifica dell'acquisto attivo",
@@ -151,5 +151,24 @@
   "aboutAppDescription": "Converti immagini in PDF rapidamente e facilmente",
   "privacyPolicy": "Informativa sulla privacy",
   "settings": "Impostazioni",
-  "selectLanguage": "Seleziona lingua"
+  "selectLanguage": "Seleziona lingua",
+  "save": "Salva",
+  "privacyAndSecurityDetailFive": "5. Informativa sulla privacy - Le nostre app utilizzano Google Firebase esclusivamente per l'ottimizzazione dell'App Store (ASO) e per l'ottimizzazione dei motori di ricerca (SEO). Non raccogliamo, vendiamo né utilizziamo queste informazioni per altri scopi.\n\nPer ulteriori informazioni sulle pratiche di gestione dei dati di Google Firebase, consulta la loro Informativa sulla privacy:",
+  "monthlyUsageLimitReached": "Limite mensile di utilizzo raggiunto",
+  "monthlyUsageLimitDescription": "Hai utilizzato i tuoi 3 minuti di tempo di utilizzo gratuito per questo mese. Il tempo di utilizzo verrà ripristinato all'inizio del prossimo mese.",
+  "unlockUnlimitedUsageWithSubscription": "Sblocca tempo di utilizzo illimitato con un acquisto una tantum del nostro abbonamento a vita.",
+  "laterButton": "Più tardi",
+  "remainingUsageTime": "Tempo di utilizzo rimanente: {minutes} min {seconds} sec",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 3 minuti di utilizzo al mese\n",
+  "usageTimeResetMonthly": "✔ Il tempo di utilizzo si azzera ogni mese\n\n"
 }

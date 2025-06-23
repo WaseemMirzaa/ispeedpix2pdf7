@@ -56,6 +56,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   Color backgroundColor = const Color(0xFFF5F5F5),
   bool includeDimensions = false,
   bool includeBlurHash = false,
+  int remainingTime = 0,
 }) async {
 
   final createUploadMediaListTile =
@@ -149,6 +150,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
     mediaSource: mediaSource,
     includeDimensions: includeDimensions,
     includeBlurHash: includeBlurHash,
+    remainingTime: remainingTime,
   );
 }
 
@@ -163,7 +165,7 @@ Future<List<SelectedFile>?> selectMedia({
   bool includeDimensions = false,
   bool includeBlurHash = false,
   bool isSubscribed = false,
-  bool are7DaysPassed = false,
+  bool are7DaysPassed = false, required int remainingTime,
 }) async {
     try {
 
@@ -176,7 +178,7 @@ Future<List<SelectedFile>?> selectMedia({
             maxHeight: maxHeight,
             requestFullMetadata: true,
             imageQuality: imageQuality,
-            limit:(!isSubscribed && are7DaysPassed) ? 3 : 60,
+            limit:(!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60,
         );
 
         final pickedMedia = await pickedMediaFuture;

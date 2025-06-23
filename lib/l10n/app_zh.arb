@@ -151,5 +151,24 @@
   "aboutAppDescription": "快速轻松将图片转换为PDF",
   "privacyPolicy": "隐私政策",
   "settings": "设置",
-  "selectLanguage": "选择语言"
+  "selectLanguage": "选择语言",
+  "save": "保存",
+  "privacyAndSecurityDetailFive": "5. 隐私政策 - 我们的应用仅使用 Google Firebase 进行应用商店优化（ASO）和搜索引擎优化（SEO）。我们不会收集、出售或将这些信息用于其他目的。\n\n有关 Google Firebase 数据处理方式的更多信息，请参阅其隐私政策：",
+  "monthlyUsageLimitReached": "已达到每月使用限制",
+  "monthlyUsageLimitDescription": "您本月的3分钟免费使用时间已用完。使用时间将在下个月初重置。",
+  "unlockUnlimitedUsageWithSubscription": "通过一次性购买终身订阅，解锁无限使用时间。",
+  "laterButton": "稍后",
+  "remainingUsageTime": "剩余使用时间：{minutes} 分钟 {seconds} 秒",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 每月3分钟使用时间\n",
+  "usageTimeResetMonthly": "✔ 使用时间每月重置\n\n"
 }

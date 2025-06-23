@@ -39,13 +39,13 @@ void main() async {
 
     // Enable analytics collection
     await analytics.setAnalyticsCollectionEnabled(true);
-    
+
     // Enable debug mode specifically for Android
     if (Platform.isAndroid) {
       // Set debug mode for Android
       await analytics.setAnalyticsCollectionEnabled(true);
       print('Android analytics debug mode enabled');
-      
+
       // Log a test event for Android
       await analytics.logEvent(
         name: 'android_test_event',
@@ -56,7 +56,7 @@ void main() async {
       );
       print('Android test event logged');
     }
-    
+
     await analytics.logAppOpen();
     print('Logged app_open event');
   } catch (e) {
@@ -151,20 +151,21 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [
         Locale('en', ''), // English
-        // Locale('es', ''), // Spanish
-        // Locale('zh', ''), // Simplified Chinese
-        // Locale('fr', ''), // French
-        // Locale('de', ''), // German
-        // Locale('pt', ''), // Portuguese
-        // Locale('ar', ''), // Arabic
-        // Locale('hi', ''), // Hindi
-        // Locale('ja', ''), // Japanese
-        // Locale('ko', ''), // Korean
-        // Locale('ru', ''), // Russian
-        // Locale('it', ''), // Italian
-        // Locale('tr', ''), // Turkish
-        // Locale('vi', ''), // Vietnamese
-        // Locale('th', ''), // Thai
+        Locale('es', ''), // Spanish
+        Locale('zh', ''), // Simplified Chinese
+        Locale('fr', ''), // French
+        Locale('de', ''), // German
+        Locale('pt', ''), // Portuguese
+        Locale('ar', ''), // Arabic
+        Locale('hi', ''), // Hindi
+        Locale('ja', ''), // Japanese
+        Locale('ko', ''), // Korean
+        Locale('ru', ''), // Russian
+        Locale('it', ''), // Italian
+        Locale('tr', ''), // Turkish
+        Locale('vi', ''), // Vietnamese
+        Locale('th', ''), // Thai
+        Locale('he', ''), // Hebrew
       ],
       theme: ThemeData(
         brightness: Brightness.light,
@@ -175,12 +176,13 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) {
         // Get the current locale
         final locale = Localizations.localeOf(context);
-        final isRtl =
-            locale.languageCode == 'ar' || locale.languageCode == 'hi';
+        final isRtl = locale.languageCode == 'ar' ||
+            locale.languageCode == 'hi' ||
+            locale.languageCode == 'he';
 
         // Apply the correct text direction based on language
         return Directionality(
-          key: UniqueKey(), // Add a unique key
+          // key: UniqueKey(), // Add a unique key
           textDirection: isRtl ? ui.TextDirection.rtl : ui.TextDirection.ltr,
           child: child!,
         );

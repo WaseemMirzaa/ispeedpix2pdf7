@@ -154,5 +154,22 @@
   "settings": "Settings",
   "selectLanguage": "Select Language",
   "save": "Save",
-  "privacyAndSecurityDetailFive": "5. Privacy Policy - Our apps use Google Firebase for App Store Optimization (ASO) and Search Engine Optimization (SEO) purposes only. We do not collect, sell, or use this information for any other purposes.\n\nFor more information about Google Firebase’s data practices, please refer to their Privacy Policy:"
+  "privacyAndSecurityDetailFive": "5. Privacy Policy - Our apps use Google Firebase for App Store Optimization (ASO) and Search Engine Optimization (SEO) purposes only. We do not collect, sell, or use this information for any other purposes.\n\nFor more information about Google Firebase’s data practices, please refer to their Privacy Policy:",
+  "monthlyUsageLimitReached": "Monthly Usage Limit Reached",
+  "monthlyUsageLimitDescription": "You've used your 3 minutes of free usage time for this month. Your usage time will reset at the beginning of next month.",
+  "unlockUnlimitedUsageWithSubscription": "Unlock unlimited usage time with a one-time purchase of our lifetime subscription.",
+  "laterButton": "Later",
+  "remainingUsageTime": "Remaining usage time: {minutes} min {seconds} sec",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 3 minutes of usage time per month\n",
+  "usageTimeResetMonthly": "✔ Usage time resets monthly\n\n"
 }

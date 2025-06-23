@@ -22,11 +22,11 @@ class DefaultFirebaseOptions {
   }
 
  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB81BedeHAMdYb6aeQtLEfIsW_OmIJqGXQ',
-    appId: '1:466315140538:ios:1f854a29f42bf1b2ed9183',
-    messagingSenderId: '466315140538',
-    projectId: 'tevin-eigh---ispeed-apps',
-    // storageBucket: 'secrets-wedding.firebasestorage.app',
+    apiKey: 'AIzaSyBEI6BMIKtvGGDVpGu5cY7ojnacQkDOjtw',
+    appId: '1:336767545818:ios:5f08e58bfec9ea80d210e3',
+    messagingSenderId: '336767545818',
+    projectId: 'tispeedpixtopdfios',
+    storageBucket: 'ispeedpixtopdfios.firebasestorage.app',
   );
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAV9O1cNRA5X_gvaI7auep9jhdkmNA_GT0',

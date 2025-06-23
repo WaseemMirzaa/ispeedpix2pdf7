@@ -93,12 +93,25 @@ Future<List<dynamic>> downloadFFUploadedFile(
       if (isIpad) {
         try {
           print('[$LOG_TAG] 📱 Attempting to share on iPad');
+          final directory = await getTemporaryDirectory();
+          print('[$LOG_TAG] Temporary directory: ${directory.path}');
 
+          // Create the file path
+          filePath = '${directory.path}/$name';
+          print('[$LOG_TAG] File path: $filePath');
+
+          // Create the file and write bytes to it
           final file = File(filePath!);
+          print(
+              '[$LOG_TAG] Writing ${pdfFile.bytes?.length ?? 0} bytes to file');
+          await file.writeAsBytes(pdfFile.bytes ?? Uint8List(0));
+          print('[$LOG_TAG] File written successfully');
+
+          // Check if file exists after writing
           print('[$LOG_TAG] Checking if file exists at path: $filePath');
           if (!await file.exists()) {
-            print('[$LOG_TAG] File does not exist at path: $filePath');
-            throw Exception('File does not exist');
+            print('[$LOG_TAG] File does not exist after writing: $filePath');
+            throw Exception('Failed to write file');
           }
 
           // Move file to Documents directory for better iOS compatibility
@@ -106,14 +119,16 @@ Future<List<dynamic>> downloadFFUploadedFile(
           print('[$LOG_TAG] Documents directory: ${documentsDir.path}');
           final newFilePath = '${documentsDir.path}/$name';
           print('[$LOG_TAG] Copying file to: $newFilePath');
-          await file.copy(newFilePath);
+
+          // Create the new file by copying
+          final newFile = await file.copy(newFilePath);
           print('[$LOG_TAG] File copied successfully');
 
-          // Ensure the file exists and is readable
-          print('[$LOG_TAG] Verifying file exists after copy');
-          if (!await file.exists()) {
-            print('[$LOG_TAG] File does not exist at path: $newFilePath');
-            throw Exception('File does not exist at path: $newFilePath');
+          // Ensure the new file exists and is readable
+          print('[$LOG_TAG] Verifying new file exists');
+          if (!await newFile.exists()) {
+            print('[$LOG_TAG] New file does not exist at path: $newFilePath');
+            throw Exception('Failed to copy file to documents directory');
           }
 
           const platform = MethodChannel('com.mycompany.ispeedpix2pdf7/share');
@@ -121,7 +136,8 @@ Future<List<dynamic>> downloadFFUploadedFile(
           print(
               '[$LOG_TAG] 📱 Invoking shareFileOnIpad method with path: $newFilePath');
 
-          final bool result = await platform.invokeMethod('shareFileOnIpad', {
+          // Handle potential null result from platform channel
+          final result = await platform.invokeMethod<bool>('shareFileOnIpad', {
             'filePath': newFilePath,
             'mimeType': 'application/pdf',
             'fileName': name,
@@ -129,13 +145,19 @@ Future<List<dynamic>> downloadFFUploadedFile(
 
           print('[$LOG_TAG] 📱 Share result: $result');
 
-          if (!result) {
-            print('[$LOG_TAG] Share failed with result: false');
-            throw Exception('Failed to share on iPad');
+          if (result == null || result == false) {
+            print('[$LOG_TAG] Share failed with result: $result');
+            throw Exception('Failed to share on iPad: null or false result');
           }
+
+          print('[$LOG_TAG] iPad sharing completed successfully');
         } catch (e) {
           print('[$LOG_TAG] 🔴 Error sharing on iPad: $e');
-          throw Exception('Failed to share on iPad: $e');
+          // Don't rethrow, just return empty values to handle gracefully
+          return [
+            {'fileName': name},
+            {'filePath': filePath ?? ''}
+          ];
         }
         // Use native iOS sharing for iPad
       } else {

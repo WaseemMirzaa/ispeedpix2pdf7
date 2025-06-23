@@ -153,5 +153,24 @@
   "privacyPolicy": "Datenschutzrichtlinie",
   "settings": "Einstellungen",
   "selectLanguage": "Sprache auswählen",
-  "chooseLanguage": "Sprache auswählen"
+  "chooseLanguage": "Sprache auswählen",
+  "save": "Speichern",
+  "privacyAndSecurityDetailFive": "5. Datenschutzrichtlinie – Unsere Apps verwenden Google Firebase ausschließlich zu Zwecken der App Store-Optimierung (ASO) und der Suchmaschinenoptimierung (SEO). Wir sammeln, verkaufen oder verwenden diese Informationen nicht für andere Zwecke.\n\nWeitere Informationen zu den Datenpraktiken von Google Firebase finden Sie in deren Datenschutzrichtlinie:",
+  "monthlyUsageLimitReached": "Monatliches Nutzungslimit erreicht",
+  "monthlyUsageLimitDescription": "Sie haben Ihre 3 Minuten kostenlose Nutzungszeit für diesen Monat aufgebraucht. Ihre Nutzungszeit wird zu Beginn des nächsten Monats zurückgesetzt.",
+  "unlockUnlimitedUsageWithSubscription": "Schalten Sie unbegrenzte Nutzungszeit mit einem einmaligen Kauf unseres lebenslangen Abonnements frei.",
+  "laterButton": "Später",
+  "remainingUsageTime": "Verbleibende Nutzungszeit: {minutes} Min. {seconds} Sek.",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 3 Minuten Nutzungszeit pro Monat\n",
+  "usageTimeResetMonthly": "✔ Nutzungszeit wird monatlich zurückgesetzt\n\n"
 }

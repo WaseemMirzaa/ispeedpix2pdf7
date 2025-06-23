@@ -151,5 +151,24 @@
   "aboutAppDescription": "छवियों को PDF में जल्दी और आसानी से कनवर्ट करें",
   "privacyPolicy": "गोपनीयता नीति",
   "settings": "सेटिंग्स",
-  "selectLanguage": "भाषा चुनें"
+  "selectLanguage": "भाषा चुनें",
+  "save": "सहेजें",
+  "privacyAndSecurityDetailFive": "5. गोपनीयता नीति - हमारे ऐप्स केवल ऐप स्टोर ऑप्टिमाइज़ेशन (ASO) और सर्च इंजन ऑप्टिमाइज़ेशन (SEO) के उद्देश्य से Google Firebase का उपयोग करते हैं। हम इस जानकारी को किसी अन्य उद्देश्य के लिए एकत्रित, बेचते या उपयोग नहीं करते हैं।\n\nGoogle Firebase की डेटा प्रथाओं के बारे में अधिक जानकारी के लिए, कृपया उनकी गोपनीयता नीति देखें:",
+  "monthlyUsageLimitReached": "मासिक उपयोग सीमा पूरी हो गई है",
+  "monthlyUsageLimitDescription": "आपने इस महीने के लिए अपनी 3 मिनट की निःशुल्क उपयोग अवधि समाप्त कर ली है। आपकी उपयोग अवधि अगले महीने की शुरुआत में रीसेट हो जाएगी।",
+  "unlockUnlimitedUsageWithSubscription": "हमारी आजीवन सदस्यता की एकमुश्त खरीद के साथ असीमित उपयोग समय अनलॉक करें।",
+  "laterButton": "बाद में",
+  "remainingUsageTime": "शेष उपयोग समय: {minutes} मिनट {seconds} सेकंड",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ प्रति माह 3 मिनट का उपयोग समय\n",
+  "usageTimeResetMonthly": "✔ उपयोग समय मासिक रूप से रीसेट होता है\n\n"
 }

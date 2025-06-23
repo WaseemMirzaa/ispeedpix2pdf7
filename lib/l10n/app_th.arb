@@ -151,5 +151,24 @@
   "aboutAppDescription": "แปลงรูปภาพเป็น PDF อย่างรวดเร็วและง่ายดาย",
   "privacyPolicy": "นโยบายความเป็นส่วนตัว",
   "settings": "การตั้งค่า",
-  "selectLanguage": "เลือกภาษา"
+  "selectLanguage": "เลือกภาษา",
+  "save": "บันทึก",
+  "privacyAndSecurityDetailFive": "5. นโยบายความเป็นส่วนตัว - แอปของเราใช้ Google Firebase สำหรับการเพิ่มประสิทธิภาพบน App Store (ASO) และการเพิ่มประสิทธิภาพบนเครื่องมือค้นหา (SEO) เท่านั้น เราจะไม่รวบรวม ขาย หรือใช้ข้อมูลนี้เพื่อวัตถุประสงค์อื่นใด\n\nหากต้องการข้อมูลเพิ่มเติมเกี่ยวกับแนวทางการจัดการข้อมูลของ Google Firebase กรุณาอ้างอิงนโยบายความเป็นส่วนตัวของพวกเขา:",
+  "monthlyUsageLimitReached": "ถึงขีดจำกัดการใช้งานรายเดือนแล้ว",
+  "monthlyUsageLimitDescription": "คุณใช้เวลาใช้งานฟรี 3 นาทีสำหรับเดือนนี้หมดแล้ว เวลาใช้งานจะรีเซ็ตใหม่เมื่อเริ่มต้นเดือนถัดไป",
+  "unlockUnlimitedUsageWithSubscription": "ปลดล็อกเวลาใช้งานไม่จำกัดด้วยการซื้อแบบชำระครั้งเดียวสำหรับการสมัครสมาชิกตลอดชีพ",
+  "laterButton": "ภายหลัง",
+  "remainingUsageTime": "เวลาใช้งานที่เหลือ: {minutes} นาที {seconds} วินาที",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ เวลาใช้งาน 3 นาทีต่อเดือน\n",
+  "usageTimeResetMonthly": "✔ เวลาใช้งานจะถูกรีเซ็ตทุกเดือน\n\n"
 }

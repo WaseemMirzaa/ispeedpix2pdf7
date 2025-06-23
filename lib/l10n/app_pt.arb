@@ -151,5 +151,24 @@
   "aboutAppDescription": "Converta imagens para PDF rápida e facilmente",
   "privacyPolicy": "Política de Privacidade",
   "settings": "Configurações",
-  "selectLanguage": "Selecionar idioma"
+  "selectLanguage": "Selecionar idioma",
+  "save": "Salvar",
+  "privacyAndSecurityDetailFive": "5. Política de Privacidade - Nossos aplicativos utilizam o Google Firebase apenas para fins de Otimização da App Store (ASO) e Otimização de Motores de Busca (SEO). Não coletamos, vendemos ou utilizamos essas informações para quaisquer outros fins.\n\nPara mais informações sobre as práticas de dados do Google Firebase, consulte a Política de Privacidade deles:",
+  "monthlyUsageLimitReached": "Limite de uso mensal atingido",
+  "monthlyUsageLimitDescription": "Você utilizou seus 3 minutos de tempo gratuito este mês. Seu tempo de uso será reiniciado no início do próximo mês.",
+  "unlockUnlimitedUsageWithSubscription": "Desbloqueie tempo de uso ilimitado com uma compra única da nossa assinatura vitalícia.",
+  "laterButton": "Mais tarde",
+  "remainingUsageTime": "Tempo de uso restante: {minutes} min {seconds} seg",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ 3 minutos de uso por mês\n",
+  "usageTimeResetMonthly": "✔ O tempo de uso é reiniciado mensalmente\n\n"
 }

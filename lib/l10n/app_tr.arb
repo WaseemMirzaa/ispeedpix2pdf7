@@ -151,5 +151,24 @@
   "aboutAppDescription": "Resimleri hızlı ve kolayca PDF'ye dönüştürün",
   "privacyPolicy": "Gizlilik Politikası",
   "settings": "Ayarlar",
-  "selectLanguage": "Dil Seç"
+  "selectLanguage": "Dil Seç",
+  "save": "Kaydet",
+  "privacyAndSecurityDetailFive": "5. Gizlilik Politikası - Uygulamalarımız, yalnızca Uygulama Mağazası Optimizasyonu (ASO) ve Arama Motoru Optimizasyonu (SEO) amaçlarıyla Google Firebase kullanır. Bu bilgileri başka herhangi bir amaçla toplamaz, satmaz veya kullanmayız.\n\nGoogle Firebase’in veri uygulamaları hakkında daha fazla bilgi için lütfen Gizlilik Politikalarına başvurun:",
+  "monthlyUsageLimitReached": "Aylık Kullanım Sınırına Ulaşıldı",
+  "monthlyUsageLimitDescription": "Bu ay için 3 dakikalık ücretsiz kullanım sürenizi tükettiniz. Kullanım süreniz önümüzdeki ayın başında sıfırlanacaktır.",
+  "unlockUnlimitedUsageWithSubscription": "Ömür boyu abonelik satın alarak sınırsız kullanım süresinin kilidini açın.",
+  "laterButton": "Daha sonra",
+  "remainingUsageTime": "Kalan kullanım süresi: {minutes} dk {seconds} sn",
+  "@remainingUsageTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "threeMinutesUsagePerMonth": "✔ Aylık 3 dakika kullanım süresi\n",
+  "usageTimeResetMonthly": "✔ Kullanım süresi her ay sıfırlanır\n\n"
 }
