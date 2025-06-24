@@ -29,7 +29,8 @@ class SharedPreferenceService {
   Future<void> saveFirstOpenDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DateTime now = DateTime.now();
-    String formattedDate = now.toIso8601String(); // You can customize the format
+    String formattedDate =
+        now.toIso8601String(); // You can customize the format
     await prefs.setString(_firstOpenDateKey, formattedDate);
   }
 
@@ -38,7 +39,7 @@ class SharedPreferenceService {
 
     if (date == null) {
       saveFirstOpenDate();
-      
+
       // If we're saving the first open date, also check the first-time app opened flag
       bool isFirstTime = await isFirstTimeAppOpened();
       if (isFirstTime) {
@@ -82,12 +83,10 @@ class SharedPreferenceService {
 
   // Increment and return the PDF created count
   Future<int> incrementAndReturnPdfCreatedCount() async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     int currentCount = prefs.getInt(_pdfCreatedCountKey) ?? 0;
     int newCount = currentCount + 1;
-
 
     LogHelper.logMessage('New Count', newCount);
     LogHelper.logMessage('currentCount', currentCount);
@@ -96,18 +95,14 @@ class SharedPreferenceService {
     return newCount;
   }
 
-
   // Fetch the PDF created count
   Future<int> getPdfCreatedCount() async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var olderThan7Days = await isFirstOpenDateOlderThan7Days();
 
-    if(!olderThan7Days) {
-
+    if (!olderThan7Days) {
       await prefs.setInt(_pdfCreatedCountKey, 0);
-
     }
 
     return prefs.getInt(_pdfCreatedCountKey) ?? 0;
@@ -141,11 +136,12 @@ class SharedPreferenceService {
   Future<void> setTrialEndDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString(_trialEndDateKey) != null) return; // Already set
-    
+
     DateTime now = DateTime.now();
     DateTime trialEndDate = now.add(Duration(days: 7));
     await prefs.setString(_trialEndDateKey, trialEndDate.toIso8601String());
-    LogHelper.logMessage('Trial End Date', 'Set to ${trialEndDate.toIso8601String()}');
+    LogHelper.logMessage(
+        'Trial End Date', 'Set to ${trialEndDate.toIso8601String()}');
   }
 
   // Check if trial period has ended
@@ -155,31 +151,31 @@ class SharedPreferenceService {
       await setTrialEndDate(); // Set it if not already set
       return false; // Trial just started
     }
-    
+
     return DateTime.now().isAfter(trialEndDate);
   }
 
   // Get remaining usage time in seconds for current month
   Future<int> getRemainingUsageTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    
+
     // Check if we need to reset for a new month
     int currentMonth = DateTime.now().month;
     int storedMonth = prefs.getInt(_usageMonthKey) ?? 0;
-    
+
     if (currentMonth != storedMonth) {
       // New month, reset usage time
       await prefs.setInt(_usageMonthKey, currentMonth);
       await prefs.setInt(_usageTimeKey, 0);
       LogHelper.logMessage('Usage Time', 'Reset for new month: $currentMonth');
     }
-    
+
     // Get current usage time
     int usedTime = prefs.getInt(_usageTimeKey) ?? 0;
-    
+
     // 3 minutes = 180 seconds
     int maxUsageTime = 180;
-    
+
     // Return remaining time (or 0 if exceeded)
     return (usedTime >= maxUsageTime) ? 0 : maxUsageTime - usedTime;
   }
@@ -187,11 +183,11 @@ class SharedPreferenceService {
   // Record usage time
   Future<void> recordUsageTime(int seconds) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    
+
     // Get current usage time
     int currentUsage = prefs.getInt(_usageTimeKey) ?? 0;
     int newUsage = currentUsage + seconds;
-    
+
     // Save new usage time
     await prefs.setInt(_usageTimeKey, newUsage);
     LogHelper.logMessage('Usage Time', 'Updated to $newUsage seconds');
