@@ -9,6 +9,12 @@ class SharedPreferenceService {
   static const _usageTimeKey = 'monthly_usage_time';
   static const _usageMonthKey = 'usage_month';
   static const _trialEndDateKey = 'trial_end_date';
+  static const _pauseStartDateKey = 'pause_start_date';
+  static const _isPausedKey = 'is_paused';
+  static const _remainingTimeKey = 'remaining_time';
+  static const _lastTrialLimitDialogDateKey = 'last_trial_limit_dialog_date';
+  static const _lastDay2DialogDateKey = 'last_day2_dialog_date';
+  static const _lastDay4DialogDateKey = 'last_day4_dialog_date';
 
   // Check if this is the first time the app is opened
   Future<bool> isFirstTimeAppOpened() async {
@@ -159,6 +165,13 @@ class SharedPreferenceService {
   Future<int> getRemainingUsageTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    // Check if usage is paused (30-day cooldown)
+    bool isPaused = await isUsagePaused();
+    if (isPaused) {
+      LogHelper.logMessage('Usage Time', 'Usage is paused, returning 0');
+      return 0;
+    }
+
     // Check if we need to reset for a new month
     int currentMonth = DateTime.now().month;
     int storedMonth = prefs.getInt(_usageMonthKey) ?? 0;
@@ -197,5 +210,210 @@ class SharedPreferenceService {
   Future<bool> hasRemainingUsageTime() async {
     int remainingTime = await getRemainingUsageTime();
     return remainingTime > 0;
+  }
+
+  // Manual reset of usage time (for testing purposes)
+  Future<void> resetUsageTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_usageTimeKey, 0);
+    await prefs.setInt(_usageMonthKey, DateTime.now().month);
+    LogHelper.logMessage('Usage Time', 'Manually reset to 0 seconds');
+  }
+
+  // Get current used time (for debugging)
+  Future<int> getUsedTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_usageTimeKey) ?? 0;
+  }
+
+  // Check if usage is currently paused (30-day cooldown)
+  Future<bool> isUsagePaused() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    bool isPaused = prefs.getBool(_isPausedKey) ?? false;
+    if (!isPaused) return false;
+
+    String? pauseStartDateStr = prefs.getString(_pauseStartDateKey);
+    if (pauseStartDateStr == null) return false;
+
+    DateTime pauseStartDate = DateTime.parse(pauseStartDateStr);
+    DateTime now = DateTime.now();
+
+    // Check if 30 days have passed since pause started
+    int daysSincePause = now.difference(pauseStartDate).inDays;
+
+    if (daysSincePause >= 30) {
+      // 30 days have passed, reset the pause
+      await _resetPause();
+      LogHelper.logMessage('Usage Pause', '30 days completed, resetting pause');
+      return false;
+    }
+
+    LogHelper.logMessage(
+        'Usage Pause', 'Still paused, $daysSincePause days since pause');
+    return true;
+  }
+
+  // Start the 30-day pause when usage limit is reached
+  Future<void> startUsagePause() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    DateTime now = DateTime.now();
+    await prefs.setBool(_isPausedKey, true);
+    await prefs.setString(_pauseStartDateKey, now.toIso8601String());
+
+    LogHelper.logMessage(
+        'Usage Pause', 'Started 30-day pause at ${now.toIso8601String()}');
+  }
+
+  // Reset the pause (called after 30 days or manually)
+  Future<void> _resetPause() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(_isPausedKey, false);
+    await prefs.remove(_pauseStartDateKey);
+    await prefs.setInt(_usageTimeKey, 0); // Reset usage time
+
+    LogHelper.logMessage('Usage Pause', 'Pause reset, usage time cleared');
+  }
+
+  // Get remaining days in pause period
+  Future<int> getRemainingPauseDays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    bool isPaused = prefs.getBool(_isPausedKey) ?? false;
+    if (!isPaused) return 0;
+
+    String? pauseStartDateStr = prefs.getString(_pauseStartDateKey);
+    if (pauseStartDateStr == null) return 0;
+
+    DateTime pauseStartDate = DateTime.parse(pauseStartDateStr);
+    DateTime now = DateTime.now();
+
+    int daysSincePause = now.difference(pauseStartDate).inDays;
+    int remainingDays = 30 - daysSincePause;
+
+    return remainingDays > 0 ? remainingDays : 0;
+  }
+
+  // Manual reset of pause (for testing)
+  Future<void> resetPause() async {
+    await _resetPause();
+  }
+
+  // Check if trial limit dialog can be shown today
+  Future<bool> canShowTrialLimitDialogToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? lastShownDateStr = prefs.getString(_lastTrialLimitDialogDateKey);
+    if (lastShownDateStr == null) return true; // Never shown before
+
+    DateTime lastShownDate = DateTime.parse(lastShownDateStr);
+    DateTime today = DateTime.now();
+
+    // Check if it's a different day
+    bool isDifferentDay = lastShownDate.year != today.year ||
+        lastShownDate.month != today.month ||
+        lastShownDate.day != today.day;
+
+    LogHelper.logMessage('Trial Limit Dialog',
+        'Last shown: ${lastShownDate.toIso8601String()}, Can show today: $isDifferentDay');
+
+    return isDifferentDay;
+  }
+
+  // Mark trial limit dialog as shown today
+  Future<void> markTrialLimitDialogShownToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    await prefs.setString(_lastTrialLimitDialogDateKey, now.toIso8601String());
+    LogHelper.logMessage('Trial Limit Dialog',
+        'Marked as shown today: ${now.toIso8601String()}');
+  }
+
+  // Check if Day 2 dialog can be shown today
+  Future<bool> canShowDay2DialogToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? lastShownDateStr = prefs.getString(_lastDay2DialogDateKey);
+    if (lastShownDateStr == null) return true; // Never shown before
+
+    DateTime lastShownDate = DateTime.parse(lastShownDateStr);
+    DateTime today = DateTime.now();
+
+    // Check if it's a different day
+    bool isDifferentDay = lastShownDate.year != today.year ||
+        lastShownDate.month != today.month ||
+        lastShownDate.day != today.day;
+
+    LogHelper.logMessage('Day 2 Dialog',
+        'Last shown: ${lastShownDate.toIso8601String()}, Can show today: $isDifferentDay');
+
+    return isDifferentDay;
+  }
+
+  // Mark Day 2 dialog as shown today
+  Future<void> markDay2DialogShownToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    await prefs.setString(_lastDay2DialogDateKey, now.toIso8601String());
+    LogHelper.logMessage(
+        'Day 2 Dialog', 'Marked as shown today: ${now.toIso8601String()}');
+  }
+
+  // Check if Day 4 dialog can be shown today
+  Future<bool> canShowDay4DialogToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? lastShownDateStr = prefs.getString(_lastDay4DialogDateKey);
+    if (lastShownDateStr == null) return true; // Never shown before
+
+    DateTime lastShownDate = DateTime.parse(lastShownDateStr);
+    DateTime today = DateTime.now();
+
+    // Check if it's a different day
+    bool isDifferentDay = lastShownDate.year != today.year ||
+        lastShownDate.month != today.month ||
+        lastShownDate.day != today.day;
+
+    LogHelper.logMessage('Day 4 Dialog',
+        'Last shown: ${lastShownDate.toIso8601String()}, Can show today: $isDifferentDay');
+
+    return isDifferentDay;
+  }
+
+  // Mark Day 4 dialog as shown today
+  Future<void> markDay4DialogShownToday() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    await prefs.setString(_lastDay4DialogDateKey, now.toIso8601String());
+    LogHelper.logMessage(
+        'Day 4 Dialog', 'Marked as shown today: ${now.toIso8601String()}');
+  }
+
+  // Store remaining time in preferences
+  Future<void> setRemainingTime(int remainingTime) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_remainingTimeKey, remainingTime);
+    LogHelper.logMessage('Remaining Time', 'Set to $remainingTime seconds');
+  }
+
+  // Get stored remaining time from preferences
+  Future<int> getStoredRemainingTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int storedTime =
+        prefs.getInt(_remainingTimeKey) ?? 180; // Default to 180 seconds
+    LogHelper.logMessage(
+        'Remaining Time', 'Retrieved $storedTime seconds from storage');
+    return storedTime;
+  }
+
+  // Check if remaining time is expired (≤ 0)
+  Future<bool> isRemainingTimeExpired() async {
+    int remainingTime = await getStoredRemainingTime();
+    bool isExpired = remainingTime <= 0;
+    LogHelper.logMessage(
+        'Remaining Time', 'Expired check: $isExpired (time: $remainingTime)');
+    return isExpired;
   }
 }

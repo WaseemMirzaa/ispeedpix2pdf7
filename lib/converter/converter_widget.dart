@@ -55,6 +55,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Offerings? offerings;
+  //TODO: FOR TESTING - Set to false to test trial expiration and 3-minute usage limits
+  //TODO: Change back to true for production or when subscription logic is working
   bool _isSubscribed = true;
   bool _is7DaysPassed = false;
   CustomerInfo? _customerInfo;
@@ -201,6 +203,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
         return;
       }
 
+      // Check if 7-day trial has ended
+      bool trialEnded = await preferenceService.hasTrialEnded();
+      if (trialEnded) {
+        print('⏰ 7-day trial has ended, skipping day-based dialogs');
+        return;
+      }
+
       // Get installation date and calculate days
       String? installationDateStr = prefs.getString('installation_date');
       if (installationDateStr != null) {
@@ -215,13 +224,24 @@ class _ConverterWidgetState extends State<ConverterWidget>
         if (daysSinceInstallation >= 2 &&
             !hasShownDay2 &&
             !_hasShownDay2Dialog) {
-          _hasShownDay2Dialog = true;
-          await prefs.setBool('has_shown_day2_dialog', true);
-          Future.delayed(Duration(seconds: 2), () {
-            if (mounted && !_isSubscribed) {
-              showDay2Dialog(context);
-            }
-          });
+          // Check if we can show the dialog today (once per day limit)
+          bool canShowToday = await preferenceService.canShowDay2DialogToday();
+
+          if (canShowToday) {
+            _hasShownDay2Dialog = true;
+            await prefs.setBool('has_shown_day2_dialog', true);
+
+            // Mark dialog as shown today
+            await preferenceService.markDay2DialogShownToday();
+
+            Future.delayed(Duration(seconds: 2), () {
+              if (mounted && !_isSubscribed) {
+                showDay2Dialog(context);
+              }
+            });
+          } else {
+            print('📅 Day 2 dialog already shown today, skipping');
+          }
         }
 
         // Check for Day 4 dialog
@@ -229,13 +249,24 @@ class _ConverterWidgetState extends State<ConverterWidget>
         if (daysSinceInstallation >= 4 &&
             !hasShownDay4 &&
             !_hasShownDay4Dialog) {
-          _hasShownDay4Dialog = true;
-          await prefs.setBool('has_shown_day4_dialog', true);
-          Future.delayed(Duration(seconds: 2), () {
-            if (mounted && !_isSubscribed) {
-              showDay4Dialog(context);
-            }
-          });
+          // Check if we can show the dialog today (once per day limit)
+          bool canShowToday = await preferenceService.canShowDay4DialogToday();
+
+          if (canShowToday) {
+            _hasShownDay4Dialog = true;
+            await prefs.setBool('has_shown_day4_dialog', true);
+
+            // Mark dialog as shown today
+            await preferenceService.markDay4DialogShownToday();
+
+            Future.delayed(Duration(seconds: 2), () {
+              if (mounted && !_isSubscribed) {
+                showDay4Dialog(context);
+              }
+            });
+          } else {
+            print('📅 Day 4 dialog already shown today, skipping');
+          }
         }
       }
     } catch (e) {
@@ -272,11 +303,18 @@ class _ConverterWidgetState extends State<ConverterWidget>
   // Usage time display methods
   void _startUsageTimeDisplay() {
     print('🟢 Starting usage time display...');
+
+    // Check if display timer is already running
+    if (_usageDisplayTimer != null && _usageDisplayTimer!.isActive) {
+      print('⚠️ Usage display timer already running, skipping start');
+      return;
+    }
+
     _showUsageTime = true;
     _updateRemainingUsageTime();
 
-    // Update every minute (60 seconds)
-    _usageDisplayTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+    // Update every 5 seconds for real-time progress
+    _usageDisplayTimer = Timer.periodic(Duration(seconds: 5), (timer) {
       _updateRemainingUsageTime();
     });
   }
@@ -291,13 +329,43 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   Future<void> _updateRemainingUsageTime() async {
     try {
+      print(
+          '🔄 _updateRemainingUsageTime called - current _usageSeconds: $_usageSeconds');
       int remainingTime;
       if (_isSubscribed) {
         // Subscribed users always have full time available
         remainingTime = 180; // 3 minutes
+        print('📊 User is subscribed, setting time to 180 seconds');
       } else {
-        // Non-subscribed users get actual remaining time
-        remainingTime = await preferenceService.getRemainingUsageTime();
+        // Check if 7-day trial is still active
+        bool trialEnded = await preferenceService.hasTrialEnded();
+        if (!trialEnded) {
+          // During trial period, always show full time
+          remainingTime = 180; // 3 minutes
+          print('🎁 7-day trial active, setting time to 180 seconds');
+        } else {
+          // Check if usage is paused
+          bool isPaused = await preferenceService.isUsagePaused();
+          if (isPaused) {
+            remainingTime = 0;
+            int remainingDays = await preferenceService.getRemainingPauseDays();
+            print('⏸️ Usage paused, $remainingDays days remaining in pause');
+          } else {
+            // Non-subscribed users after trial: calculate remaining time based on current session usage
+            int baseRemainingTime =
+                await preferenceService.getRemainingUsageTime();
+
+            // Subtract current session usage from the base remaining time
+            remainingTime = baseRemainingTime - _usageSeconds;
+            if (remainingTime < 0) remainingTime = 0;
+
+            // Store the calculated remaining time in preferences
+            await preferenceService.setRemainingTime(remainingTime);
+
+            print(
+                '📊 Non-subscribed user (trial ended): base=$baseRemainingTime, session=$_usageSeconds, remaining=$remainingTime');
+          }
+        }
 
         // Check if user is in the 80-90% usage range (18-36 seconds remaining)
         if (!_hasShownWarningDialog &&
@@ -305,6 +373,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             remainingTime <= 36 &&
             remainingTime >= 18) {
           _hasShownWarningDialog = true;
+          print('⚠️ Showing warning dialog (80-90% usage)');
           // Show warning dialog after a short delay
           Future.delayed(Duration(milliseconds: 500), () {
             if (mounted) {
@@ -313,11 +382,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
           });
         }
       }
+
+      print('🔄 Updating UI: $_remainingUsageTime -> $remainingTime seconds');
       setState(() {
         _remainingUsageTime = remainingTime;
       });
       print(
-          '⏱️ Remaining usage time: $_remainingUsageTime seconds (subscribed: $_isSubscribed)');
+          '⏱️ UI Updated - Remaining usage time: $_remainingUsageTime seconds (subscribed: $_isSubscribed)');
     } catch (e) {
       print('❌ Error fetching remaining usage time: $e');
     }
@@ -452,7 +523,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
                       // Usage time indicator
-                      if (_showUsageTime)
+                      if (_showUsageTime && !_isSubscribed)
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               2.0, 10.0, 2.0, 10.0),
@@ -500,7 +571,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                           backgroundColor: Colors.grey[300],
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                            Color(0xFF173F5A),
+                                            _remainingUsageTime < 50
+                                                ? Colors.red
+                                                : Color(0xFF173F5A),
                                           ),
                                           minHeight: 12.0,
                                         ),
@@ -519,6 +592,229 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   ],
                                 ),
                                 SizedBox(height: 12.0),
+                                // Trial motivation message for non-subscribed users within 7-day trial
+                                if (!_isSubscribed) ...[
+                                  FutureBuilder<bool>(
+                                    future: preferenceService.hasTrialEnded(),
+                                    builder: (context, trialSnapshot) {
+                                      bool trialEnded =
+                                          trialSnapshot.data ?? false;
+
+                                      // Show message only if trial hasn't ended and remaining time > 50 seconds
+                                      if (!trialEnded &&
+                                          _remainingUsageTime >= 50) {
+                                        return Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFF173F5A)
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            border: Border.all(
+                                              color: Color(0xFF173F5A)
+                                                  .withOpacity(0.3),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Unlock Unlimited Access Today!',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .displayMedium
+                                                        .override(
+                                                          fontFamily: 'Poppins',
+                                                          color:
+                                                              Color(0xFF173F5A),
+                                                          fontSize: 14.0,
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                              ),
+                                              SizedBox(height: 8.0),
+                                              Text(
+                                                "You're enjoying the free trial! Why wait? Upgrade now to our lifetime plan and never worry about time limits again. One payment, unlimited usage forever — no subscriptions, no recurring charges!",
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Poppins',
+                                                          color: Colors.black,
+                                                          fontSize: 12.0,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return SizedBox
+                                          .shrink(); // Return empty widget if conditions not met
+                                    },
+                                  ),
+                                  SizedBox(height: 12.0),
+                                ],
+                                // Warning text when remaining time is less than 50 seconds (including 0) and trial has ended
+                                FutureBuilder<bool>(
+                                  future: preferenceService.hasTrialEnded(),
+                                  builder: (context, trialSnapshot) {
+                                    bool trialEnded =
+                                        trialSnapshot.data ?? false;
+
+                                    // Show warning only if trial has ended and remaining time < 50
+                                    if (trialEnded &&
+                                        _remainingUsageTime < 50) {
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.all(12.0),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.red.withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              border: Border.all(
+                                                color:
+                                                    Colors.red.withOpacity(0.3),
+                                                width: 1.0,
+                                              ),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                FutureBuilder<bool>(
+                                                  future: preferenceService
+                                                      .isUsagePaused(),
+                                                  builder:
+                                                      (context, pauseSnapshot) {
+                                                    bool isPaused =
+                                                        pauseSnapshot.data ??
+                                                            false;
+
+                                                    return Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        FutureBuilder<bool>(
+                                                          future: preferenceService
+                                                              .isRemainingTimeExpired(),
+                                                          builder: (context,
+                                                              expiredSnapshot) {
+                                                            bool isExpired =
+                                                                expiredSnapshot
+                                                                        .data ??
+                                                                    false;
+
+                                                            return Text(
+                                                              isPaused
+                                                                  ? 'Usage Paused (30 Days)'
+                                                                  : (isExpired ||
+                                                                          _remainingUsageTime <=
+                                                                              0
+                                                                      ? 'Free Time Expired'
+                                                                      : 'Almost Out of Free Time'),
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .displayMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontSize:
+                                                                        14.0,
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                            );
+                                                          },
+                                                        ),
+                                                        SizedBox(height: 8.0),
+                                                        if (isPaused) ...[
+                                                          FutureBuilder<int>(
+                                                            future: preferenceService
+                                                                .getRemainingPauseDays(),
+                                                            builder: (context,
+                                                                daysSnapshot) {
+                                                              int remainingDays =
+                                                                  daysSnapshot
+                                                                          .data ??
+                                                                      0;
+                                                              return Text(
+                                                                "Your free time is paused for $remainingDays more days. Upgrade to our lifetime plan to get unlimited usage immediately — no recurring charges, no subscriptions.",
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Poppins',
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12.0,
+                                                                      letterSpacing:
+                                                                          0.0,
+                                                                    ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ] else ...[
+                                                          FutureBuilder<bool>(
+                                                            future: preferenceService
+                                                                .isRemainingTimeExpired(),
+                                                            builder: (context,
+                                                                expiredSnapshot) {
+                                                              bool isExpired =
+                                                                  expiredSnapshot
+                                                                          .data ??
+                                                                      false;
+
+                                                              return Text(
+                                                                (isExpired ||
+                                                                        _remainingUsageTime <=
+                                                                            0)
+                                                                    ? "Your free time has expired! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever."
+                                                                    : "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Poppins',
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12.0,
+                                                                      letterSpacing:
+                                                                          0.0,
+                                                                    ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                    return SizedBox
+                                        .shrink(); // Return empty widget if trial active or time >= 50
+                                  },
+                                ),
                                 // Subscribe Now button
                                 SizedBox(
                                   width: double.infinity,
@@ -551,102 +847,607 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 8.0),
-                                // Demo button to show warning dialog
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showUsageWarningDialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(6.0),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: Text(
-                                      'Demo Warning Dialog',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Inter',
-                                            color: Colors.white,
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                // Demo button for Day 2 dialog
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showDay2Dialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.purple,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(6.0),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: Text(
-                                      'Day 2',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Inter',
-                                            color: Colors.white,
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                // Demo button for Day 4 dialog
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showDay4Dialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.teal,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(6.0),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: Text(
-                                      'Day 4',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Inter',
-                                            color: Colors.white,
-                                            fontSize: 12.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                  ),
-                                ),
+
+                                // SizedBox(height: 6.0),
+                                // // Demo button for warning dialog
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showUsageWarningDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.orange,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Demo Warning Dialog',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // Demo button for Day 2 dialog
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay2Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.purple,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Day 2',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // Demo button for Day 4 dialog
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay4Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.teal,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Day 4',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to manually expire trial
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       // Manually set trial as expired for testing
+                                //       SharedPreferences prefs =
+                                //           await SharedPreferences.getInstance();
+                                //       DateTime pastDate = DateTime.now()
+                                //           .subtract(Duration(days: 8));
+                                //       await prefs.setString('trial_end_date',
+                                //           pastDate.toIso8601String());
+
+                                //       // Update the trial status
+                                //       await checkSubscriptionStatus();
+
+                                //       ScaffoldMessenger.of(context)
+                                //           .showSnackBar(
+                                //         SnackBar(
+                                //           content: Text(
+                                //               'Trial manually expired for testing'),
+                                //           duration: Duration(seconds: 2),
+                                //         ),
+                                //       );
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.red,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Expire Trial (Testing)',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Reset Usage Time button
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         print(
+                                //             '🔄 Starting usage time reset...');
+
+                                //         // Stop all timers first
+                                //         _pauseUsageTracking();
+                                //         _stopUsageTimeDisplay();
+
+                                //         // Reset usage time in SharedPreferences
+                                //         await preferenceService
+                                //             .resetUsageTime();
+                                //         print(
+                                //             '✅ SharedPreferences reset completed');
+
+                                //         // Reset stored remaining time to 180 seconds
+                                //         await preferenceService
+                                //             .setRemainingTime(180);
+                                //         print(
+                                //             '✅ Stored remaining time reset to 180 seconds');
+
+                                //         // Reset all dialog flags
+                                //         _hasShownSubscriptionDialogThisSession =
+                                //             false;
+                                //         _hasShownWarningDialog = false;
+
+                                //         // Reset timer variables
+                                //         _usageSeconds = 0;
+                                //         _isTimerActive = false;
+                                //         print('🔄 Reset _usageSeconds to 0');
+
+                                //         // Manually set the remaining time to 180 and update UI
+                                //         setState(() {
+                                //           _remainingUsageTime = 180;
+                                //         });
+
+                                //         // Wait a moment then update from SharedPreferences
+                                //         await Future.delayed(
+                                //             Duration(milliseconds: 100));
+                                //         await _updateRemainingUsageTime();
+
+                                //         // Restart usage time display
+                                //         _startUsageTimeDisplay();
+
+                                //         print(
+                                //             '🔄 Usage time manually reset to $_remainingUsageTime seconds');
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Usage time reset to 3:00 minutes ($_remainingUsageTime seconds)'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print(
+                                //             '❌ Error resetting usage time: $e');
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Error resetting usage time: $e'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.green,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Reset Usage Time',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to simulate low time (30 seconds)
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Set usage time to 150 seconds (leaving 30 seconds)
+                                //         SharedPreferences prefs =
+                                //             await SharedPreferences
+                                //                 .getInstance();
+                                //         await prefs.setInt('usage_time', 150);
+                                //         await prefs.setInt('usage_month',
+                                //             DateTime.now().month);
+
+                                //         // Set stored remaining time to 30 seconds
+                                //         await preferenceService
+                                //             .setRemainingTime(30);
+
+                                //         // Reset session counter
+                                //         _usageSeconds = 0;
+
+                                //         // Update UI
+                                //         await _updateRemainingUsageTime();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Set to 30 seconds remaining (red bar test)'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print('❌ Error setting low time: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.orange,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Set 30s Remaining (Test)',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to simulate 0 seconds (expired)
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Set usage time to 180 seconds (leaving 0 seconds)
+                                //         SharedPreferences prefs =
+                                //             await SharedPreferences
+                                //                 .getInstance();
+                                //         await prefs.setInt('usage_time', 180);
+                                //         await prefs.setInt('usage_month',
+                                //             DateTime.now().month);
+
+                                //         // Set stored remaining time to 0 seconds
+                                //         await preferenceService
+                                //             .setRemainingTime(0);
+
+                                //         // Reset session counter
+                                //         _usageSeconds = 0;
+
+                                //         // Update UI
+                                //         await _updateRemainingUsageTime();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Set to 0 seconds remaining (expired test)'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print(
+                                //             '❌ Error setting expired time: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.red,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Set 0s Remaining (Expired)',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to reset 30-day pause
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Reset the 30-day pause
+                                //         await preferenceService.resetPause();
+
+                                //         // Reset session variables
+                                //         _usageSeconds = 0;
+                                //         _hasShownSubscriptionDialogThisSession =
+                                //             false;
+
+                                //         // Update UI
+                                //         await _updateRemainingUsageTime();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 '30-day pause reset, usage time restored'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print('❌ Error resetting pause: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.purple,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Reset 30-Day Pause',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to manually expire trial
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Set trial to expired (yesterday)
+                                //         SharedPreferences prefs =
+                                //             await SharedPreferences
+                                //                 .getInstance();
+                                //         DateTime yesterday = DateTime.now()
+                                //             .subtract(Duration(days: 1));
+                                //         await prefs.setString('trial_end_date',
+                                //             yesterday.toIso8601String());
+
+                                //         // Reset usage time and remaining time
+                                //         await preferenceService
+                                //             .resetUsageTime();
+                                //         await preferenceService
+                                //             .setRemainingTime(180);
+                                //         _usageSeconds = 0;
+
+                                //         // Update UI
+                                //         await _updateRemainingUsageTime();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Trial expired, 3-min timer will start'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print('❌ Error expiring trial: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.deepOrange,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Expire Trial (Start Timer)',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to reset trial (set to active)
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Reset trial to active (7 days from now)
+                                //         SharedPreferences prefs =
+                                //             await SharedPreferences
+                                //                 .getInstance();
+                                //         DateTime now = DateTime.now();
+                                //         DateTime trialEndDate =
+                                //             now.add(Duration(days: 7));
+                                //         await prefs.setString('trial_end_date',
+                                //             trialEndDate.toIso8601String());
+
+                                //         // Reset usage time and remaining time
+                                //         await preferenceService
+                                //             .resetUsageTime();
+                                //         await preferenceService
+                                //             .setRemainingTime(180);
+                                //         _usageSeconds = 0;
+
+                                //         // Update UI
+                                //         await _updateRemainingUsageTime();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Trial reset to 7 days active'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print('❌ Error resetting trial: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.blue,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Reset Trial (7 Days)',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Button to reset trial limit dialog date
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         // Reset the trial limit dialog date
+                                //         SharedPreferences prefs =
+                                //             await SharedPreferences
+                                //                 .getInstance();
+                                //         await prefs.remove(
+                                //             'last_trial_limit_dialog_date');
+
+                                //         // Reset session flag
+                                //         _hasShownSubscriptionDialogThisSession =
+                                //             false;
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Trial limit dialog date reset'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print(
+                                //             '❌ Error resetting dialog date: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.indigo,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Reset Dialog Date',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -779,24 +1580,42 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                               await preferenceService
                                                   .getRemainingUsageTime();
 
-                                          // If no time remaining, show limit dialog (only once per session)
+                                          // If no time remaining, show limit dialog (only once per day)
                                           if (remainingTime <= 0 &&
                                               !_hasShownSubscriptionDialogThisSession) {
-                                            _hasShownSubscriptionDialogThisSession =
-                                                true;
-                                            await analytics.logEvent(
-                                              name: 'event_usage_limit_reached',
-                                              parameters: {
-                                                'os': Platform.isAndroid
-                                                    ? 'android'
-                                                    : 'ios',
-                                                'timestamp': DateTime.now()
-                                                    .toIso8601String(),
-                                                'remaining_time': '0',
-                                              },
-                                            );
-                                            showUsageLimitDialog(context);
-                                            return;
+                                            // Check if we can show the dialog today
+                                            bool canShowToday =
+                                                await preferenceService
+                                                    .canShowTrialLimitDialogToday();
+
+                                            if (canShowToday) {
+                                              // Mark dialog as shown today
+                                              await preferenceService
+                                                  .markTrialLimitDialogShownToday();
+
+                                              _hasShownSubscriptionDialogThisSession =
+                                                  true;
+                                              await analytics.logEvent(
+                                                name:
+                                                    'event_usage_limit_reached',
+                                                parameters: {
+                                                  'os': Platform.isAndroid
+                                                      ? 'android'
+                                                      : 'ios',
+                                                  'timestamp': DateTime.now()
+                                                      .toIso8601String(),
+                                                  'remaining_time': '0',
+                                                },
+                                              );
+                                              showUsageLimitDialog(context);
+                                              return;
+                                            } else {
+                                              print(
+                                                  '⏰ Trial limit dialog already shown today, skipping in createPDF');
+                                              _hasShownSubscriptionDialogThisSession =
+                                                  true;
+                                              return;
+                                            }
                                           }
                                         }
 
@@ -1920,6 +2739,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             if (prodResponse != null && prodResponse['status'] == 0) {
               setState(() {
                 // isPurchased = true;
+
                 _isSubscribed = true;
               });
               LogHelper.logSuccessMessage(
@@ -2059,7 +2879,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
             _startUsageTimeDisplay();
           }
         }
-
         // If not subscribed and trial has ended, check remaining usage time
         if (!_isSubscribed &&
             _is7DaysPassed &&
@@ -2143,9 +2962,35 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   // Add this method to start tracking usage time
-  void _startUsageTracking() {
-    if (_isSubscribed) return; // No need to track for subscribers
+  void _startUsageTracking() async {
+    if (_isSubscribed) {
+      print('🚫 User is subscribed, skipping usage tracking');
+      return; // No need to track for subscribers
+    }
 
+    // Check if 7-day trial is still active
+    bool trialEnded = await preferenceService.hasTrialEnded();
+    if (!trialEnded) {
+      print('🎁 7-day trial is active, skipping usage tracking');
+      return; // No need to track during trial period
+    }
+
+    // Check if timer is already running
+    if (_usageTimer != null && _usageTimer!.isActive) {
+      print('⚠️ Usage timer already running, skipping start');
+      return;
+    }
+
+    // Check if usage is paused (30-day cooldown)
+    bool isPaused = await preferenceService.isUsagePaused();
+    if (isPaused) {
+      int remainingDays = await preferenceService.getRemainingPauseDays();
+      print('⏸️ Usage is paused, $remainingDays days remaining');
+      return;
+    }
+
+    print(
+        '🟢 Starting usage tracking - _isSubscribed: $_isSubscribed, trial ended: $trialEnded');
     _lastActiveTime = DateTime.now();
     _isTimerActive = true;
 
@@ -2154,6 +2999,12 @@ class _ConverterWidgetState extends State<ConverterWidget>
       if (!_isTimerActive) return;
 
       _usageSeconds++;
+      print('⏱️ Usage seconds: $_usageSeconds');
+
+      // Update UI every 5 seconds for real-time progress
+      if (_usageSeconds % 5 == 0) {
+        await _updateRemainingUsageTime();
+      }
 
       // Every 10 seconds, record the usage time
       if (_usageSeconds % 10 == 0) {
@@ -2175,10 +3026,29 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
         // Check if we've exceeded the monthly limit
         bool hasRemainingTime = await preferenceService.hasRemainingUsageTime();
-        if (!hasRemainingTime) {
-          _pauseUsageTracking();
-          if (mounted) {
-            showUsageLimitDialog(context);
+        if (!hasRemainingTime && !_hasShownSubscriptionDialogThisSession) {
+          // Check if we can show the dialog today (once per day limit)
+          bool canShowToday =
+              await preferenceService.canShowTrialLimitDialogToday();
+
+          if (canShowToday) {
+            // Start the 30-day pause
+            await preferenceService.startUsagePause();
+
+            // Mark dialog as shown today
+            await preferenceService.markTrialLimitDialogShownToday();
+
+            _pauseUsageTracking();
+            _hasShownSubscriptionDialogThisSession = true;
+            if (mounted) {
+              showUsageLimitDialog(context);
+            }
+          } else {
+            print('⏰ Trial limit dialog already shown today, skipping');
+            // Still pause usage tracking even if dialog not shown
+            await preferenceService.startUsagePause();
+            _pauseUsageTracking();
+            _hasShownSubscriptionDialogThisSession = true;
           }
 
           // Log the event
@@ -2197,7 +3067,14 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   // Pause the usage tracking
   void _pauseUsageTracking() {
+    print('⏸️ Pausing usage tracking...');
     _isTimerActive = false;
+
+    // Cancel the usage timer if it's running
+    if (_usageTimer != null && _usageTimer!.isActive) {
+      _usageTimer!.cancel();
+      print('✅ Usage timer cancelled');
+    }
 
     // Record the final seconds since last checkpoint
     if (_lastActiveTime != null) {
@@ -2212,14 +3089,38 @@ class _ConverterWidgetState extends State<ConverterWidget>
   // Resume the usage tracking
   void _resumeUsageTracking() {
     if (_isSubscribed) return; // No need to track for subscribers
+
+    // Check if timer is already running
+    if (_usageTimer != null && _usageTimer!.isActive) {
+      print('⚠️ Usage timer already running, skipping resume');
+      return;
+    }
+
+    print('▶️ Resuming usage tracking...');
     _lastActiveTime = DateTime.now();
     _isTimerActive = true;
+
+    // Restart the usage tracking timer
+    _startUsageTracking();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    print('📱 didChangeDependencies called');
+    _debugTimerStatus();
     _startUsageTracking();
+  }
+
+  // Debug method to check timer status
+  void _debugTimerStatus() {
+    print('🔍 Timer Status:');
+    print(
+        '  - Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}');
+    print(
+        '  - Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}');
+    print('  - Timer Active Flag: $_isTimerActive');
+    print('  - Usage Seconds: $_usageSeconds');
   }
 
   // Add this method to handle app lifecycle changes
@@ -2597,96 +3498,6 @@ void showDay4Dialog(BuildContext context) {
   );
 }
 
-void showUsageWarningDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: true, // User can dismiss by tapping outside
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              height: MediaQuery.of(context).size.height * 0.15,
-              child: Image.asset(
-                'assets/images/premium.png',
-                fit: BoxFit.contain,
-              ),
-            ),
-            SizedBox(height: 15),
-            Text(
-              textAlign: TextAlign.center,
-              "Almost Out of Free Time",
-              style: FlutterFlowTheme.of(context).displayMedium.override(
-                    fontFamily: 'Poppins',
-                    color: Color(0xFF173F5A),
-                    fontSize: 14.0,
-                    letterSpacing: 0.0,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
-              textAlign: TextAlign.center,
-              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                    fontFamily: 'Poppins',
-                    color: Colors.black,
-                    fontSize: 12.0,
-                    letterSpacing: 0.0,
-                  ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              "Later",
-              style: FlutterFlowTheme.of(context).displayMedium.override(
-                    fontFamily: 'Poppins',
-                    color: Colors.grey,
-                    fontSize: 14.0,
-                    letterSpacing: 0.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Navigate to subscription page
-              Navigator.pop(context);
-              context.pushNamed('Subscription');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF173F5A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              "Upgrade Now",
-              style: FlutterFlowTheme.of(context).displayMedium.override(
-                    fontFamily: 'Poppins',
-                    color: Colors.white,
-                    fontSize: 14.0,
-                    letterSpacing: 0.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
 void showUsageLimitDialog(BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
 
@@ -2787,6 +3598,96 @@ void showFilenameErrorDialog(BuildContext context) {
               Navigator.of(context).pop(); // Close the dialog
             },
             child: Text('${l10n.ok}'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showUsageWarningDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: true, // User can dismiss by tapping outside
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: Image.asset(
+                'assets/images/premium.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height: 15),
+            Text(
+              textAlign: TextAlign.center,
+              "Almost Out of Free Time",
+              style: FlutterFlowTheme.of(context).displayMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF173F5A),
+                    fontSize: 14.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
+              textAlign: TextAlign.center,
+              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Colors.black,
+                    fontSize: 12.0,
+                    letterSpacing: 0.0,
+                  ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Later",
+              style: FlutterFlowTheme.of(context).displayMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Colors.grey,
+                    fontSize: 14.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to subscription page
+              Navigator.pop(context);
+              context.pushNamed('Subscription');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF173F5A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              "Upgrade Now",
+              style: FlutterFlowTheme.of(context).displayMedium.override(
+                    fontFamily: 'Poppins',
+                    color: Colors.white,
+                    fontSize: 14.0,
+                    letterSpacing: 0.0,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
           ),
         ],
       );
