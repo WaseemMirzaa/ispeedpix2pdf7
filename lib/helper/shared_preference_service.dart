@@ -114,7 +114,7 @@ class SharedPreferenceService {
     return prefs.getInt(_pdfCreatedCountKey) ?? 0;
   }
 
-  // Reset the PDF created count after 7 days
+  // Reset the PDF created count after 3 days
   Future<void> resetPdfCreatedCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? firstOpenDate = prefs.getString(_firstOpenDateKey);
@@ -138,13 +138,13 @@ class SharedPreferenceService {
     return DateTime.parse(dateStr);
   }
 
-  // Set the trial end date (7 days from first open)
+  // Set the trial end date (3 days from first open)
   Future<void> setTrialEndDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString(_trialEndDateKey) != null) return; // Already set
 
     DateTime now = DateTime.now();
-    DateTime trialEndDate = now.add(Duration(days: 7));
+    DateTime trialEndDate = now.add(Duration(days: 3));
     await prefs.setString(_trialEndDateKey, trialEndDate.toIso8601String());
     LogHelper.logMessage(
         'Trial End Date', 'Set to ${trialEndDate.toIso8601String()}');

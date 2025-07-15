@@ -58,7 +58,6 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   bool includeBlurHash = false,
   int remainingTime = 0,
 }) async {
-
   final createUploadMediaListTile =
       (String label, MediaSource mediaSource) => ListTile(
             title: Text(
@@ -165,122 +164,106 @@ Future<List<SelectedFile>?> selectMedia({
   bool includeDimensions = false,
   bool includeBlurHash = false,
   bool isSubscribed = false,
-  bool are7DaysPassed = false, required int remainingTime,
+  bool are7DaysPassed = false,
+  required int remainingTime,
 }) async {
-    try {
+  try {
+    final picker = ImagePicker();
 
-      final picker = ImagePicker();
-
-      if (multiImage) {
-
-        final pickedMediaFuture = picker.pickMultiImage(
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
-            requestFullMetadata: true,
-            imageQuality: imageQuality,
-            limit:(!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60,
-        );
-
-        final pickedMedia = await pickedMediaFuture;
-
-        print('🟢🟢🟢🟢🟢 Picked Media ${pickedMedia.length}');
-
-        if (pickedMedia.isEmpty) {
-
-          print('🟢🟢🟢🟢🟢 Picked Media Empty Returning Null ${pickedMedia.length}');
-
-          return null;
-
-        }
-
-        print('🟢🟢🟢🟢🟢 Picked Media ${pickedMedia.length}');
-
-        return Future.wait(pickedMedia.asMap().entries.map((e) async {
-
-          final index = e.key;
-          final media = e.value;
-          final mediaBytes = await media.readAsBytes();
-          final path = _getStoragePath(storageFolderPath, media.name, false, index);
-          final dimensions = includeDimensions
-              ? isVideo
-              ? _getVideoDimensions(media.path)
-              : _getImageDimensions(mediaBytes)
-              : null;
-
-          return SelectedFile(
-
-            storagePath: path,
-
-            filePath: media.path,
-
-            bytes: mediaBytes,
-
-            dimensions: await dimensions,
-
-          );
-
-        }));
-      }
-
-      final source = mediaSource == MediaSource.camera
-          ? ImageSource.camera
-          : ImageSource.gallery;
-
-      final pickedMediaFuture = isVideo
-
-          ? picker.pickVideo(source: source)
-
-          : picker.pickImage(
-
+// Debug logging for image selection limit
+    print('[IMAGE_LIMIT] 📸 Image selection logic evaluation:');
+    print('[IMAGE_LIMIT] 🔍 !isSubscribed = ${!isSubscribed}');
+    print('[IMAGE_LIMIT] 🔍 are7DaysPassed = $are7DaysPassed');
+    print('[IMAGE_LIMIT] 🔍 remainingTime = $remainingTime');
+    print('[IMAGE_LIMIT] 🔍 remainingTime <= 0 = ${remainingTime <= 0}');
+    print(
+        '[IMAGE_LIMIT] 🧮 Full condition: (!isSubscribed && are7DaysPassed && remainingTime <= 0) = ${(!isSubscribed && are7DaysPassed && remainingTime <= 0)}');
+    print(
+        '[IMAGE_LIMIT] 🎯 Selected limit: ${(!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60} images');
+    if (multiImage) {
+      final pickedMediaFuture = picker.pickMultiImage(
         maxWidth: maxWidth,
-
         maxHeight: maxHeight,
-
+        requestFullMetadata: true,
         imageQuality: imageQuality,
-
-        source: source,
-
+        limit: (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60,
       );
 
       final pickedMedia = await pickedMediaFuture;
 
-      final mediaBytes = await pickedMedia?.readAsBytes();
+      print('[IMAGE_LIMIT] ✅ Successfully picked ${pickedMedia.length} images');
 
-      if (mediaBytes == null) {
+      if (pickedMedia.isEmpty) {
+        print('[IMAGE_LIMIT] ❌ No images selected, returning null');
 
         return null;
-
       }
 
-      final path = _getStoragePath(storageFolderPath, pickedMedia!.name, isVideo);
+      print('[IMAGE_LIMIT] ✅ Processing ${pickedMedia.length} selected images');
 
-      final dimensions = includeDimensions
-          ? isVideo
-          ? _getVideoDimensions(pickedMedia.path)
-          : _getImageDimensions(mediaBytes)
-          : null;
+      return Future.wait(pickedMedia.asMap().entries.map((e) async {
+        final index = e.key;
+        final media = e.value;
+        final mediaBytes = await media.readAsBytes();
+        final path =
+            _getStoragePath(storageFolderPath, media.name, false, index);
+        final dimensions = includeDimensions
+            ? isVideo
+                ? _getVideoDimensions(media.path)
+                : _getImageDimensions(mediaBytes)
+            : null;
 
-      return [
-
-        SelectedFile(
-
+        return SelectedFile(
           storagePath: path,
-
-          filePath: pickedMedia.path,
-
+          filePath: media.path,
           bytes: mediaBytes,
-
           dimensions: await dimensions,
-
-        ),
-      ];
-    } catch (e) {
-
-      print('🔴🔴🔴🔴🔴 Exception While Picking Images $e');
-
-      return null;
-
+        );
+      }));
     }
+
+    final source = mediaSource == MediaSource.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    final pickedMediaFuture = isVideo
+        ? picker.pickVideo(source: source)
+        : picker.pickImage(
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            imageQuality: imageQuality,
+            source: source,
+          );
+
+    final pickedMedia = await pickedMediaFuture;
+
+    final mediaBytes = await pickedMedia?.readAsBytes();
+
+    if (mediaBytes == null) {
+      return null;
+    }
+
+    final path = _getStoragePath(storageFolderPath, pickedMedia!.name, isVideo);
+
+    final dimensions = includeDimensions
+        ? isVideo
+            ? _getVideoDimensions(pickedMedia.path)
+            : _getImageDimensions(mediaBytes)
+        : null;
+
+    return [
+      SelectedFile(
+        storagePath: path,
+        filePath: pickedMedia.path,
+        bytes: mediaBytes,
+        dimensions: await dimensions,
+      ),
+    ];
+  } catch (e) {
+    print('🔴🔴🔴🔴🔴 Exception While Picking Images $e');
+
+    return null;
+  }
 }
 
 bool validateFileFormat(String filePath, BuildContext context) {
