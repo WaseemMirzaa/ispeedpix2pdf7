@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -78,6 +79,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
   // Usage time display variables
   Timer? _usageDisplayTimer;
   int _remainingUsageTime = 180; // Default 3 minutes = 180 seconds
+  int _trialDaysRemaining = 7; // Trial days remaining
   bool _showUsageTime = false;
   bool _hasShownWarningDialog = false; // Track if warning dialog has been shown
   bool _hasShownDay2Dialog = false; // Track if Day 2 dialog has been shown
@@ -313,8 +315,12 @@ class _ConverterWidgetState extends State<ConverterWidget>
     _showUsageTime = true;
     _updateRemainingUsageTime();
 
-    // Update every 5 seconds for real-time progress
-    _usageDisplayTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+    // Update every second for smooth progress
+    _usageDisplayTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       _updateRemainingUsageTime();
     });
   }
@@ -327,18 +333,42 @@ class _ConverterWidgetState extends State<ConverterWidget>
     setState(() {});
   }
 
+  // Method to safely stop usage time display only for subscribed users
+  void _stopUsageTimeDisplayIfSubscribed() {
+    if (_isSubscribed) {
+      print('🔴 Stopping usage time display for subscribed user...');
+      _stopUsageTimeDisplay();
+    } else {
+      print('⚠️ Keeping usage time display running for non-subscribed user');
+    }
+  }
+
   Future<void> _updateRemainingUsageTime() async {
     try {
       print(
           '🔄 _updateRemainingUsageTime called - current _usageSeconds: $_usageSeconds');
       int remainingTime;
+      int trialDays = 0;
+
+      // Calculate trial days remaining
+      bool trialEnded = await preferenceService.hasTrialEnded();
+      if (!trialEnded) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? trialEndDateStr = prefs.getString('trial_end_date');
+        if (trialEndDateStr != null) {
+          DateTime trialEndDate = DateTime.parse(trialEndDateStr);
+          DateTime now = DateTime.now();
+          trialDays = trialEndDate.difference(now).inDays;
+          if (trialDays < 0) trialDays = 0;
+        }
+      }
+
       if (_isSubscribed) {
         // Subscribed users always have full time available
         remainingTime = 180; // 3 minutes
         print('📊 User is subscribed, setting time to 180 seconds');
       } else {
         // Check if 7-day trial is still active
-        bool trialEnded = await preferenceService.hasTrialEnded();
         if (!trialEnded) {
           // During trial period, always show full time
           remainingTime = 180; // 3 minutes
@@ -383,12 +413,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
         }
       }
 
-      print('🔄 Updating UI: $_remainingUsageTime -> $remainingTime seconds');
-      setState(() {
-        _remainingUsageTime = remainingTime;
-      });
       print(
-          '⏱️ UI Updated - Remaining usage time: $_remainingUsageTime seconds (subscribed: $_isSubscribed)');
+          '🔄 Updating UI: $_remainingUsageTime -> $remainingTime seconds, trial days: $trialDays');
+      if (mounted) {
+        setState(() {
+          _remainingUsageTime = remainingTime;
+          _trialDaysRemaining = trialDays;
+        });
+      }
+      print(
+          '⏱️ UI Updated - Remaining usage time: $_remainingUsageTime seconds, trial days: $_trialDaysRemaining (subscribed: $_isSubscribed)');
     } catch (e) {
       print('❌ Error fetching remaining usage time: $e');
     }
@@ -523,7 +557,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
                       // Usage time indicator
-                      if (_showUsageTime && !_isSubscribed)
+                      if (!_isSubscribed) // Always show for non-subscribed users
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               2.0, 10.0, 2.0, 10.0),
@@ -546,7 +580,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Trial Time Left',
+                                      l10n!.trialTimeLeft,
                                       style: FlutterFlowTheme.of(context)
                                           .titleLarge
                                           .override(
@@ -559,37 +593,168 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                   ],
                                 ),
                                 SizedBox(height: 6.0),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: LinearProgressIndicator(
-                                          value: _remainingUsageTime /
-                                              180.0, // 180 seconds = 3 minutes
-                                          backgroundColor: Colors.grey[300],
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            _remainingUsageTime < 50
-                                                ? Colors.red
-                                                : Color(0xFF173F5A),
+                                // Enhanced Time Remaining Widget with Different States
+                                FutureBuilder<bool>(
+                                  future: preferenceService.hasTrialEnded(),
+                                  builder: (context, trialSnapshot) {
+                                    bool trialEnded =
+                                        trialSnapshot.data ?? false;
+
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Trial Time Left or Usage Time Header
+                                        if (!trialEnded && !_isSubscribed) ...[
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.access_time,
+                                                size: 16,
+                                                color: Color(0xFF173F5A),
+                                              ),
+                                              SizedBox(width: 6),
+                                              Text(
+                                                l10n!.trialTimeLeft,
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Inter',
+                                                          color:
+                                                              Color(0xFF173F5A),
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                              ),
+                                              Spacer(),
+                                              Text(
+                                                '${_trialDaysRemaining} ${_trialDaysRemaining == 1 ? l10n!.day : l10n!.days} ${l10n!.left}',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Inter',
+                                                          color:
+                                                              _trialDaysRemaining <=
+                                                                      1
+                                                                  ? Colors.red
+                                                                  : Color(
+                                                                      0xFF173F5A),
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                              ),
+                                            ],
                                           ),
-                                          minHeight: 12.0,
+                                          SizedBox(height: 8),
+                                        ],
+
+                                        // Progress Bar and Time Display
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: TweenAnimationBuilder<
+                                                    double>(
+                                                  duration: Duration(
+                                                      milliseconds:
+                                                          300), // Faster animation for smoother updates
+                                                  curve: Curves.easeOut,
+                                                  tween: Tween<double>(
+                                                    begin: _remainingUsageTime /
+                                                        180.0, // Start from current value
+                                                    end: _remainingUsageTime /
+                                                        180.0,
+                                                  ),
+                                                  builder:
+                                                      (context, value, child) {
+                                                    return LinearProgressIndicator(
+                                                      value:
+                                                          value, // Animated value
+                                                      backgroundColor:
+                                                          Colors.grey[300],
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                              Color>(
+                                                        _remainingUsageTime < 50
+                                                            ? Colors.red
+                                                            : (_remainingUsageTime <
+                                                                    90
+                                                                ? Colors.orange
+                                                                : Color(
+                                                                    0xFF173F5A)),
+                                                      ),
+                                                      minHeight: 12.0,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 12.0),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  l10n!.remainingTime(
+                                                      (_remainingUsageTime ~/
+                                                          60),
+                                                      (_remainingUsageTime % 60)
+                                                          .toString()
+                                                          .padLeft(2, '0')),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily: 'Inter',
+                                                        color:
+                                                            _remainingUsageTime <
+                                                                    50
+                                                                ? Colors.red
+                                                                : Colors
+                                                                    .black87,
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            _remainingUsageTime <
+                                                                    50
+                                                                ? FontWeight
+                                                                    .w700
+                                                                : FontWeight
+                                                                    .w500,
+                                                        letterSpacing: 0.0,
+                                                      ),
+                                                ),
+                                                if (_remainingUsageTime <
+                                                    50) ...[
+                                                  Text(
+                                                    l10n!.sessionTime,
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Inter',
+                                                          color: Colors.red,
+                                                          fontSize: 10.0,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.0),
-                                    Text(
-                                      '${(_remainingUsageTime ~/ 60)}:${(_remainingUsageTime % 60).toString().padLeft(2, '0')} remaining',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Inter',
-                                            letterSpacing: 0.0,
-                                          ),
-                                    ),
-                                  ],
+                                      ],
+                                    );
+                                  },
                                 ),
                                 SizedBox(height: 12.0),
                                 // Trial motivation message for non-subscribed users within 7-day trial
@@ -621,7 +786,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'Unlock Unlimited Access Today!',
+                                                l10n!
+                                                    .unlockUnlimitedAccessToday,
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .displayMedium
@@ -637,7 +803,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                               ),
                                               SizedBox(height: 8.0),
                                               Text(
-                                                "You're enjoying the free trial! Why wait? Upgrade now to our lifetime plan and never worry about time limits again. One payment, unlimited usage forever — no subscriptions, no recurring charges!",
+                                                l10n!
+                                                    .enjoyingFreeTrialUpgradeMessage,
                                                 style:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -711,14 +878,27 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                                         .data ??
                                                                     false;
 
+                                                            String titleText;
+                                                            if (isPaused) {
+                                                              titleText = l10n!
+                                                                  .usagePausedThirtyDays;
+                                                            } else if (isExpired ||
+                                                                _remainingUsageTime <=
+                                                                    0) {
+                                                              titleText = l10n!
+                                                                  .freeTimeExpired;
+                                                            } else if (_remainingUsageTime <
+                                                                90) {
+                                                              // Use Day 2/4 dialog messages for yellow/orange state
+                                                              titleText = l10n!
+                                                                  .likingTheApp;
+                                                            } else {
+                                                              titleText = l10n!
+                                                                  .almostOutOfFreeTime;
+                                                            }
+
                                                             return Text(
-                                                              isPaused
-                                                                  ? 'Usage Paused (30 Days)'
-                                                                  : (isExpired ||
-                                                                          _remainingUsageTime <=
-                                                                              0
-                                                                      ? 'Free Time Expired'
-                                                                      : 'Almost Out of Free Time'),
+                                                              titleText,
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .displayMedium
@@ -750,7 +930,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                                           .data ??
                                                                       0;
                                                               return Text(
-                                                                "Your free time is paused for $remainingDays more days. Upgrade to our lifetime plan to get unlimited usage immediately — no recurring charges, no subscriptions.",
+                                                                l10n!.usagePausedMessage(
+                                                                    remainingDays),
                                                                 style: FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyMedium
@@ -768,37 +949,62 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                             },
                                                           ),
                                                         ] else ...[
-                                                          FutureBuilder<bool>(
-                                                            future: preferenceService
-                                                                .isRemainingTimeExpired(),
-                                                            builder: (context,
-                                                                expiredSnapshot) {
-                                                              bool isExpired =
-                                                                  expiredSnapshot
-                                                                          .data ??
-                                                                      false;
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    bottom:
+                                                                        18.0),
+                                                            child:
+                                                                FutureBuilder<
+                                                                    bool>(
+                                                              future: preferenceService
+                                                                  .isRemainingTimeExpired(),
+                                                              builder: (context,
+                                                                  expiredSnapshot) {
+                                                                bool isExpired =
+                                                                    expiredSnapshot
+                                                                            .data ??
+                                                                        false;
 
-                                                              return Text(
-                                                                (isExpired ||
-                                                                        _remainingUsageTime <=
-                                                                            0)
-                                                                    ? "Your free time has expired! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever."
-                                                                    : "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .override(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          12.0,
-                                                                      letterSpacing:
-                                                                          0.0,
-                                                                    ),
-                                                              );
-                                                            },
+                                                                String
+                                                                    messageText;
+                                                                if (isExpired ||
+                                                                    _remainingUsageTime <=
+                                                                        0) {
+                                                                  messageText =
+                                                                      l10n!
+                                                                          .freeTimeExpiredMessage;
+                                                                } else if (_remainingUsageTime <
+                                                                    90) {
+                                                                  // Use Day 2/4 dialog messages for yellow/orange state
+                                                                  messageText =
+                                                                      l10n!
+                                                                          .likingTheAppMessage;
+                                                                } else {
+                                                                  messageText =
+                                                                      l10n!
+                                                                          .almostOutOfFreeTimeMessage;
+                                                                }
+
+                                                                return Text(
+                                                                  messageText,
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Poppins',
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            12.0,
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                      ),
+                                                                );
+                                                              },
+                                                            ),
                                                           ),
                                                         ],
                                                       ],
@@ -815,6 +1021,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         .shrink(); // Return empty widget if trial active or time >= 50
                                   },
                                 ),
+                                SizedBox(height: 12.0),
                                 // Subscribe Now button
                                 SizedBox(
                                   width: double.infinity,
@@ -834,7 +1041,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       elevation: 0,
                                     ),
                                     child: Text(
-                                      'Subscribe Now',
+                                      l10n!.subscribeNow,
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -847,6 +1054,55 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     ),
                                   ),
                                 ),
+
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Set Subscription False button
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         setState(() {
+                                //           _isSubscribed = false;
+                                //         });
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Subscription set to false'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print(
+                                //             '❌ Error setting subscription false: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.red,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Set Subscription False',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
 
                                 // SizedBox(height: 6.0),
                                 // // Demo button for warning dialog
@@ -961,6 +1217,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
                                 //       // Update the trial status
                                 //       await checkSubscriptionStatus();
+
+                                //       // Force start usage tracking after trial expiration
+                                //       _startUsageTracking();
 
                                 //       ScaffoldMessenger.of(context)
                                 //           .showSnackBar(
@@ -1079,6 +1338,71 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 //     ),
                                 //     child: Text(
                                 //       'Reset Usage Time',
+                                //       style: FlutterFlowTheme.of(context)
+                                //           .bodyMedium
+                                //           .override(
+                                //             fontFamily: 'Inter',
+                                //             color: Colors.white,
+                                //             fontSize: 12.0,
+                                //             letterSpacing: 0.0,
+                                //             fontWeight: FontWeight.w500,
+                                //           ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // // TODO: FOR TESTING - Force Start Usage Timer button
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () async {
+                                //       try {
+                                //         print(
+                                //             '🧪 Force starting usage timer for testing...');
+
+                                //         // Stop any existing timers first
+                                //         _pauseUsageTracking();
+                                //         _stopUsageTimeDisplay();
+
+                                //         // Reset session variables
+                                //         _usageSeconds = 0;
+                                //         _isTimerActive = false;
+                                //         _hasShownSubscriptionDialogThisSession =
+                                //             false;
+                                //         _hasShownWarningDialog = false;
+
+                                //         // Update remaining time
+                                //         await _updateRemainingUsageTime();
+
+                                //         // Force start both timers
+                                //         _startUsageTimeDisplay();
+                                //         _forceStartUsageTracking();
+
+                                //         ScaffoldMessenger.of(context)
+                                //             .showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //                 'Force started usage timer for testing'),
+                                //             duration: Duration(seconds: 2),
+                                //           ),
+                                //         );
+                                //       } catch (e) {
+                                //         print(
+                                //             '❌ Error force starting timer: $e');
+                                //       }
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.purple,
+                                //       foregroundColor: Colors.white,
+                                //       shape: RoundedRectangleBorder(
+                                //         borderRadius:
+                                //             BorderRadius.circular(6.0),
+                                //       ),
+                                //       elevation: 0,
+                                //     ),
+                                //     child: Text(
+                                //       'Force Start Timer (Test)',
                                 //       style: FlutterFlowTheme.of(context)
                                 //           .bodyMedium
                                 //           .override(
@@ -1448,6 +1772,169 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 //     ),
                                 //   ),
                                 // ),
+                                // TODO: FOR TESTING - Set Subscription False button
+
+                                // TODO: FOR TESTING - Dialog Testing Buttons
+                                // SizedBox(height: 6.0),
+                                // // Debug Status Display
+                                // Container(
+                                //   padding: EdgeInsets.all(8.0),
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.grey[100],
+                                //     borderRadius: BorderRadius.circular(6.0),
+                                //     border:
+                                //         Border.all(color: Colors.grey[300]!),
+                                //   ),
+                                //   child: Column(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     children: [
+                                //       Text(
+                                //         'DEBUG STATUS:',
+                                //         style: TextStyle(
+                                //           fontSize: 10,
+                                //           fontWeight: FontWeight.bold,
+                                //           color: Colors.grey[600],
+                                //         ),
+                                //       ),
+                                //       SizedBox(height: 4),
+                                //       FutureBuilder<bool>(
+                                //         future:
+                                //             preferenceService.hasTrialEnded(),
+                                //         builder: (context, snapshot) {
+                                //           bool trialEnded =
+                                //               snapshot.data ?? false;
+                                //           return Column(
+                                //             crossAxisAlignment:
+                                //                 CrossAxisAlignment.start,
+                                //             children: [
+                                //               Text(
+                                //                 'Subscribed: $_isSubscribed',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Trial Ended: $trialEnded',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Remaining Time: $_remainingUsageTime s',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //             ],
+                                //           );
+                                //         },
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay2Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.blue,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Day 2 Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay4Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.blue,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Day 4 Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showUsageWarningDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.orange,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Usage Warning Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showUsageLimitDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.red,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Usage Limit Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showTrialLimitDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.purple,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Trial Limit Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -1666,8 +2153,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         } catch (e) {
                                           print(
                                               '🔴🔴🔴Error While Creating PDF: $e');
-                                          // Stop the usage time display if there's an error
-                                          _stopUsageTimeDisplay();
+                                          // Use the safer method to stop usage time display only for subscribed users
+                                          _stopUsageTimeDisplayIfSubscribed();
                                         }
                                       },
                                       child: Container(
@@ -2441,6 +2928,678 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           //     ),
                           //   ),
                           // ),
+
+                          // DEBUG TESTING SECTION - Only visible in debug mode
+//                           if (kDebugMode) ...[
+//                             Padding(
+//                               padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+//                               child: Container(
+//                                 width: double.infinity,
+//                                 padding: EdgeInsets.all(16.0),
+//                                 decoration: BoxDecoration(
+//                                   color: Colors.yellow.withOpacity(0.1),
+//                                   border: Border.all(
+//                                       color: Colors.orange, width: 2),
+//                                   borderRadius: BorderRadius.circular(8.0),
+//                                 ),
+//                                 child: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Text(
+//                                       '🧪 DEBUG TESTING CONTROLS',
+//                                       style: TextStyle(
+//                                         fontSize: 16,
+//                                         fontWeight: FontWeight.bold,
+//                                         color: Colors.orange[800],
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 12),
+
+//                                     // Current Status Display
+//                                     Container(
+//                                       padding: EdgeInsets.all(8),
+//                                       decoration: BoxDecoration(
+//                                         color: Colors.blue.withOpacity(0.1),
+//                                         borderRadius: BorderRadius.circular(4),
+//                                       ),
+//                                       child: Column(
+//                                         crossAxisAlignment:
+//                                             CrossAxisAlignment.start,
+//                                         children: [
+//                                           Row(
+//                                             children: [
+//                                               Text('Current Status:',
+//                                                   style: TextStyle(
+//                                                       fontWeight:
+//                                                           FontWeight.bold)),
+//                                               Spacer(),
+//                                               ElevatedButton(
+//                                                 onPressed: () {
+//                                                   _debugTimerStatus();
+//                                                   setState(
+//                                                       () {}); // Refresh display
+//                                                 },
+//                                                 style: ElevatedButton.styleFrom(
+//                                                   backgroundColor: Colors.blue,
+//                                                   foregroundColor: Colors.white,
+//                                                   minimumSize: Size(60, 30),
+//                                                 ),
+//                                                 child: Text('Refresh',
+//                                                     style: TextStyle(
+//                                                         fontSize: 10)),
+//                                               ),
+//                                             ],
+//                                           ),
+//                                           SizedBox(height: 4),
+//                                           Text(
+//                                               'Subscribed: ${_isSubscribed ? "✅ YES" : "❌ NO"}'),
+//                                           Text(
+//                                               'Remaining Time: ${_remainingUsageTime}s'),
+//                                           Text('Usage Seconds: $_usageSeconds'),
+//                                           Text(
+//                                               'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "🟢 RUNNING" : "🔴 STOPPED"}'),
+//                                           Text(
+//                                               'Usage Timer: ${_usageTimer?.isActive ?? false ? "🟢 RUNNING" : "🔴 STOPPED"}'),
+//                                           Text(
+//                                               'Timer Active Flag: ${_isTimerActive ? "✅ TRUE" : "❌ FALSE"}'),
+//                                           FutureBuilder<bool>(
+//                                             future: preferenceService
+//                                                 .hasTrialEnded(),
+//                                             builder: (context, snapshot) {
+//                                               bool trialEnded =
+//                                                   snapshot.data ?? false;
+//                                               return Text(
+//                                                   'Trial Status: ${trialEnded ? "⏰ EXPIRED" : "🎁 ACTIVE"}');
+//                                             },
+//                                           ),
+//                                           FutureBuilder<bool>(
+//                                             future: preferenceService
+//                                                 .isUsagePaused(),
+//                                             builder: (context, snapshot) {
+//                                               bool isPaused =
+//                                                   snapshot.data ?? false;
+//                                               return Text(
+//                                                   'Usage: ${isPaused ? "⏸️ PAUSED" : "▶️ ACTIVE"}');
+//                                             },
+//                                           ),
+//                                         ],
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Subscription Status Controls
+//                                     Text(
+//                                       'Subscription Status:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               setState(() {
+//                                                 // _isSubscribed = true;
+//                                               });
+//                                               ScaffoldMessenger.of(context)
+//                                                   .showSnackBar(
+//                                                 SnackBar(
+//                                                     content: Text(
+//                                                         '✅ Subscription set to TRUE')),
+//                                               );
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.green,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set Subscribed'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               setState(() {
+//                                                 _isSubscribed = false;
+//                                               });
+//                                               ScaffoldMessenger.of(context)
+//                                                   .showSnackBar(
+//                                                 SnackBar(
+//                                                     content: Text(
+//                                                         '❌ Subscription set to FALSE')),
+//                                               );
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.red,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set Unsubscribed'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Trial Controls
+//                                     Text(
+//                                       'Trial Controls:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 DateTime now = DateTime.now();
+//                                                 DateTime trialEndDate =
+//                                                     now.add(Duration(days: 7));
+//                                                 await prefs.setString(
+//                                                     'trial_end_date',
+//                                                     trialEndDate
+//                                                         .toIso8601String());
+
+//                                                 await preferenceService
+//                                                     .resetUsageTime();
+//                                                 await preferenceService
+//                                                     .setRemainingTime(180);
+//                                                 _usageSeconds = 0;
+//                                                 await _updateRemainingUsageTime();
+
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '🎁 Trial reset to 7 days active')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error resetting trial: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.blue,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Reset Trial (7 Days)'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 DateTime yesterday =
+//                                                     DateTime.now().subtract(
+//                                                         Duration(days: 1));
+//                                                 await prefs.setString(
+//                                                     'trial_end_date',
+//                                                     yesterday
+//                                                         .toIso8601String());
+
+//                                                 await _updateRemainingUsageTime();
+
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '⏰ Trial set to EXPIRED')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error expiring trial: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.orange,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Expire Trial'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Usage Time Controls
+//                                     Text(
+//                                       'Usage Time Controls:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 // Stop only the usage timer (keep display timer running)
+//                                                 _pauseUsageTracking();
+
+//                                                 // Set time to 30 seconds
+//                                                 await preferenceService
+//                                                     .setRemainingTime(30);
+
+//                                                 // Reset session variables
+//                                                 _usageSeconds = 0;
+
+//                                                 // Update UI first
+//                                                 await _updateRemainingUsageTime();
+
+//                                                 // Force start usage tracking for testing
+//                                                 _forceStartUsageTracking();
+
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '⚠️ Timer set to 30s and started!')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error setting time: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.amber,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set 30s'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 // Stop only the usage timer (keep display timer running)
+//                                                 _pauseUsageTracking();
+
+//                                                 // Set time to 0 seconds (expired)
+//                                                 await preferenceService
+//                                                     .setRemainingTime(0);
+
+//                                                 // Reset session variables
+//                                                 _usageSeconds = 0;
+
+//                                                 // Update UI to show expired state
+//                                                 await _updateRemainingUsageTime();
+
+//                                                 // Don't start timers since time is 0
+
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '🚫 Timer set to 0s (expired)')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error setting time: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.red,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set 0s'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 // Stop only the usage timer (keep display timer running)
+//                                                 _pauseUsageTracking();
+
+//                                                 // Reset usage time in SharedPreferences
+//                                                 await preferenceService
+//                                                     .resetUsageTime();
+//                                                 await preferenceService
+//                                                     .setRemainingTime(180);
+
+//                                                 // Reset session variables
+//                                                 _usageSeconds = 0;
+//                                                 _hasShownWarningDialog = false;
+//                                                 _hasShownSubscriptionDialogThisSession =
+//                                                     false;
+
+//                                                 // Update UI first
+//                                                 await _updateRemainingUsageTime();
+
+//                                                 // Force start usage tracking for testing (bypass trial check)
+//                                                 // Display timer should already be running from initState
+//                                                 _forceStartUsageTracking();
+
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '✅ Timer reset to 180s and started!')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error resetting time: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.green,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Reset 180s'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Usage Pause Controls
+//                                     Text(
+//                                       'Usage Pause Controls:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 await preferenceService
+//                                                     .startUsagePause();
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '⏸️ Usage PAUSED for 30 days')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error starting pause: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.purple,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Start 30-Day Pause'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 await prefs.remove(
+//                                                     'usage_pause_start_date');
+//                                                 await preferenceService
+//                                                     .setRemainingTime(180);
+//                                                 await _updateRemainingUsageTime();
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '▶️ 30-day pause RESET')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error resetting pause: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.teal,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Reset Pause'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Dialog Testing Controls
+//                                     Text(
+//                                       'Dialog Testing:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               showUsageWarningDialog(context);
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.orange,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Warning Dialog'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               showDay2Dialog(context);
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.purple,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Day 2 Dialog'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               showDay4Dialog(context);
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.teal,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Day 4 Dialog'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () {
+//                                               showUsageLimitDialog(context);
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.red,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Usage Limit Dialog'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 await prefs.remove(
+//                                                     'last_trial_limit_dialog_date');
+//                                                 _hasShownSubscriptionDialogThisSession =
+//                                                     false;
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '🔄 Dialog dates reset')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error resetting dialog dates: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.indigo,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Reset Dialog Dates'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     SizedBox(height: 16),
+
+//                                     // Installation Date Controls
+//                                     Text(
+//                                       'Installation Date Controls:',
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         fontWeight: FontWeight.w600,
+//                                         color: Colors.black87,
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Row(
+//                                       children: [
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 DateTime twoDaysAgo =
+//                                                     DateTime.now().subtract(
+//                                                         Duration(days: 2));
+//                                                 await prefs.setString(
+//                                                     'installation_date',
+//                                                     twoDaysAgo
+//                                                         .toIso8601String());
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '📅 Installation set to 2 days ago')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error setting installation date: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.blue,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set Day 2'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 DateTime fourDaysAgo =
+//                                                     DateTime.now().subtract(
+//                                                         Duration(days: 4));
+//                                                 await prefs.setString(
+//                                                     'installation_date',
+//                                                     fourDaysAgo
+//                                                         .toIso8601String());
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '📅 Installation set to 4 days ago')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error setting installation date: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.green,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Set Day 4'),
+//                                           ),
+//                                         ),
+//                                         SizedBox(width: 8),
+//                                         Expanded(
+//                                           child: ElevatedButton(
+//                                             onPressed: () async {
+//                                               try {
+//                                                 SharedPreferences prefs =
+//                                                     await SharedPreferences
+//                                                         .getInstance();
+//                                                 DateTime now = DateTime.now();
+//                                                 await prefs.setString(
+//                                                     'installation_date',
+//                                                     now.toIso8601String());
+//                                                 ScaffoldMessenger.of(context)
+//                                                     .showSnackBar(
+//                                                   SnackBar(
+//                                                       content: Text(
+//                                                           '📅 Installation reset to today')),
+//                                                 );
+//                                               } catch (e) {
+//                                                 print(
+//                                                     '❌ Error resetting installation date: $e');
+//                                               }
+//                                             },
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.grey,
+//                                               foregroundColor: Colors.white,
+//                                             ),
+//                                             child: Text('Reset Today'),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+// //
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
                             child: Container(
@@ -2529,7 +3688,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
       print(
           '[$LOG_TAG] No media selected, hiding loading dialog and returning');
       LoadingDialog.hide(context);
-      _stopUsageTimeDisplay();
+      // Don't stop usage time display when no media selected - keep it running for non-subscribed users
       return;
     }
 
@@ -2587,7 +3746,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
         });
       } else {
         print('[$LOG_TAG] Not all files were converted, returning');
-        _stopUsageTimeDisplay();
+        // Don't stop usage time display when file conversion fails - keep it running for non-subscribed users
         safeSetState(() {});
         return;
       }
@@ -2703,8 +3862,14 @@ class _ConverterWidgetState extends State<ConverterWidget>
     print('[$LOG_TAG] Hiding loading dialog');
     LoadingDialog.hide(context);
 
-    // Stop the usage time display when PDF creation is complete
-    _stopUsageTimeDisplay();
+    // Use the safer method to stop usage time display only for subscribed users
+    _stopUsageTimeDisplayIfSubscribed();
+
+    // Ensure usage time display is running for non-subscribed users
+    if (!_isSubscribed && !_showUsageTime) {
+      print('[$LOG_TAG] Restarting usage time display for non-subscribed user');
+      _startUsageTimeDisplay();
+    }
 
     print('[$LOG_TAG] PDF creation process completed successfully');
   }
@@ -2727,7 +3892,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
           if (receipt != null) {
             // isPurchased = true;
             setState(() {
-              // isPurchased = true;
+              // _isPurchased = true;
               _isSubscribed = true;
             });
             LogHelper.logMessage('Receipt Status', 'Receipt found on device');
@@ -2738,7 +3903,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             final prodResponse = await _verifyReceipt(receipt, false);
             if (prodResponse != null && prodResponse['status'] == 0) {
               setState(() {
-                // isPurchased = true;
+                // _isP = true;
 
                 _isSubscribed = true;
               });
@@ -2962,6 +4127,57 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   // Add this method to start tracking usage time
+  // Force start usage tracking for testing purposes (bypasses trial/subscription checks)
+  // void _forceStartUsageTracking() async {
+  //   print('🧪 FORCE starting usage tracking for testing');
+
+  //   // Stop any existing timer first
+  //   if (_usageTimer != null && _usageTimer!.isActive) {
+  //     _usageTimer!.cancel();
+  //     print('🛑 Cancelled existing usage timer');
+  //   }
+
+  //   _lastActiveTime = DateTime.now();
+  //   _isTimerActive = true;
+
+  //   // Create a timer that fires every second
+  //   _usageTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+  //     if (!_isTimerActive || !mounted) {
+  //       timer.cancel();
+  //       return;
+  //     }
+
+  //     _usageSeconds++;
+  //     print(
+  //         '⏱️ Usage seconds: $_usageSeconds, remaining: $_remainingUsageTime');
+
+  //     // For testing: directly decrement the remaining time instead of recalculating
+  //     if (_remainingUsageTime > 0) {
+  //       setState(() {
+  //         _remainingUsageTime--;
+  //       });
+  //     }
+
+  //     // Check if time has expired
+  //     if (_remainingUsageTime <= 0) {
+  //       print('⏰ Time expired, pausing timer');
+  //       _pauseUsageTracking();
+
+  //       // Show usage limit dialog if not shown this session
+  //       if (!_hasShownSubscriptionDialogThisSession) {
+  //         _hasShownSubscriptionDialogThisSession = true;
+  //         Future.delayed(Duration(milliseconds: 500), () {
+  //           if (mounted) {
+  //             showUsageLimitDialog(context);
+  //           }
+  //         });
+  //       }
+  //     }
+  //   });
+
+  //   print('🟢 FORCE started usage tracking timer');
+  // }
+
   void _startUsageTracking() async {
     if (_isSubscribed) {
       print('🚫 User is subscribed, skipping usage tracking');
@@ -2996,13 +4212,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
     // Create a timer that fires every second
     _usageTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      if (!_isTimerActive) return;
+      if (!_isTimerActive || !mounted) {
+        timer.cancel();
+        return;
+      }
 
       _usageSeconds++;
       print('⏱️ Usage seconds: $_usageSeconds');
 
-      // Update UI every 5 seconds for real-time progress
-      if (_usageSeconds % 5 == 0) {
+      // Update UI every second for smooth progress
+      if (mounted) {
         await _updateRemainingUsageTime();
       }
 
@@ -3147,8 +4366,7 @@ class LoadingDialog {
   static bool isImagePickerCalled = false;
   static bool isAlreadyCancelled = false;
 
-  static void show(BuildContext context,
-      {String message = "{Creating PDF}..."}) {
+  static void show(BuildContext context, {String? message}) {
     if (isAlreadyCancelled) {
       isAlreadyCancelled = false;
       return;
@@ -3172,7 +4390,9 @@ class LoadingDialog {
               children: [
                 const CircularProgressIndicator(),
                 const SizedBox(width: 16),
-                Text(message, style: const TextStyle(fontSize: 16)),
+                Text(
+                    message ?? AppLocalizations.of(context)!.creatingPdfMessage,
+                    style: const TextStyle(fontSize: 16)),
               ],
             ),
           ),
@@ -3321,6 +4541,7 @@ void showTrialLimitDialog(BuildContext context) {
 }
 
 void showDay2Dialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -3343,7 +4564,7 @@ void showDay2Dialog(BuildContext context) {
             SizedBox(height: 15),
             Text(
               textAlign: TextAlign.center,
-              "Liking the App?",
+              l10n!.likingTheApp,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Color(0xFF173F5A),
@@ -3354,7 +4575,7 @@ void showDay2Dialog(BuildContext context) {
             ),
             SizedBox(height: 10),
             Text(
-              "Liking the app? Get lifetime access today with a single one-time payment — no recurring charges, no subscriptions. Unlock unlimited usage forever!",
+              l10n!.likingTheAppMessage,
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Poppins',
@@ -3371,7 +4592,7 @@ void showDay2Dialog(BuildContext context) {
               Navigator.pop(context);
             },
             child: Text(
-              "Maybe Later",
+              l10n!.maybeLatr,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.grey,
@@ -3393,7 +4614,7 @@ void showDay2Dialog(BuildContext context) {
               ),
             ),
             child: Text(
-              "Get Lifetime Access",
+              l10n!.getLifetimeAccess,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.white,
@@ -3410,6 +4631,7 @@ void showDay2Dialog(BuildContext context) {
 }
 
 void showDay4Dialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -3432,7 +4654,7 @@ void showDay4Dialog(BuildContext context) {
             SizedBox(height: 15),
             Text(
               textAlign: TextAlign.center,
-              "Still Enjoying It?",
+              l10n!.stillEnjoyingIt,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Color(0xFF173F5A),
@@ -3443,7 +4665,7 @@ void showDay4Dialog(BuildContext context) {
             ),
             SizedBox(height: 10),
             Text(
-              "Still enjoying it? Upgrade now and keep access forever with our lifetime plan — one payment, no subscriptions, unlimited usage for life!",
+              l10n!.stillEnjoyingItMessage,
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Poppins',
@@ -3460,7 +4682,7 @@ void showDay4Dialog(BuildContext context) {
               Navigator.pop(context);
             },
             child: Text(
-              "Not Now",
+              l10n!.notNow,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.grey,
@@ -3482,7 +4704,7 @@ void showDay4Dialog(BuildContext context) {
               ),
             ),
             child: Text(
-              "Upgrade Forever",
+              l10n!.upgradeForever,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.white,
@@ -3606,6 +4828,7 @@ void showFilenameErrorDialog(BuildContext context) {
 }
 
 void showUsageWarningDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
   showDialog(
     context: context,
     barrierDismissible: true, // User can dismiss by tapping outside
@@ -3628,7 +4851,7 @@ void showUsageWarningDialog(BuildContext context) {
             SizedBox(height: 15),
             Text(
               textAlign: TextAlign.center,
-              "Almost Out of Free Time",
+              l10n!.likingTheApp,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Color(0xFF173F5A),
@@ -3639,7 +4862,7 @@ void showUsageWarningDialog(BuildContext context) {
             ),
             SizedBox(height: 10),
             Text(
-              "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
+              l10n!.likingTheAppMessage,
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Poppins',
@@ -3656,7 +4879,7 @@ void showUsageWarningDialog(BuildContext context) {
               Navigator.pop(context);
             },
             child: Text(
-              "Later",
+              l10n!.later,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.grey,
@@ -3679,7 +4902,7 @@ void showUsageWarningDialog(BuildContext context) {
               ),
             ),
             child: Text(
-              "Upgrade Now",
+              l10n!.upgradeNowButton,
               style: FlutterFlowTheme.of(context).displayMedium.override(
                     fontFamily: 'Poppins',
                     color: Colors.white,

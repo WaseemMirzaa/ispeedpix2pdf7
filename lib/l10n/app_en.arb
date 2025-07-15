@@ -171,5 +171,51 @@
     }
   },
   "threeMinutesUsagePerMonth": "✔ 3 minutes of usage time per month\n",
-  "usageTimeResetMonthly": "✔ Usage time resets monthly\n\n"
+  "usageTimeResetMonthly": "✔ Usage time resets monthly\n\n",
+  "trialTimeLeft": "Trial Time Left",
+  "remainingTime": "{minutes}:{seconds} remaining",
+  "@remainingTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "unlockUnlimitedAccessToday": "Unlock Unlimited Access Today!",
+  "enjoyingFreeTrialUpgradeMessage": "You're enjoying the free trial! Why wait? Upgrade now to our lifetime plan and never worry about time limits again. One payment, unlimited usage forever — no subscriptions, no recurring charges!",
+  "usagePausedThirtyDays": "Usage Paused (30 Days)",
+  "freeTimeExpired": "Free Time Expired",
+  "almostOutOfFreeTime": "Almost Out of Free Time",
+  "usagePausedMessage": "Your free time is paused for {days} more days. Upgrade to our lifetime plan to get unlimited usage immediately — no recurring charges, no subscriptions.",
+  "@usagePausedMessage": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freeTimeExpiredMessage": "⏰ Time's up! But your journey continues...🌟 Upgrade to Premium and scan without limits! Join thousands of users who've unlocked their full potential.",
+  "almostOutOfFreeTimeMessage": "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
+  "subscribeNow": "Subscribe Now",
+  "likingTheApp": "Liking the App?",
+  "likingTheAppMessage": "Liking the app? Get lifetime access today with a single one-time payment — no recurring charges, no subscriptions. Unlock unlimited usage forever!",
+  "maybeLatr": "Maybe Later",
+  "getLifetimeAccess": "Get Lifetime Access",
+  "stillEnjoyingIt": "Still Enjoying It?",
+  "stillEnjoyingItMessage": "Still enjoying it? Upgrade now and keep access forever with our lifetime plan — one payment, no subscriptions, unlimited usage for life!",
+  "notNow": "Not Now",
+  "upgradeForever": "Upgrade Forever",
+  "almostOutOfFreeTimeTitle": "Almost Out of Free Time",
+  "almostOutOfFreeTimeWarningMessage": "You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.",
+  "later": "Later",
+  "upgradeNow": "Upgrade Now",
+  "creatingPdfMessage": "Creating PDF...",
+  "day": "day",
+  "days": "days",
+  "left": "left",
+  "upgradeNowButton": "Upgrade Now",
+  "sessionTime": "session time"
 }
