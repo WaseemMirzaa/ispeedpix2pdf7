@@ -4249,17 +4249,22 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   void _startUsageTracking() async {
+    // Timer will NOT run if: 3 days have not passed OR user is subscribed
     if (_isSubscribed) {
-      print('🚫 User is subscribed, skipping usage tracking');
+      print('🚫 Timer will NOT run: User is subscribed (isSubscribed = true)');
       return; // No need to track for subscribers
     }
 
-    // Check if 3-day trial is still active
+    // Check if 3-day trial period has ended
     bool trialEnded = await preferenceService.hasTrialEnded();
     if (!trialEnded) {
-      print('🎁 3-day trial is active, skipping usage tracking');
+      print(
+          '🚫 Timer will NOT run: 3 days have not passed (trialEnded = false)');
       return; // No need to track during trial period
     }
+
+    print(
+        '✅ Timer WILL run: 3 days passed AND user not subscribed (trialEnded=$trialEnded && isSubscribed=$_isSubscribed)');
 
     // Check if timer is already running
     if (_usageTimer != null && _usageTimer!.isActive) {
@@ -4376,8 +4381,19 @@ class _ConverterWidgetState extends State<ConverterWidget>
   }
 
   // Resume the usage tracking
-  void _resumeUsageTracking() {
-    if (_isSubscribed) return; // No need to track for subscribers
+  void _resumeUsageTracking() async {
+    // Timer will NOT run if: 3 days have not passed OR user is subscribed
+    if (_isSubscribed) {
+      print('🚫 Resume blocked: User is subscribed (isSubscribed = true)');
+      return; // No need to track for subscribers
+    }
+
+    // Check if 3-day trial period has ended
+    bool trialEnded = await preferenceService.hasTrialEnded();
+    if (!trialEnded) {
+      print('🚫 Resume blocked: 3 days have not passed (trialEnded = false)');
+      return; // No need to track during trial period
+    }
 
     // Check if timer is already running
     if (_usageTimer != null && _usageTimer!.isActive) {
@@ -4398,6 +4414,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
     super.didChangeDependencies();
     print('📱 didChangeDependencies called');
     _debugTimerStatus();
+    // Timer will NOT run if: 3 days have not passed OR user is subscribed
     _startUsageTracking();
   }
 

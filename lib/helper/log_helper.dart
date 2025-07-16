@@ -1,6 +1,4 @@
-
 class LogHelper {
-
   static logSuccessMessage(String? logTitle, dynamic message) {
     print('🟢🟢🟢🟢🟢 SUCCESS ${logTitle ?? ''} : $message');
   }
@@ -10,7 +8,6 @@ class LogHelper {
   }
 
   static logMessage(String? logTitle, dynamic message) {
-    print('🟡🟡🟡🟡🟡 MESSAGE ${logTitle ?? ''} : $message');
+    // print('🟡🟡🟡🟡🟡 MESSAGE ${logTitle ?? ''} : $message');
   }
-
 }

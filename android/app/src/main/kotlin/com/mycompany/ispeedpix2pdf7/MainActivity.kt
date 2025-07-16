@@ -1,15 +1,49 @@
 package com.mycompany.ispeedpix2pdf7
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.mycompany.ispeedpix2pdf7/file" // The method channel name
+    private val NATIVE_PICKER_CHANNEL = "com.ispeedpix2pdf.native_picker" // Native picker channel
+    private val IMAGE_PICKER_REQUEST_CODE = 1001
+
+    private var imagePickerResult: MethodChannel.Result? = null
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+
+        // Set up native image picker method channel
+        MethodChannel(flutterEngine.dartExecutor, NATIVE_PICKER_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "pickMultipleImages" -> {
+                    val limit = call.argument<Int>("limit") ?: 60
+                    pickMultipleImages(limit, result)
+                }
+                "readContentUri" -> {
+                    val uri = call.argument<String>("uri")
+                    if (uri != null) {
+                        readContentUriBytes(uri, result)
+                    } else {
+                        result.error("INVALID_URI", "URI parameter is null", null)
+                    }
+                }
+
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,5 +93,92 @@ class MainActivity : FlutterActivity() {
 
         // Start the activity to choose the sharing app
         startActivity(Intent.createChooser(intent, "Share $fileName"))
+    }
+
+    private fun pickMultipleImages(limit: Int, result: MethodChannel.Result) {
+        imagePickerResult = result
+
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ - Use PickMultipleVisualMedia
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, limit)
+                type = "image/*"
+            }
+        } else {
+            // Pre-Android 13 - Use EXTRA_PICK_IMAGES_MAX
+            Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/*"
+                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, limit)
+            }
+        }
+
+        try {
+            startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE)
+        } catch (e: Exception) {
+            result.error("PICKER_ERROR", "Failed to launch image picker: ${e.message}", null)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == IMAGE_PICKER_REQUEST_CODE) {
+            handleImagePickerResult(resultCode, data)
+        }
+    }
+
+    private fun handleImagePickerResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            val imagePaths = mutableListOf<String>()
+
+            if (data.clipData != null) {
+                // Multiple images selected
+                val clipData = data.clipData!!
+                for (i in 0 until clipData.itemCount) {
+                    val uri = clipData.getItemAt(i).uri
+                    // Grant persistent URI permission for Photo Picker URIs
+                    try {
+                        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    } catch (e: SecurityException) {
+                        // Permission might not be needed or already granted
+                    }
+                    imagePaths.add(uri.toString())
+                }
+            } else if (data.data != null) {
+                // Single image selected
+                val uri = data.data!!
+                // Grant persistent URI permission for Photo Picker URIs
+                try {
+                    contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (e: SecurityException) {
+                    // Permission might not be needed or already granted
+                }
+                imagePaths.add(uri.toString())
+            }
+
+            imagePickerResult?.success(imagePaths)
+        } else {
+            imagePickerResult?.success(emptyList<String>())
+        }
+
+        imagePickerResult = null
+    }
+
+    private fun readContentUriBytes(uriString: String, result: MethodChannel.Result) {
+        try {
+            val uri = Uri.parse(uriString)
+            val inputStream = contentResolver.openInputStream(uri)
+
+            if (inputStream != null) {
+                val bytes = inputStream.readBytes()
+                inputStream.close()
+                result.success(bytes)
+            } else {
+                result.error("READ_ERROR", "Could not open input stream for URI: $uriString", null)
+            }
+        } catch (e: Exception) {
+            result.error("READ_ERROR", "Failed to read content URI: ${e.message}", null)
+        }
     }
 }
