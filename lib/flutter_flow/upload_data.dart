@@ -9,11 +9,45 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:video_player/video_player.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow_util.dart';
 
 const allowedFormats = {'image/png', 'image/jpeg', 'video/mp4', 'image/gif'};
+
+// Future<XFile?> createXFileFromContentUri(String uriPath) async {
+//   try {
+//     // Open the URI as a stream via Platform Channels or use a plugin like `uri_to_file`
+//     final bytes = await File(uriPath)
+//         .readAsBytes(); // This may throw if it's a content://
+
+//     // Create a temporary file
+//     final tempDir = await getTemporaryDirectory();
+//     final file =
+//         File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+//     await file.writeAsBytes(bytes);
+
+//     return XFile(file.path);
+//   } catch (e) {
+//     print('❌ Failed to read file from content URI: $e');
+//     return null;
+//   }
+// }
+Future<XFile?> convertContentUriToXFile(String uri) async {
+  try {
+    final file = await toFile(uri); // This resolves the content:// URI properly
+    return XFile(file.path);
+  } catch (e) {
+    print('❌ Failed to convert URI: $e');
+    return null;
+  }
+}
 
 // Android-specific image picker with proper limit enforcement
 Future<List<XFile>> _pickMultipleImagesAndroid({
@@ -27,7 +61,7 @@ Future<List<XFile>> _pickMultipleImagesAndroid({
       '[IMAGE_LIMIT] 🤖 Android native picker: Attempting to use proper limit enforcement');
 
   try {
-    // First, try using the enhanced Android implementation
+    // Use the enhanced Android native picker
     final List<XFile> images = await _tryAndroidNativePicker(
       picker: picker,
       maxWidth: maxWidth,
@@ -53,6 +87,11 @@ Future<List<XFile>> _pickMultipleImagesAndroid({
   }
 }
 
+// Future<XFile> convertUriToXFile(String contentUri) async {
+//   final file = await con(contentUri);
+//   return XFile(file.path);
+// }
+
 // Enhanced Android picker that uses platform channel for native limit enforcement
 Future<List<XFile>> _tryAndroidNativePicker({
   required ImagePicker picker,
@@ -70,53 +109,54 @@ Future<List<XFile>> _tryAndroidNativePicker({
 
     if (imagePaths != null && imagePaths.isNotEmpty) {
       print(
-          '[IMAGE_LIMIT] � Native Android platform channel returned ${imagePaths.length} images');
+          '[IMAGE_LIMIT] 📱 Native Android platform channel returned ${imagePaths.length} images');
 
-      // Convert paths/URIs to XFile objects - FIX: Ensure proper file reading
+      // Check if we got Photo Picker content URIs - if so, fall back immediately
+      // bool hasPhotoPickerUris =
+      //     imagePaths.any((path) => path.contains('media/picker/'));
+      // if (hasPhotoPickerUris) {
+      //   print(
+      //       '[IMAGE_LIMIT] ⚠️ Detected Photo Picker content URIs, falling back to regular image_picker');
+      //   throw Exception('Photo Picker content URIs detected - using fallback');
+      // }
+
+      // Convert paths/URIs to XFile obj
+      //ects - FIX: Ensure proper file reading
       final List<XFile> images = [];
-      for (String path in imagePaths) {
-        try {
-          // Create XFile and verify it can be read
-          final XFile xfile = XFile(path);
 
-          // Test if we can read the file to ensure it's valid
-          try {
-            final bytes = await xfile.readAsBytes();
-            if (bytes.isNotEmpty) {
-              images.add(xfile);
-              print(
-                  '[IMAGE_LIMIT] ✅ Successfully validated image: $path (${bytes.length} bytes)');
-            } else {
-              print('[IMAGE_LIMIT] ⚠️ Skipping empty image: $path');
-            }
-          } catch (readError) {
-            print('[IMAGE_LIMIT] ⚠️ Direct read failed for $path: $readError');
-            // Try using native Android content URI reader as fallback
-            try {
-              print(
-                  '[IMAGE_LIMIT] 🔄 Attempting native content URI reader for: $path');
-              final nativeBytes = await _readContentUriNative(path);
-              if (nativeBytes != null && nativeBytes.isNotEmpty) {
-                // Create a new XFile with the validated bytes
-                images.add(xfile);
-                print(
-                    '[IMAGE_LIMIT] ✅ Native reader success: $path (${nativeBytes.length} bytes)');
-              } else {
-                print(
-                    '[IMAGE_LIMIT] ⚠️ Native reader returned empty for: $path');
-              }
-            } catch (nativeError) {
-              print(
-                  '[IMAGE_LIMIT] ❌ Native reader also failed for $path: $nativeError');
-            }
-          }
-        } catch (e) {
-          print('[IMAGE_LIMIT] ⚠️ Failed to validate image: $path, error: $e');
+      for (String path in imagePaths) {
+        var xfile = await convertContentUriToXFile(path);
+        // final file = File(path); // Create File
+        print('[IMAGE_LIMIT] Creating XFile from path: $xfile');
+        if (xfile != null) {
+          images.add(xfile);
         }
       }
 
-      print(
-          '[IMAGE_LIMIT] ✅ Successfully validated ${images.length} images out of ${imagePaths.length}');
+      // Create XFile and verify it can be read
+      // final XFile xfile = XFile(file.path);
+
+      // Test if we can read the file to ensure it's valid
+      //     try {
+      //       final bytes = await xfile.readAsBytes();
+      //       if (bytes.isNotEmpty) {
+      //         print(
+      //             '[IMAGE_LIMIT] ✅ Successfully validated image: $path (${bytes.length} bytes)');
+      //       } else {
+      //         print('[IMAGE_LIMIT] ⚠️ Skipping empty image: $path');
+      //       }
+      //     } catch (readError) {
+      //       print('[IMAGE_LIMIT] ⚠️ Direct read failed for $path: $readError');
+      //       print(
+      //           '[IMAGE_LIMIT] ⚠️ Skipping image due to content URI read failure: $path');
+      //       // Skip this image - will be handled by fallback to regular image_picker
+      //     }
+      //   } catch (e) {
+      //     print('[IMAGE_LIMIT] ⚠️ Failed to validate image: $path, error: $e');
+      //   }
+
+      // prin/t(
+      // '[IMAGE_LIMIT] ✅ Successfully validated ${images.length} images out of ${imagePaths.length}');
       return images;
     } else {
       print(
@@ -128,49 +168,17 @@ Future<List<XFile>> _tryAndroidNativePicker({
     print('[IMAGE_LIMIT] 🔄 Falling back to image_picker with limit parameter');
 
     // Fallback to image_picker with limit
-    final List<XFile> images = await picker.pickMultiImage(
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
-      requestFullMetadata: true,
-      imageQuality: imageQuality,
-      limit: limit,
-    );
 
-    print(
-        '[IMAGE_LIMIT] 📱 Fallback image_picker completed with ${images.length} images');
-    return images;
-  }
-}
-
-// Read content URI bytes using native Android method
-Future<Uint8List?> _readContentUriNative(String uri) async {
-  print('[IMAGE_LIMIT] 📱 Calling native Android content URI reader for: $uri');
-
-  try {
-    const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
-    final result = await platform.invokeMethod('readContentUri', {
-      'uri': uri,
-    });
-
-    if (result != null) {
-      final Uint8List bytes = Uint8List.fromList(result.cast<int>());
-      print(
-          '[IMAGE_LIMIT] 🎯 Native Android content URI reader returned ${bytes.length} bytes');
-      return bytes;
-    } else {
-      print('[IMAGE_LIMIT] ❌ Native Android content URI reader returned null');
-      return null;
-    }
-  } catch (e) {
-    print('[IMAGE_LIMIT] ❌ Native content URI reader error: $e');
-    return null;
+    // print(
+    // '[IMAGE_LIMIT] 📱 Fallback image_picker completed with ${images.length} images');
+    return [];
   }
 }
 
 // Call native Android picker using platform channel
 Future<List<String>?> _callNativeAndroidPicker(int limit) async {
   print(
-      '[IMAGE_LIMIT] � Calling native Android picker via platform channel with limit: $limit');
+      '[IMAGE_LIMIT] 📱 Calling native Android picker via platform channel with limit: $limit');
 
   try {
     const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
@@ -369,13 +377,12 @@ Future<List<SelectedFile>?> selectMedia({
           (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60;
 
       if (Platform.isAndroid) {
-        // Android: Use native Android picker with proper limit enforcement
+        // Android: Use Android-specific implementation with proper limit enforcement
         print(
-            '[IMAGE_LIMIT] 🤖 Android: Using native picker with EXTRA_PICK_IMAGES_MAX limit: $imageLimit');
+            '[IMAGE_LIMIT] 🤖 Android: Using Android-specific picker with limit: $imageLimit');
 
         try {
-          // Use Android-specific implementation with proper limit
-          print('[IMAGE_LIMIT] 🔧 Opening Android native picker with limit...');
+          // Use Android-specific implementation
           pickedMedia = await _pickMultipleImagesAndroid(
             picker: picker,
             maxWidth: maxWidth,
@@ -384,32 +391,26 @@ Future<List<SelectedFile>?> selectMedia({
             limit: imageLimit,
           );
           print(
-              '[IMAGE_LIMIT] 📊 Android native picker returned ${pickedMedia.length} images (limit: $imageLimit)');
+              '[IMAGE_LIMIT] 📊 Android picker returned ${pickedMedia.length} images (limit: $imageLimit)');
         } catch (e) {
-          print('[IMAGE_LIMIT] ❌ Android native picker failed: $e');
+          print('[IMAGE_LIMIT] ❌ Android picker failed: $e');
           print(
               '[IMAGE_LIMIT] 🔄 Falling back to regular picker with manual limit');
 
           // Fallback to regular picker
-          try {
-            pickedMedia = await picker.pickMultiImage(
-              maxWidth: maxWidth,
-              maxHeight: maxHeight,
-              requestFullMetadata: true,
-              imageQuality: imageQuality,
-              limit: imageLimit,
-            );
+          pickedMedia = await picker.pickMultiImage(
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            requestFullMetadata: true,
+            imageQuality: imageQuality,
+            limit: imageLimit,
+          );
 
-            // Manually enforce limit for fallback
-            if (pickedMedia.length > imageLimit) {
-              print(
-                  '[IMAGE_LIMIT] ✂️ Fallback: manually limiting to $imageLimit images');
-              pickedMedia = pickedMedia.take(imageLimit).toList();
-            }
-          } catch (fallbackError) {
+          // Manually enforce limit for fallback
+          if (pickedMedia.length > imageLimit) {
             print(
-                '[IMAGE_LIMIT] ❌ Fallback picker also failed: $fallbackError');
-            return null;
+                '[IMAGE_LIMIT] ✂️ Fallback: manually limiting to $imageLimit images');
+            pickedMedia = pickedMedia.take(imageLimit).toList();
           }
         }
       } else {
