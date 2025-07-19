@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -28,11 +27,7 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
                 "pickMultipleImages" -> {
                     val limit = call.argument<Int>("limit") ?: 60
-                    val androidVersion = call.argument<Int>("androidVersion") ?: Build.VERSION.SDK_INT
-
-                    Log.d("ImagePicker", "Android version: $androidVersion, Limit: $limit")
-
-                    pickMultipleImages(limit, androidVersion, result)
+                    pickMultipleImages(limit, result)
                 }
                 "readContentUri" -> {
                     val uri = call.argument<String>("uri")
@@ -100,33 +95,27 @@ class MainActivity : FlutterActivity() {
         startActivity(Intent.createChooser(intent, "Share $fileName"))
     }
 
-    private fun pickMultipleImages(limit: Int, androidVersion: Int, result: MethodChannel.Result) {
+    private fun pickMultipleImages(limit: Int, result: MethodChannel.Result) {
         imagePickerResult = result
 
-        Log.d("ImagePicker", "Creating intent for Android version: $androidVersion with limit: $limit")
-
-        val intent = if (androidVersion >= Build.VERSION_CODES.KITKAT) {
-            // Android 4.4+ (API 19+) to API 32 - Use ACTION_GET_CONTENT
-            Log.d("ImagePicker", "Using ACTION_GET_CONTENT (Android 4.4+ to API 32)")
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ - Use PickMultipleVisualMedia
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, limit)
+                type = "image/*"
+            }
+        } else {
+            // Pre-Android 13 - Use EXTRA_PICK_IMAGES_MAX
             Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/*"
                 putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                // Note: EXTRA_PICK_IMAGES_MAX not available on older versions
-            }
-        } else {
-            // Very old Android versions - Basic picker
-            Log.d("ImagePicker", "Using ACTION_PICK (older Android)")
-            Intent(Intent.ACTION_PICK).apply {
-                type = "image/*"
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, limit)
             }
         }
 
         try {
-            Log.d("ImagePicker", "Starting activity for result")
             startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE)
         } catch (e: Exception) {
-            Log.e("ImagePicker", "Failed to open image picker", e)
             result.error("PICKER_ERROR", "Failed to launch image picker: ${e.message}", null)
         }
     }

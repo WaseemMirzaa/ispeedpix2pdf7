@@ -16,7 +16,6 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow_util.dart';
 
@@ -182,26 +181,10 @@ Future<List<String>?> _callNativeAndroidPicker(int limit) async {
       '[IMAGE_LIMIT] 📱 Calling native Android picker via platform channel with limit: $limit');
 
   try {
-    // Get Android version info
-    final deviceInfo = DeviceInfoPlugin();
-    final androidInfo = await deviceInfo.androidInfo;
-    final androidVersion = androidInfo.version.sdkInt;
-
-    print('[IMAGE_LIMIT] 🔍 Android SDK version: $androidVersion');
-
-    // Check if Android version is supported (API 32 and lower)
-    if (androidVersion > 32) {
-      print(
-          '[IMAGE_LIMIT] ⚠️ Android version $androidVersion not supported (max API 32)');
-      throw Exception(
-          'Android version not supported - app restricted to API 32 and lower');
-    }
-
     const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
     final List<dynamic>? result =
         await platform.invokeMethod('pickMultipleImages', {
       'limit': limit,
-      'androidVersion': androidVersion, // Pass Android version to native code
     });
 
     if (result != null) {
@@ -264,6 +247,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   bool includeBlurHash = false,
   int remainingTime = 0,
 }) async {
+  
   final createUploadMediaListTile =
       (String label, MediaSource mediaSource) => ListTile(
             title: Text(
@@ -431,6 +415,10 @@ Future<List<SelectedFile>?> selectMedia({
           }
         }
       } else {
+
+         final int imageLimit =
+          (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60;
+
         // iOS: Use regular picker with limit
         print('[IMAGE_LIMIT] 🍎 Using iOS picker with limit: $imageLimit');
 

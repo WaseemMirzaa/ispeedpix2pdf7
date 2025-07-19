@@ -2209,7 +2209,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             isSubscribed: _isSubscribed,
                                             are7DaysPassed: _is7DaysPassed,
                                             remainingTime:
-                                                hasRemainingTime ? 0 : 0,
+                                                _remainingUsageTime,
                                           );
 
                                           if (media != null) {
@@ -2332,7 +2332,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 children: [
                                   Text(
                                     //todo add check of 3 mins passed
-                                    (!_isSubscribed && _is7DaysPassed)
+                                    (!_isSubscribed && _is7DaysPassed && _remainingUsageTime <=0)
                                         ? l10n!
                                             .youCanSelectUpTo3ImagesInFreeVersion
                                         : l10n!.youCanSelectUpTo60Images,
@@ -4325,7 +4325,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
           bool canShowToday =
               await preferenceService.canShowTrialLimitDialogToday();
 
-          if (canShowToday) {
+          if (canShowToday && !_hasShownSubscriptionDialogThisSession) {
             // Start the 30-day pause
             await preferenceService.startUsagePause();
 
