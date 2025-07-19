@@ -1495,518 +1495,518 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           ),
                         ),
 
-                      // ===== DEBUG BUTTONS SECTION (Always Visible) =====
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            16.0, 8.0, 16.0, 8.0),
-                        child: Column(
-                          children: [
-                            // Debug header
-                            Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(8.0),
-                                border: Border.all(color: Colors.grey[400]!),
-                              ),
-                              child: Text(
-                                '🧪 DEBUG CONTROLS (Testing Only)',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 8.0),
+                      // // ===== DEBUG BUTTONS SECTION (Always Visible) =====
+                      // Padding(
+                      //   padding: const EdgeInsetsDirectional.fromSTEB(
+                      //       16.0, 8.0, 16.0, 8.0),
+                      //   child: Column(
+                      //     children: [
+                      //       // Debug header
+                      //       Container(
+                      //         width: double.infinity,
+                      //         padding: EdgeInsets.all(8.0),
+                      //         decoration: BoxDecoration(
+                      //           color: Colors.grey[200],
+                      //           borderRadius: BorderRadius.circular(8.0),
+                      //           border: Border.all(color: Colors.grey[400]!),
+                      //         ),
+                      //         child: Text(
+                      //           '🧪 DEBUG CONTROLS (Testing Only)',
+                      //           textAlign: TextAlign.center,
+                      //           style: TextStyle(
+                      //             fontSize: 14,
+                      //             fontWeight: FontWeight.bold,
+                      //             color: Colors.grey[700],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 8.0),
 
-                            // Set Subscription False button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    setState(() {
-                                      _isSubscribed = false;
-                                    });
+                      //       // Set Subscription False button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () async {
+                      //             try {
+                      //               setState(() {
+                      //                 _isSubscribed = false;
+                      //               });
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content:
-                                            Text('Subscription set to false'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    print(
-                                        '❌ Error setting subscription false: $e');
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Set Subscription False',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //               ScaffoldMessenger.of(context).showSnackBar(
+                      //                 SnackBar(
+                      //                   content:
+                      //                       Text('Subscription set to false'),
+                      //                   duration: Duration(seconds: 2),
+                      //                 ),
+                      //               );
+                      //             } catch (e) {
+                      //               print(
+                      //                   '❌ Error setting subscription false: $e');
+                      //             }
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.red,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Set Subscription False',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Demo Warning Dialog button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  showUsageWarningDialog(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Demo Warning Dialog',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //       // Demo Warning Dialog button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () {
+                      //             showUsageWarningDialog(context);
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.orange,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Demo Warning Dialog',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Day 2 Dialog button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  showDay2Dialog(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Day 2 Dialog',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //       // Day 2 Dialog button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () {
+                      //             showDay2Dialog(context);
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.purple,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Day 2 Dialog',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Day 4 Dialog button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  showDay4Dialog(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.teal,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Day 4 Dialog',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //       // Day 4 Dialog button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () {
+                      //             showDay4Dialog(context);
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.teal,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Day 4 Dialog',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Expire Trial button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  // Manually set trial as expired for testing
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  DateTime pastDate = DateTime.now()
-                                      .subtract(Duration(days: 8));
-                                  await prefs.setString('trial_end_date',
-                                      pastDate.toIso8601String());
+                      //       // Expire Trial button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () async {
+                      //             // Manually set trial as expired for testing
+                      //             SharedPreferences prefs =
+                      //                 await SharedPreferences.getInstance();
+                      //             DateTime pastDate = DateTime.now()
+                      //                 .subtract(Duration(days: 8));
+                      //             await prefs.setString('trial_end_date',
+                      //                 pastDate.toIso8601String());
 
-                                  // Update the trial status
-                                  await checkSubscriptionStatus();
+                      //             // Update the trial status
+                      //             await checkSubscriptionStatus();
 
-                                  // Force start usage tracking after trial expiration
-                                  _startUsageTracking();
+                      //             // Force start usage tracking after trial expiration
+                      //             _startUsageTracking();
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Trial manually expired for testing'),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Expire Trial (Testing)',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //             ScaffoldMessenger.of(context).showSnackBar(
+                      //               SnackBar(
+                      //                 content: Text(
+                      //                     'Trial manually expired for testing'),
+                      //                 duration: Duration(seconds: 2),
+                      //               ),
+                      //             );
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.red,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Expire Trial (Testing)',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Reset Usage Time button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    print('🔄 Starting usage time reset...');
+                      //       // Reset Usage Time button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () async {
+                      //             try {
+                      //               print('🔄 Starting usage time reset...');
 
-                                    // Stop all timers first
-                                    _pauseUsageTracking();
-                                    _stopUsageTimeDisplay();
+                      //               // Stop all timers first
+                      //               _pauseUsageTracking();
+                      //               _stopUsageTimeDisplay();
 
-                                    // Reset usage time in SharedPreferences
-                                    await preferenceService.resetUsageTime();
-                                    print(
-                                        '✅ SharedPreferences reset completed');
+                      //               // Reset usage time in SharedPreferences
+                      //               await preferenceService.resetUsageTime();
+                      //               print(
+                      //                   '✅ SharedPreferences reset completed');
 
-                                    // Reset stored remaining time to 180 seconds
-                                    await preferenceService
-                                        .setRemainingTime(180);
-                                    print(
-                                        '✅ Stored remaining time reset to 180 seconds');
+                      //               // Reset stored remaining time to 180 seconds
+                      //               await preferenceService
+                      //                   .setRemainingTime(180);
+                      //               print(
+                      //                   '✅ Stored remaining time reset to 180 seconds');
 
-                                    // Reset all dialog flags
-                                    _hasShownSubscriptionDialogThisSession =
-                                        false;
-                                    _hasShownWarningDialog = false;
+                      //               // Reset all dialog flags
+                      //               _hasShownSubscriptionDialogThisSession =
+                      //                   false;
+                      //               _hasShownWarningDialog = false;
 
-                                    // Reset timer variables
-                                    _usageSeconds = 0;
-                                    _isTimerActive = false;
-                                    print('🔄 Reset _usageSeconds to 0');
+                      //               // Reset timer variables
+                      //               _usageSeconds = 0;
+                      //               _isTimerActive = false;
+                      //               print('🔄 Reset _usageSeconds to 0');
 
-                                    // Manually set the remaining time to 180 and update UI
-                                    setState(() {
-                                      _remainingUsageTime = 180;
-                                    });
+                      //               // Manually set the remaining time to 180 and update UI
+                      //               setState(() {
+                      //                 _remainingUsageTime = 180;
+                      //               });
 
-                                    // Wait a moment then update from SharedPreferences
-                                    await Future.delayed(
-                                        Duration(milliseconds: 100));
-                                    await _updateRemainingUsageTime();
+                      //               // Wait a moment then update from SharedPreferences
+                      //               await Future.delayed(
+                      //                   Duration(milliseconds: 100));
+                      //               await _updateRemainingUsageTime();
 
-                                    // Restart usage time display
-                                    _startUsageTimeDisplay();
+                      //               // Restart usage time display
+                      //               _startUsageTimeDisplay();
 
-                                    print(
-                                        '🔄 Usage time manually reset to $_remainingUsageTime seconds');
+                      //               print(
+                      //                   '🔄 Usage time manually reset to $_remainingUsageTime seconds');
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Usage time reset to 3:00 minutes ($_remainingUsageTime seconds)'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    print('❌ Error resetting usage time: $e');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Error resetting usage time: $e'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Reset Usage Time',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      //               ScaffoldMessenger.of(context).showSnackBar(
+                      //                 SnackBar(
+                      //                   content: Text(
+                      //                       'Usage time reset to 3:00 minutes ($_remainingUsageTime seconds)'),
+                      //                   duration: Duration(seconds: 2),
+                      //                 ),
+                      //               );
+                      //             } catch (e) {
+                      //               print('❌ Error resetting usage time: $e');
+                      //               ScaffoldMessenger.of(context).showSnackBar(
+                      //                 SnackBar(
+                      //                   content: Text(
+                      //                       'Error resetting usage time: $e'),
+                      //                   duration: Duration(seconds: 2),
+                      //                 ),
+                      //               );
+                      //             }
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.green,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Reset Usage Time',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
-                      // ===== MORE DEBUG BUTTONS =====
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            16.0, 0.0, 16.0, 8.0),
-                        child: Column(
-                          children: [
-                            // Force Start Timer button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    print(
-                                        '🧪 Force starting usage timer for testing...');
+                      // // ===== MORE DEBUG BUTTONS =====
+                      // Padding(
+                      //   padding: const EdgeInsetsDirectional.fromSTEB(
+                      //       16.0, 0.0, 16.0, 8.0),
+                      //   child: Column(
+                      //     children: [
+                      //       // Force Start Timer button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () async {
+                      //             try {
+                      //               print(
+                      //                   '🧪 Force starting usage timer for testing...');
 
-                                    // Stop any existing timers first
-                                    _pauseUsageTracking();
-                                    _stopUsageTimeDisplay();
+                      //               // Stop any existing timers first
+                      //               _pauseUsageTracking();
+                      //               _stopUsageTimeDisplay();
 
-                                    // Reset session variables
-                                    _usageSeconds = 0;
-                                    _isTimerActive = false;
-                                    _hasShownSubscriptionDialogThisSession =
-                                        false;
-                                    _hasShownWarningDialog = false;
+                      //               // Reset session variables
+                      //               _usageSeconds = 0;
+                      //               _isTimerActive = false;
+                      //               _hasShownSubscriptionDialogThisSession =
+                      //                   false;
+                      //               _hasShownWarningDialog = false;
 
-                                    // Update remaining time
-                                    await _updateRemainingUsageTime();
+                      //               // Update remaining time
+                      //               await _updateRemainingUsageTime();
 
-                                    // Force start both timers
-                                    _startUsageTimeDisplay();
-                                    _forceStartUsageTracking();
+                      //               // Force start both timers
+                      //               _startUsageTimeDisplay();
+                      //               _forceStartUsageTracking();
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Force started usage timer for testing'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    print('❌ Error force starting timer: $e');
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Force Start Timer (Test)',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 6.0),
+                      //               ScaffoldMessenger.of(context).showSnackBar(
+                      //                 SnackBar(
+                      //                   content: Text(
+                      //                       'Force started usage timer for testing'),
+                      //                   duration: Duration(seconds: 2),
+                      //                 ),
+                      //               );
+                      //             } catch (e) {
+                      //               print('❌ Error force starting timer: $e');
+                      //             }
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.purple,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Force Start Timer (Test)',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 6.0),
 
-                            // Set 30s Remaining button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 32.0,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    // Set usage time to 150 seconds (leaving 30 seconds)
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    await prefs.setInt('usage_time', 150);
-                                    await prefs.setInt(
-                                        'usage_month', DateTime.now().month);
+                      //       // Set 30s Remaining button
+                      //       SizedBox(
+                      //         width: double.infinity,
+                      //         height: 32.0,
+                      //         child: ElevatedButton(
+                      //           onPressed: () async {
+                      //             try {
+                      //               // Set usage time to 150 seconds (leaving 30 seconds)
+                      //               SharedPreferences prefs =
+                      //                   await SharedPreferences.getInstance();
+                      //               await prefs.setInt('usage_time', 150);
+                      //               await prefs.setInt(
+                      //                   'usage_month', DateTime.now().month);
 
-                                    // Set stored remaining time to 30 seconds
-                                    await preferenceService
-                                        .setRemainingTime(30);
+                      //               // Set stored remaining time to 30 seconds
+                      //               await preferenceService
+                      //                   .setRemainingTime(30);
 
-                                    // Reset session counter
-                                    _usageSeconds = 0;
+                      //               // Reset session counter
+                      //               _usageSeconds = 0;
 
-                                    // Update UI
-                                    await _updateRemainingUsageTime();
+                      //               // Update UI
+                      //               await _updateRemainingUsageTime();
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Set to 30 seconds remaining (red bar test)'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    print('❌ Error setting low time: $e');
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  'Set 30s Remaining (Test)',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 8.0),
+                      //               ScaffoldMessenger.of(context).showSnackBar(
+                      //                 SnackBar(
+                      //                   content: Text(
+                      //                       'Set to 30 seconds remaining (red bar test)'),
+                      //                   duration: Duration(seconds: 2),
+                      //                 ),
+                      //               );
+                      //             } catch (e) {
+                      //               print('❌ Error setting low time: $e');
+                      //             }
+                      //           },
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor: Colors.orange,
+                      //             foregroundColor: Colors.white,
+                      //             shape: RoundedRectangleBorder(
+                      //               borderRadius: BorderRadius.circular(6.0),
+                      //             ),
+                      //             elevation: 0,
+                      //           ),
+                      //           child: Text(
+                      //             'Set 30s Remaining (Test)',
+                      //             style: FlutterFlowTheme.of(context)
+                      //                 .bodyMedium
+                      //                 .override(
+                      //                   fontFamily: 'Inter',
+                      //                   color: Colors.white,
+                      //                   fontSize: 12.0,
+                      //                   letterSpacing: 0.0,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 8.0),
 
-                            // Debug Status Display
-                            Container(
-                              padding: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(6.0),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'DEBUG STATUS:',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  FutureBuilder<bool>(
-                                    future: preferenceService.hasTrialEnded(),
-                                    builder: (context, snapshot) {
-                                      bool trialEnded = snapshot.data ?? false;
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Subscribed: $_isSubscribed',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700]),
-                                          ),
-                                          Text(
-                                            'Trial Ended: $trialEnded',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700]),
-                                          ),
-                                          Text(
-                                            'Remaining Time: $_remainingUsageTime s',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700]),
-                                          ),
-                                          Text(
-                                            'Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700]),
-                                          ),
-                                          Text(
-                                            'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700]),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      //       // Debug Status Display
+                      //       Container(
+                      //         padding: EdgeInsets.all(8.0),
+                      //         decoration: BoxDecoration(
+                      //           color: Colors.grey[100],
+                      //           borderRadius: BorderRadius.circular(6.0),
+                      //           border: Border.all(color: Colors.grey[300]!),
+                      //         ),
+                      //         child: Column(
+                      //           crossAxisAlignment: CrossAxisAlignment.start,
+                      //           children: [
+                      //             Text(
+                      //               'DEBUG STATUS:',
+                      //               style: TextStyle(
+                      //                 fontSize: 10,
+                      //                 fontWeight: FontWeight.bold,
+                      //                 color: Colors.grey[600],
+                      //               ),
+                      //             ),
+                      //             SizedBox(height: 4),
+                      //             FutureBuilder<bool>(
+                      //               future: preferenceService.hasTrialEnded(),
+                      //               builder: (context, snapshot) {
+                      //                 bool trialEnded = snapshot.data ?? false;
+                      //                 return Column(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.start,
+                      //                   children: [
+                      //                     Text(
+                      //                       'Subscribed: $_isSubscribed',
+                      //                       style: TextStyle(
+                      //                           fontSize: 10,
+                      //                           color: Colors.grey[700]),
+                      //                     ),
+                      //                     Text(
+                      //                       'Trial Ended: $trialEnded',
+                      //                       style: TextStyle(
+                      //                           fontSize: 10,
+                      //                           color: Colors.grey[700]),
+                      //                     ),
+                      //                     Text(
+                      //                       'Remaining Time: $_remainingUsageTime s',
+                      //                       style: TextStyle(
+                      //                           fontSize: 10,
+                      //                           color: Colors.grey[700]),
+                      //                     ),
+                      //                     Text(
+                      //                       'Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                      //                       style: TextStyle(
+                      //                           fontSize: 10,
+                      //                           color: Colors.grey[700]),
+                      //                     ),
+                      //                     Text(
+                      //                       'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                      //                       style: TextStyle(
+                      //                           fontSize: 10,
+                      //                           color: Colors.grey[700]),
+                      //                     ),
+                      //                   ],
+                      //                 );
+                      //               },
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
@@ -2208,8 +2208,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             multiImage: true,
                                             isSubscribed: _isSubscribed,
                                             are7DaysPassed: _is7DaysPassed,
-                                            remainingTime:
-                                                _remainingUsageTime,
+                                            remainingTime: _remainingUsageTime,
                                           );
 
                                           if (media != null) {
@@ -2332,7 +2331,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 children: [
                                   Text(
                                     //todo add check of 3 mins passed
-                                    (!_isSubscribed && _is7DaysPassed && _remainingUsageTime <=0)
+                                    (!_isSubscribed &&
+                                            _is7DaysPassed &&
+                                            _remainingUsageTime <= 0)
                                         ? l10n!
                                             .youCanSelectUpTo3ImagesInFreeVersion
                                         : l10n!.youCanSelectUpTo60Images,
