@@ -247,7 +247,6 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   bool includeBlurHash = false,
   int remainingTime = 0,
 }) async {
-  
   final createUploadMediaListTile =
       (String label, MediaSource mediaSource) => ListTile(
             title: Text(
@@ -355,6 +354,7 @@ Future<List<SelectedFile>?> selectMedia({
   bool includeBlurHash = false,
   bool isSubscribed = false,
   bool are7DaysPassed = false,
+  bool isPurchased = false,
   required int remainingTime,
 }) async {
   try {
@@ -415,12 +415,17 @@ Future<List<SelectedFile>?> selectMedia({
           }
         }
       } else {
-
-         final int imageLimit =
-          (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60;
+        final int imageLimit = (!isSubscribed &&
+                are7DaysPassed &&
+                remainingTime <= 0 &&
+                isPurchased == false)
+            ? 3
+            : 60;
 
         // iOS: Use regular picker with limit
         print('[IMAGE_LIMIT] 🍎 Using iOS picker with limit: $imageLimit');
+
+        print('[IMAGE_LIMIT] 🍎isSubscribed: $isSubscribed');
 
         pickedMedia = await picker.pickMultiImage(
           maxWidth: maxWidth,

@@ -1330,166 +1330,166 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 // TODO: FOR TESTING - Set Subscription False button
 
                                 // TODO: FOR TESTING - Dialog Testing Buttons
-                                SizedBox(height: 6.0),
-                                // Debug Status Display
-                                Container(
-                                  padding: EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(6.0),
-                                    border:
-                                        Border.all(color: Colors.grey[300]!),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'DEBUG STATUS:',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      FutureBuilder<bool>(
-                                        future:
-                                            preferenceService.hasTrialEnded(),
-                                        builder: (context, snapshot) {
-                                          bool trialEnded =
-                                              snapshot.data ?? false;
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Subscribed: $_isSubscribed',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700]),
-                                              ),
-                                              Text(
-                                                'Trial Ended: $trialEnded',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700]),
-                                              ),
-                                              Text(
-                                                'Remaining Time: $_remainingUsageTime s',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700]),
-                                              ),
-                                              Text(
-                                                'Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700]),
-                                              ),
-                                              Text(
-                                                'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700]),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showDay2Dialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(
-                                      'Test Day 2 Dialog',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showDay4Dialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(
-                                      'Test Day 4 Dialog',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showUsageWarningDialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(
-                                      'Test Usage Warning Dialog',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showUsageLimitDialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(
-                                      'Test Usage Limit Dialog',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 6.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 32.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showTrialLimitDialog(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.purple,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(
-                                      'Test Trial Limit Dialog',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
+                                // SizedBox(height: 6.0),
+                                // // Debug Status Display
+                                // Container(
+                                //   padding: EdgeInsets.all(8.0),
+                                //   decoration: BoxDecoration(
+                                //     color: Colors.grey[100],
+                                //     borderRadius: BorderRadius.circular(6.0),
+                                //     border:
+                                //         Border.all(color: Colors.grey[300]!),
+                                //   ),
+                                //   child: Column(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     children: [
+                                //       Text(
+                                //         'DEBUG STATUS:',
+                                //         style: TextStyle(
+                                //           fontSize: 10,
+                                //           fontWeight: FontWeight.bold,
+                                //           color: Colors.grey[600],
+                                //         ),
+                                //       ),
+                                //       SizedBox(height: 4),
+                                //       FutureBuilder<bool>(
+                                //         future:
+                                //             preferenceService.hasTrialEnded(),
+                                //         builder: (context, snapshot) {
+                                //           bool trialEnded =
+                                //               snapshot.data ?? false;
+                                //           return Column(
+                                //             crossAxisAlignment:
+                                //                 CrossAxisAlignment.start,
+                                //             children: [
+                                //               Text(
+                                //                 'Subscribed: $_isSubscribed',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Trial Ended: $trialEnded',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Remaining Time: $_remainingUsageTime s',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Usage Timer: ${_usageTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //               Text(
+                                //                 'Display Timer: ${_usageDisplayTimer?.isActive ?? false ? "ACTIVE" : "INACTIVE"}',
+                                //                 style: TextStyle(
+                                //                     fontSize: 10,
+                                //                     color: Colors.grey[700]),
+                                //               ),
+                                //             ],
+                                //           );
+                                //         },
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay2Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.blue,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Day 2 Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showDay4Dialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.blue,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Day 4 Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showUsageWarningDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.orange,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Usage Warning Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showUsageLimitDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.red,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Usage Limit Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
+                                // SizedBox(height: 6.0),
+                                // SizedBox(
+                                //   width: double.infinity,
+                                //   height: 32.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: () {
+                                //       showTrialLimitDialog(context);
+                                //     },
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Colors.purple,
+                                //       foregroundColor: Colors.white,
+                                //     ),
+                                //     child: Text(
+                                //       'Test Trial Limit Dialog',
+                                //       style: TextStyle(fontSize: 12),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -2209,6 +2209,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             isSubscribed: _isSubscribed,
                                             are7DaysPassed: _is7DaysPassed,
                                             remainingTime: _remainingUsageTime,
+                                            // isPurchased: isPurchased,
                                           );
 
                                           if (media != null) {
