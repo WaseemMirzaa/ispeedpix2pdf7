@@ -7,22 +7,22 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:ispeedpix2pdf7/firebase_service';
-import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/constants.dart';
 import 'package:ispeedpix2pdf7/helper/language_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'flutter_flow/flutter_flow_util.dart';
-import 'flutter_flow/nav/nav.dart';
-
-// Global variable to track if Firebase is initialized
-bool _isFirebaseInitialized = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the Mobile Ads SDK
+  await MobileAds.instance.initialize();
+  debugPrint('Google Mobile Ads SDK initialized');
 
   try {
     // Check if Firebase is already initialized
@@ -30,9 +30,9 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      print('Firebase initialized successfully');
+      debugPrint('Firebase initialized successfully');
     } else {
-      print('Firebase was already initialized');
+      debugPrint('Firebase was already initialized');
     }
 
     final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
@@ -44,7 +44,7 @@ void main() async {
     if (Platform.isAndroid) {
       // Set debug mode for Android
       await analytics.setAnalyticsCollectionEnabled(true);
-      print('Android analytics debug mode enabled');
+      debugPrint('Android analytics debug mode enabled');
 
       // Log a test event for Android
       await analytics.logEvent(
@@ -54,11 +54,11 @@ void main() async {
           'timestamp': DateTime.now().toIso8601String(),
         },
       );
-      print('Android test event logged');
+      debugPrint('Android test event logged');
     }
 
     await analytics.logAppOpen();
-    print('Logged app_open event');
+    debugPrint('Logged app_open event');
   } catch (e) {
     debugPrint('Failed to initialize Firebase: $e');
   }
@@ -70,10 +70,12 @@ void main() async {
   await Purchases.configure(PurchasesConfiguration(
       (Platform.isAndroid) ? revenueCatAndroidKey : revenueCatKey));
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 
@@ -191,13 +193,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> checkAndRestorePurchases() async {
-    await Purchases.setDebugLogsEnabled(true);
+    await Purchases.setLogLevel(LogLevel.debug);
 
     try {
-      CustomerInfo customerInfo = await Purchases.restorePurchases();
-
+      await Purchases.restorePurchases();
       // ... check restored purchaserInfo to see if entitlement is now active
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // Error restoring purchases
     }
   }

@@ -49,6 +49,8 @@
 	<string>Allow acces to the app in order to take pictures that will convert to PDF</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Provide acccess to the app to upload pictures that will convert to PDF</string>
+	<key>GADIsAdManagerApp</key>
+	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -89,5 +91,9 @@
 		<string>fr</string>
 		<string>de</string>
 	</array>
+
+	<key>GADApplicationIdentifier</key>
+<string>ca-app-pub-8212879270080474~4213561188</string>
+
 </dict>
 </plist>

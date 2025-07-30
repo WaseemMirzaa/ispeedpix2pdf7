@@ -8,8 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:video_player/video_player.dart';
 import 'package:uri_to_file/uri_to_file.dart';
+import 'package:video_player/video_player.dart';
+// import 'package:uri_to_file/uri_to_file.dart'; // Removed due to namespace issues
 
 import 'dart:io';
 import 'dart:typed_data';

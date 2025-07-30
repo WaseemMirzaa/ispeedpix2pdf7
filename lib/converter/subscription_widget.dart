@@ -514,7 +514,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                 }
                               },
                               text: l10n!.buyNowInFourNineNine,
-                              // 'Buy Now in 4.99\$'
+                              // 'Buy Now in 1.99\$'
                               // ,
                               options: FFButtonOptions(
                                 width: double.infinity,

@@ -10,6 +10,8 @@ import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';
 import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
+import 'package:ispeedpix2pdf7/widgets/admob_banner_widget.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:purchases_flutter/models/customer_info_wrapper.dart';
@@ -86,6 +88,26 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   // Add this property to track if we've shown the dialog this session
 
+  // Interstitial Ad variables
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+
+  // Ad Unit IDs for interstitial ads
+  static const String _androidInterstitialAdUnitId =
+      'ca-app-pub-8212879270080474/1716697262';
+  static const String _iosInterstitialAdUnitId =
+      'ca-app-pub-8212879270080474/1716697262';
+
+  // Test Ad Unit IDs for development
+  static const String _testAndroidInterstitialAdUnitId =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String _testIosInterstitialAdUnitId =
+      'ca-app-pub-3940256099942544/4411468910';
+
+  // Choose Files button interstitial ad tracking
+  int _chooseFilesClickCount = 0;
+  Timer? _chooseFilesAdTimer;
+
   @override
   void initState() {
     super.initState();
@@ -160,6 +182,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
     });
 
     initRateMyApp();
+
+    // Load the first interstitial ad
+    _loadInterstitialAd();
   }
 
   // Add this method to check and handle first-time app open
@@ -183,6 +208,114 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
       // Set the flag to false for future app opens
       await preferenceService.setFirstTimeAppOpened(false);
+    }
+  }
+
+  /// Get the appropriate interstitial ad unit ID based on platform and build mode
+  String get _interstitialAdUnitId {
+    // Use test ads in debug mode
+    if (const bool.fromEnvironment('dart.vm.product') == false) {
+      return Platform.isAndroid
+          ? _testAndroidInterstitialAdUnitId
+          : _testIosInterstitialAdUnitId;
+    }
+
+    // Use real ads in production
+    return Platform.isAndroid
+        ? _androidInterstitialAdUnitId
+        : _iosInterstitialAdUnitId;
+  }
+
+  /// Load an interstitial ad
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: _interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          debugPrint('✅ Interstitial ad loaded successfully');
+          _interstitialAd = ad;
+          _isInterstitialAdReady = true;
+
+          // Set up full screen content callback
+          _interstitialAd!.setImmersiveMode(true);
+          _interstitialAd!.fullScreenContentCallback =
+              FullScreenContentCallback(
+            onAdShowedFullScreenContent: (InterstitialAd ad) {
+              debugPrint('📱 Interstitial ad showed full screen content');
+            },
+            onAdDismissedFullScreenContent: (InterstitialAd ad) {
+              debugPrint('🔒 Interstitial ad dismissed');
+              ad.dispose();
+              _interstitialAd = null;
+              _isInterstitialAdReady = false;
+              // Preload the next ad
+              _loadInterstitialAd();
+            },
+            onAdFailedToShowFullScreenContent:
+                (InterstitialAd ad, AdError error) {
+              debugPrint('❌ Interstitial ad failed to show: $error');
+              ad.dispose();
+              _interstitialAd = null;
+              _isInterstitialAdReady = false;
+              // Preload the next ad
+              _loadInterstitialAd();
+            },
+            onAdImpression: (InterstitialAd ad) {
+              debugPrint('👁️ Interstitial ad impression recorded');
+            },
+            onAdClicked: (InterstitialAd ad) {
+              debugPrint('👆 Interstitial ad clicked');
+            },
+          );
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('❌ Interstitial ad failed to load: $error');
+          _interstitialAd = null;
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
+
+  /// Show interstitial ad if available and user is not subscribed
+  void showInterstitialAd() {
+    // Don't show ads to subscribed users
+    // if (_isSubscribed) {
+    //   debugPrint('🚫 User is subscribed, not showing interstitial ad');
+    //   return;
+    // }
+
+    if (_isInterstitialAdReady && _interstitialAd != null) {
+      debugPrint('🎯 Showing interstitial ad');
+      _interstitialAd!.show();
+    } else {
+      debugPrint('⚠️ Interstitial ad not ready, loading new ad');
+      _loadInterstitialAd();
+    }
+  }
+
+  /// Handle choose files button click with interstitial ad logic
+  void _handleChooseFilesButtonClick() {
+    _chooseFilesClickCount++;
+    debugPrint(
+        '📁 Choose files button clicked. Count: $_chooseFilesClickCount');
+
+    // Cancel any existing timer
+    _chooseFilesAdTimer?.cancel();
+
+    if (_chooseFilesClickCount == 1) {
+      // First click - show ad after 4 seconds
+      debugPrint('⏰ First click - setting 4 second timer for interstitial ad');
+      _chooseFilesAdTimer = Timer(Duration(seconds: 4), () {
+        debugPrint('🎯 4 seconds elapsed - showing interstitial ad');
+        showInterstitialAd();
+      });
+    } else if (_chooseFilesClickCount % 3 == 0) {
+      // Every 3rd click - show ad immediately
+      debugPrint(
+          '🎯 Every 3rd click ($_chooseFilesClickCount) - showing interstitial ad immediately');
+      showInterstitialAd();
     }
   }
 
@@ -256,6 +389,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
     _usageTimer?.cancel();
     _usageDisplayTimer?.cancel();
     _pauseUsageTracking();
+
+    // Dispose interstitial ad
+    _interstitialAd?.dispose();
+    _interstitialAd = null;
+
+    // Cancel choose files ad timer
+    _chooseFilesAdTimer?.cancel();
 
     // Remove the observer when disposing
     WidgetsBinding.instance.removeObserver(this);
@@ -2093,6 +2233,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
+                                        // Handle interstitial ad logic for choose files button
+                                        _handleChooseFilesButtonClick();
+
                                         try {
                                           LogHelper.logErrorMessage(
                                               'Analytics Error', 'None');
@@ -2105,6 +2248,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                   : 'ios',
                                               'timestamp': DateTime.now()
                                                   .toIso8601String(),
+                                              'click_count':
+                                                  _chooseFilesClickCount
+                                                      .toString(),
                                             },
                                           );
                                           // LogHelper.logErrorMessage(
@@ -2969,6 +3115,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             ),
                           ),
 
+                          // Banner Ad Widget
+                          // if (!_isSubscribed)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                            child: AdMobBannerWidget(),
+                          ),
+
                           // Padding(
                           //   padding: const EdgeInsetsDirectional.fromSTEB(
                           //       0.0, 20.0, 0.0, 0.0),
@@ -3740,6 +3893,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             ),
                           ),
                         ].divide(const SizedBox(height: 12.0)),
+                      ),
+                      // AdMob Banner Ad at the bottom
+                      ConditionalAdMobBanner(
+                        isSubscribed: _isSubscribed,
                       ),
                     ],
                   ),
