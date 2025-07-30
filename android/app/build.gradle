@@ -30,7 +30,6 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace 'com.mycompany.ispeedpix2pdf7'
     compileSdkVersion 35
     
 
@@ -96,12 +95,9 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10"
     implementation platform('com.google.firebase:firebase-bom:32.7.4')
     implementation 'com.google.firebase:firebase-analytics'
-
-    // Force compatible webkit version
-    implementation 'androidx.webkit:webkit:1.11.0'
 }
 
 // Add this task to extract debug symbols
@@ -125,4 +121,5 @@ task extractNativeDebugSymbols(type: Copy) {
     }
 }
 
-// Google Services plugin is already declared in the plugins block above
+// apply plugin: 'com.google.gms.google-services' is now in the plugins block
+apply plugin: 'com.google.gms.google-services'  // Add this at the bottom of the file
