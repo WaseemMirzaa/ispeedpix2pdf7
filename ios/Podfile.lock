@@ -154,7 +154,7 @@ PODS:
     - PurchasesHybridCommon (= 11.1.0)
   - PurchasesHybridCommon (11.1.0):
     - RevenueCat (= 4.43.2)
-  - rate_my_app (2.3.0):
+  - rate_my_app (2.3.2):
     - Flutter
     - FlutterMacOS
   - RevenueCat (4.43.2)
@@ -293,7 +293,7 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   purchases_flutter: 42d5544e7730ea89a88cc2f008b7c700fd147052
   PurchasesHybridCommon: 4022d5944cb30ec44ba5159e42aa161fe0e30175
-  rate_my_app: 79b255442c34c58affc733ccf39bb37fb74a198f
+  rate_my_app: 32114ed340bfb4be961f4ce59211af3684adb700
   RevenueCat: 3d934653b7e8b09af88fd47e9e84cfaf5d0a89ba
   SDWebImage: f29024626962457f3470184232766516dee8dfea
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410

@@ -311,7 +311,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
         debugPrint('🎯 4 seconds elapsed - showing interstitial ad');
         showInterstitialAd();
       });
-    } else if (_chooseFilesClickCount % 3 == 0) {
+    } else if (_chooseFilesClickCount % 6 == 0) {
       // Every 3rd click - show ad immediately
       debugPrint(
           '🎯 Every 3rd click ($_chooseFilesClickCount) - showing interstitial ad immediately');
@@ -671,6 +671,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
                       // Usage time indicator
+                      ConditionalAdMobBanner(
+                        isSubscribed: _isSubscribed,
+                      ),
                       if (!_isSubscribed) // Always show for non-subscribed users
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
@@ -2214,6 +2217,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           ),
                         ),
                       ),
+
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             0.0, 16.0, 0.0, 0.0),
@@ -2234,7 +2238,10 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         // Handle interstitial ad logic for choose files button
-                                        _handleChooseFilesButtonClick();
+                                        if(!_isSubscribed){
+                                          _handleChooseFilesButtonClick();
+                                        }
+                                        // _handleChooseFilesButtonClick();
 
                                         try {
                                           LogHelper.logErrorMessage(
@@ -3117,10 +3124,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
                           // Banner Ad Widget
                           // if (!_isSubscribed)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                            child: AdMobBannerWidget(),
-                          ),
 
                           // Padding(
                           //   padding: const EdgeInsetsDirectional.fromSTEB(
@@ -3895,9 +3898,6 @@ class _ConverterWidgetState extends State<ConverterWidget>
                         ].divide(const SizedBox(height: 12.0)),
                       ),
                       // AdMob Banner Ad at the bottom
-                      ConditionalAdMobBanner(
-                        isSubscribed: _isSubscribed,
-                      ),
                     ],
                   ),
                 ),

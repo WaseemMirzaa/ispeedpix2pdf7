@@ -231,10 +231,10 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
     // ));
     spans.add(TextSpan(text: '\n\n', style: textStyle));
 
-    spans.add(TextSpan(text: '$point4\n\n', style: textStyle));
+    // spans.add(TextSpan(text: '$point4\n\n', style: textStyle));
 
     // Add another span with a clickable link
-    spans.add(TextSpan(text: '$point5 ', style: textStyle));
+    spans.add(TextSpan(text: '${point5.replaceAll('5', '4')} ', style: textStyle));
     spans.add(TextSpan(
       text: 'https://firebase.google.com/support/privacy',
       style: linkStyle,

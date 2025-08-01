@@ -278,6 +278,14 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                                       ),
                                             ),
                                             TextSpan(
+                                              text: l10n!.adFreeAfterPurchase,
+
+                                              // ' ✔ Ad-free after purchase\n',
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                              ),
+                                            ),
+                                            TextSpan(
                                               text: l10n!.unlimitedPDFCreation,
 
                                               // ' ✔ Unlimited PDF creation\n',

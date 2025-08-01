@@ -124,15 +124,15 @@ class ConditionalAdMobBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Don't show ads to subscribed users
-    if (!isSubscribed) {
+    if (isSubscribed) {
       return const SizedBox.shrink();
     }
 
     return Column(
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         const AdMobBannerWidget(),
-        const SizedBox(height: 8),
+        const SizedBox(height: 15),
       ],
     );
   }
