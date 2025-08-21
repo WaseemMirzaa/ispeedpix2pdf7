@@ -10,7 +10,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:ispeedpix2pdf7/firebase_service';
+import 'package:ispeedpix2pdf7/firebase_options.dart';
 import 'package:ispeedpix2pdf7/helper/constants.dart';
 import 'package:ispeedpix2pdf7/helper/language_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
@@ -19,9 +19,16 @@ import 'flutter_flow/flutter_flow_util.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Set up request configuration BEFORE initializing the SDK
+  RequestConfiguration configuration = RequestConfiguration(
+    tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+    maxAdContentRating: MaxAdContentRating.g,
+  );
 
-  // Initialize the Mobile Ads SDK
+  MobileAds.instance.updateRequestConfiguration(configuration);
   await MobileAds.instance.initialize();
+  // Initialize the Mobile Ads SDK
+  // await MobileAds.instance.initialize();
   debugPrint('Google Mobile Ads SDK initialized');
 
   try {

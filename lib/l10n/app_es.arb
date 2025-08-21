@@ -199,5 +199,11 @@
   "days": "días",
   "left": "restante",
   "upgradeNowButton": "Actualizar Ahora",
-  "sessionTime": "tiempo de sesión"
+  "sessionTime": "tiempo de sesión",
+  "usePromoCode": "Usar Código Promocional",
+  "enterPromoCode": "Ingresar Código Promocional",
+  "apply": "Aplicar",
+  "invalidPromoCode": "Código Promocional Inválido",
+  "promoCodeAppliedSuccessfully": "¡Código Promocional Aplicado Exitosamente!",
+  "promoCode": "Código Promocional"
 }

@@ -15,15 +15,15 @@ class _AdMobBannerWidgetState extends State<AdMobBannerWidget> {
 
   // Ad Unit IDs
   static const String _androidBannerAdUnitId =
-      'ca-app-pub-8212879270080474/1957188650';
+      'ca-app-pub-8212879270080474/3059938216';
   static const String _iosBannerAdUnitId =
       'ca-app-pub-8212879270080474/1957188650';
 
-  // Test Ad Unit IDs for development
-  static const String _testAndroidBannerAdUnitId =
-      'ca-app-pub-3940256099942544/6300978111';
-  static const String _testIosBannerAdUnitId =
-      'ca-app-pub-3940256099942544/2934735716';
+  // // Test Ad Unit IDs for development
+  // static const String _testAndroidBannerAdUnitId =
+  //     'ca-app-pub-3940256099942544/6300978111';
+  // static const String _testIosBannerAdUnitId =
+  //     'ca-app-pub-3940256099942544/2934735716';
 
   @override
   void initState() {
@@ -34,11 +34,11 @@ class _AdMobBannerWidgetState extends State<AdMobBannerWidget> {
   /// Get the appropriate ad unit ID based on platform and build mode
   String get _adUnitId {
     // Use test ads in debug mode
-    if (const bool.fromEnvironment('dart.vm.product') == false) {
-      return Platform.isAndroid
-          ? _testAndroidBannerAdUnitId
-          : _testIosBannerAdUnitId;
-    }
+    // if (const bool.fromEnvironment('dart.vm.product') == false) {
+    //   return Platform.isAndroid
+    //       ? _testAndroidBannerAdUnitId
+    //       : _testIosBannerAdUnitId;
+    // }
 
     // Use real ads in production
     return Platform.isAndroid ? _androidBannerAdUnitId : _iosBannerAdUnitId;
@@ -48,7 +48,7 @@ class _AdMobBannerWidgetState extends State<AdMobBannerWidget> {
   void _loadAd() {
     _bannerAd = BannerAd(
       adUnitId: _adUnitId,
-      request: const AdRequest(),
+      request: const AdRequest(nonPersonalizedAds: true),
       size: AdSize.banner,
       listener: BannerAdListener(
         onAdLoaded: (ad) {

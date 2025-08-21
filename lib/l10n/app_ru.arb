@@ -200,5 +200,11 @@
   "days": "дней",
   "left": "осталось",
   "upgradeNowButton": "Обновить сейчас",
-  "sessionTime": "время сеанса"
+  "sessionTime": "время сеанса",
+  "usePromoCode": "Использовать промо-код",
+  "enterPromoCode": "Введите промо-код",
+  "apply": "Применить",
+  "invalidPromoCode": "Недействительный промо-код",
+  "promoCodeAppliedSuccessfully": "Промо-код успешно применен!",
+  "promoCode": "Промо-код"
 }

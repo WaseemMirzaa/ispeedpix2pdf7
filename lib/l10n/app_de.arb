@@ -202,5 +202,11 @@
   "days": "Tage",
   "left": "übrig",
   "upgradeNowButton": "Jetzt Upgraden",
-  "sessionTime": "Sitzungszeit"
+  "sessionTime": "Sitzungszeit",
+  "usePromoCode": "Promo-Code verwenden",
+  "enterPromoCode": "Promo-Code eingeben",
+  "apply": "Anwenden",
+  "invalidPromoCode": "Ungültiger Promo-Code",
+  "promoCodeAppliedSuccessfully": "Promo-Code erfolgreich angewendet!",
+  "promoCode": "Promo-Code"
 }

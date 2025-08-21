@@ -139,8 +139,12 @@ class SharedPreferenceService {
   }
 
   // Set the trial end date (3 days from first open)
-  Future<void> setTrialEndDate() async {
+  Future<void> setTrialEndDate([DateTime? fiveDaysAgo]) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(fiveDaysAgo != null){
+      await prefs.setString(_trialEndDateKey, fiveDaysAgo.toIso8601String());
+      return;
+    }
     if (prefs.getString(_trialEndDateKey) != null) return; // Already set
 
     DateTime now = DateTime.now();

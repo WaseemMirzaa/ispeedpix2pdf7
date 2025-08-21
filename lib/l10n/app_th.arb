@@ -200,5 +200,11 @@
   "days": "วัน",
   "left": "เหลือ",
   "upgradeNowButton": "อัปเกรดตอนนี้",
-  "sessionTime": "เวลาเซสชัน"
+  "sessionTime": "เวลาเซสชัน",
+  "usePromoCode": "ใช้รหัสโปรโมชั่น",
+  "enterPromoCode": "ป้อนรหัสโปรโมชั่น",
+  "apply": "ใช้",
+  "invalidPromoCode": "รหัสโปรโมชั่นไม่ถูกต้อง",
+  "promoCodeAppliedSuccessfully": "ใช้รหัสโปรโมชั่นสำเร็จ!",
+  "promoCode": "รหัสโปรโมชั่น"
 }

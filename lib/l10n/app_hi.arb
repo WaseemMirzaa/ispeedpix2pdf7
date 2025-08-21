@@ -200,5 +200,11 @@
   "days": "दिन",
   "left": "बचे",
   "upgradeNowButton": "अभी अपग्रेड करें",
-  "sessionTime": "सत्र समय"
+  "sessionTime": "सत्र समय",
+  "usePromoCode": "प्रोमो कोड का उपयोग करें",
+  "enterPromoCode": "प्रोमो कोड दर्ज करें",
+  "apply": "लागू करें",
+  "invalidPromoCode": "अमान्य प्रोमो कोड",
+  "promoCodeAppliedSuccessfully": "प्रोमो कोड सफलतापूर्वक लागू किया गया!",
+  "promoCode": "प्रोमो कोड"
 }

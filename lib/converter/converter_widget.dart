@@ -17,7 +17,9 @@ import 'package:permission_handler_platform_interface/permission_handler_platfor
 import 'package:purchases_flutter/models/customer_info_wrapper.dart';
 import 'package:purchases_flutter/models/offerings_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:rate_my_app/rate_my_app.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 import '../custom_code/actions/pdf_multi_img.dart';
@@ -52,7 +54,7 @@ bool _hasShownSubscriptionDialogThisSession = false;
 class _ConverterWidgetState extends State<ConverterWidget>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   late ConverterModel _model;
-
+  // bool isPromoApplied = false;
   late SharedPreferenceService preferenceService;
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -94,15 +96,15 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   // Ad Unit IDs for interstitial ads
   static const String _androidInterstitialAdUnitId =
-      'ca-app-pub-8212879270080474/1716697262';
+      'ca-app-pub-8212879270080474/7154880290';
   static const String _iosInterstitialAdUnitId =
       'ca-app-pub-8212879270080474/1716697262';
 
   // Test Ad Unit IDs for development
-  static const String _testAndroidInterstitialAdUnitId =
-      'ca-app-pub-3940256099942544/1033173712';
-  static const String _testIosInterstitialAdUnitId =
-      'ca-app-pub-3940256099942544/4411468910';
+  // static const String _testAndroidInterstitialAdUnitId =
+  //     'ca-app-pub-3940256099942544/1033173712';
+  // static const String _testIosInterstitialAdUnitId =
+  //     'ca-app-pub-3940256099942544/4411468910';
 
   // Choose Files button interstitial ad tracking
   int _chooseFilesClickCount = 0;
@@ -134,6 +136,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
     _model.filenameFocusNode!.addListener(() {
       if (_isFocused && selectedMedia != null) {
+        _isLoaderShowing = true;
+
         LoadingDialog.show(context, message: l10n!.creatingPdf);
 
         createPDF();
@@ -181,10 +185,13 @@ class _ConverterWidgetState extends State<ConverterWidget>
       FocusScope.of(context).requestFocus(FocusNode());
     });
 
-    initRateMyApp();
+    // Delay the rate dialog to ensure context is ready
+    Future.delayed(Duration(seconds: 4), () {
+      initRateMyApp();
+    });
 
     // Load the first interstitial ad
-    _loadInterstitialAd();
+    // _loadInterstitialAd();
   }
 
   // Add this method to check and handle first-time app open
@@ -214,11 +221,11 @@ class _ConverterWidgetState extends State<ConverterWidget>
   /// Get the appropriate interstitial ad unit ID based on platform and build mode
   String get _interstitialAdUnitId {
     // Use test ads in debug mode
-    if (const bool.fromEnvironment('dart.vm.product') == false) {
-      return Platform.isAndroid
-          ? _testAndroidInterstitialAdUnitId
-          : _testIosInterstitialAdUnitId;
-    }
+    // if (const bool.fromEnvironment('dart.vm.product') == false) {
+    //   return Platform.isAndroid
+    //       ? _testAndroidInterstitialAdUnitId
+    //       : _testIosInterstitialAdUnitId;
+    // }
 
     // Use real ads in production
     return Platform.isAndroid
@@ -230,7 +237,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
   void _loadInterstitialAd() {
     InterstitialAd.load(
       adUnitId: _interstitialAdUnitId,
-      request: const AdRequest(),
+      request: const AdRequest(nonPersonalizedAds: true),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (InterstitialAd ad) {
           debugPrint('✅ Interstitial ad loaded successfully');
@@ -671,9 +678,9 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
                       // Usage time indicator
-                      ConditionalAdMobBanner(
-                        isSubscribed: _isSubscribed,
-                      ),
+                      // ConditionalAdMobBanner(
+                      //   isSubscribed: _isSubscribed,
+                      // ),
                       if (!_isSubscribed) // Always show for non-subscribed users
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
@@ -1638,7 +1645,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                           ),
                         ),
 
-                      // // ===== DEBUG BUTTONS SECTION (Always Visible) =====
+                      // ===== RATING DIALOG TEST BUTTONS (Debug) =====
+                      // // // ===== DEBUG BUTTONS SECTION (Always Visible) =====
                       // Padding(
                       //   padding: const EdgeInsetsDirectional.fromSTEB(
                       //       16.0, 8.0, 16.0, 8.0),
@@ -2185,6 +2193,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     _orientationOptions
                                         .indexOf(_selectedOrientation);
 
+                                _isLoaderShowing = true;
+
                                 LoadingDialog.show(context,
                                     message: l10n!.creatingPdf);
 
@@ -2237,11 +2247,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        // Handle interstitial ad logic for choose files button
-                                        if(!_isSubscribed){
-                                          _handleChooseFilesButtonClick();
-                                        }
-                                        // _handleChooseFilesButtonClick();
+                                        _isLoaderShowing = true;
 
                                         try {
                                           LogHelper.logErrorMessage(
@@ -2317,12 +2323,18 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                 },
                                               );
                                               showUsageLimitDialog(context);
+
+                                              _isLoaderShowing = false;
+
                                               return;
                                             } else {
                                               print(
                                                   '⏰ Trial limit dialog already shown today, skipping in createPDF');
                                               _hasShownSubscriptionDialogThisSession =
                                                   true;
+
+                                              _isLoaderShowing = false;
+
                                               return;
                                             }
                                           }
@@ -2373,6 +2385,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                             createPDF();
                                           });
                                         } catch (e) {
+                                          _isLoaderShowing = false;
+
                                           print(
                                               '🔴🔴🔴Error While Creating PDF: $e');
                                           // Use the safer method to stop usage time display only for subscribed users
@@ -2481,25 +2495,36 @@ class _ConverterWidgetState extends State<ConverterWidget>
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 2, left: 4),
-                              child: Row(
+                              child: Column(
                                 children: [
-                                  Text(
-                                    //todo add check of 3 mins passed
-                                    (!_isSubscribed &&
-                                            _is7DaysPassed &&
-                                            _remainingUsageTime <= 0)
-                                        ? l10n!
-                                            .youCanSelectUpTo3ImagesInFreeVersion
-                                        : l10n!.youCanSelectUpTo60Images,
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Inter',
-                                          color: Colors.black,
-                                          fontSize: 12.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          //todo add check of 3 mins passed
+                                          (!_isSubscribed &&
+                                                  _is7DaysPassed &&
+                                                  _remainingUsageTime <= 0)
+                                              ? l10n!
+                                                  .youCanSelectUpTo3ImagesInFreeVersion
+                                              : l10n!.youCanSelectUpTo60Images,
+                                          maxLines: 2, // allow up to 2 lines
+                                          softWrap: true, // wrap when needed
+                                          overflow: TextOverflow
+                                              .ellipsis, // add "…" if still too long
+
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Inter',
+                                                color: Colors.black,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -3009,10 +3034,35 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                         DateTime.now().toIso8601String(),
                                   },
                                 );
-                                context.pushNamed('Subscription').then((_) {
+
+                                // final result =
+                                // await context.pushNamed('Subscription');
+
+                                context
+                                    .pushNamed('Subscription')
+                                    .then((result) async {
+                                  if (result != null && result is List) {
+                                    // Access your JSON-like data
+                                    final promoResult = result[
+                                        0]; // because you returned a list with one map
+                                    bool isPromoApplied =
+                                        promoResult["promoCodeApplied"] ??
+                                            false;
+
+                                    print(
+                                        "Promo code applied: $isPromoApplied");
+
+                                    if (isPromoApplied) {
+                                      DateTime fiveDaysAgo = DateTime.now()
+                                          .subtract(Duration(days: 5));
+
+                                      await preferenceService
+                                          .setTrialEndDate(fiveDaysAgo);
+                                    }
+                                  }
+
                                   checkSubscriptionStatus();
-                                  setState(
-                                      () {}); // This will trigger a rebuild, calling initState if necessary
+                                  setState(() {});
                                 });
                               },
                               text: !_isSubscribed
@@ -4100,6 +4150,12 @@ class _ConverterWidgetState extends State<ConverterWidget>
       _startUsageTimeDisplay();
     }
 
+    if (!_isSubscribed) {
+      _handleChooseFilesButtonClick();
+    }
+
+    _isLoaderShowing = false;
+
     print('[$LOG_TAG] PDF creation process completed successfully');
   }
 
@@ -4228,6 +4284,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   Future<void> checkSubscriptionStatus() async {
     // Check if trial has ended
+
     _is7DaysPassed = await preferenceService.hasTrialEnded();
 
     // Set trial end date if not already set
@@ -4275,7 +4332,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
         }
         // If not subscribed and trial has ended, check remaining usage time
         if (!_isSubscribed &&
-            _is7DaysPassed &&
+            (_is7DaysPassed) &&
             !_hasShownSubscriptionDialogThisSession) {
           bool hasRemainingTime =
               await preferenceService.hasRemainingUsageTime();
@@ -4295,65 +4352,445 @@ class _ConverterWidgetState extends State<ConverterWidget>
     }
   }
 
-  void initRateMyApp() {
-    // todo revert this commeted function
-    // RateMyApp rateMyApp = RateMyApp(
-    //   preferencesPrefix: 'rateMyApp_',
-    //   minDays: 7,
-    //   minLaunches: 7,
-    //   remindDays: 7,
-    //   remindLaunches: 10,
-    //   googlePlayIdentifier: 'com.mycompany.ispeedpix2pdf7',
-    //   appStoreIdentifier: '6667115897',
-    // );
+  var _isLoaderShowing = false;
 
-    RateMyApp rateMyApp = RateMyApp(
-      preferencesPrefix: 'rateMyApp_',
-      minDays: 1,
-      minLaunches: 1,
-      remindDays: 1,
-      remindLaunches: 1,
-      googlePlayIdentifier: 'com.mycompany.ispeedpix2pdf7',
-      appStoreIdentifier: '6667115897',
+  Future<void> initRateMyApp() async {
+    print('Checking rate app conditions...');
+
+    final prefs = await SharedPreferences.getInstance();
+    final firstLaunchDate = prefs.getString('first_launch_date');
+    final launchCount = prefs.getInt('launch_count') ?? 0;
+    final hasRated = prefs.getBool('has_rated') ?? false;
+    final lastReminderDate = prefs.getString('last_reminder_date');
+
+    // Set first launch date if not set
+    if (firstLaunchDate == null) {
+      await prefs.setString(
+          'first_launch_date', DateTime.now().toIso8601String());
+    }
+
+    // Increment launch count
+    await prefs.setInt('launch_count', launchCount + 1);
+
+    // Check if we should show the rating dialog
+    bool shouldShow = false;
+
+    if (!hasRated) {
+      final now = DateTime.now();
+      final firstLaunch =
+          DateTime.parse(firstLaunchDate ?? now.toIso8601String());
+      final daysSinceFirstLaunch = now.difference(firstLaunch).inDays;
+
+      // Show after 3 days and 5 launches, or after 7 days regardless of launches
+      if ((daysSinceFirstLaunch >= 3 && launchCount >= 5) ||
+          daysSinceFirstLaunch >= 7) {
+        // Check if we haven't shown reminder recently (at least 7 days ago)
+        if (lastReminderDate == null) {
+          shouldShow = true;
+        } else {
+          final lastReminder = DateTime.parse(lastReminderDate);
+          final daysSinceReminder = now.difference(lastReminder).inDays;
+          if (daysSinceReminder >= 7) {
+            shouldShow = true;
+          }
+        }
+      }
+    }
+
+    print(
+        'Launch count: $launchCount, Has rated: $hasRated, Should show: $shouldShow');
+
+    if (shouldShow && !_isLoaderShowing) {
+      await _showRatingDialog();
+    }
+  }
+
+  Future<void> _showRatingDialog() async {
+    print('✅ Showing custom rating dialog');
+
+    // Track analytics event
+    try {
+      await analytics.logEvent(
+        name: 'rating_dialog_shown',
+        parameters: {
+          'timestamp': DateTime.now().toIso8601String(),
+          'platform': Platform.isAndroid ? 'android' : 'ios',
+        },
+      );
+    } catch (e) {
+      print('Analytics error: $e');
+    }
+
+    // Show custom rating dialog first
+    await _showCustomRatingDialog();
+  }
+
+  Future<void> _showCustomRatingDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          elevation: 10,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            constraints: BoxConstraints(
+              maxWidth: 400,
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            padding: EdgeInsets.all(24.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white,
+                  Color(0xFFF8F9FA),
+                ],
+              ),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // App Icon or Logo
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'assets/images/app_launcher_icon.jpg',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Fallback to ispeed_logo.png if app_launcher_icon.jpg fails
+                          return Image.asset(
+                            'assets/images/ispeed_logo.png',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Final fallback to PDF icon
+                              return Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xFF173F5A),
+                                      Color(0xFF2E5A7A)
+                                    ],
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.picture_as_pdf,
+                                  size: 40,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 20),
+
+                  // Title
+                  Text(
+                    l10n!.rateThisApp,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF173F5A),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  SizedBox(height: 12),
+
+                  // Message
+                  Text(
+                    l10n!.rateThisAppMessage,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF6B7280),
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  SizedBox(height: 24),
+
+                  // 5-Star Rating Bar
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: List.generate(5, (index) {
+                  //     return GestureDetector(
+                  //       onTap: () {
+                  //         setState(() {
+                  //           selectedStars = index + 1;
+                  //         });
+                  //       },
+                  //       child: Container(
+                  //         padding: EdgeInsets.all(4),
+                  //         child: Icon(
+                  //           selectedStars > index
+                  //               ? Icons.star_rounded
+                  //               : Icons.star_outline_rounded,
+                  //           size: 40,
+                  //           color: selectedStars > index
+                  //               ? Colors.amber
+                  //               : Colors.grey[300],
+                  //         ),
+                  //       ),
+                  //     );
+                  //   }),
+                  // ),
+
+                  SizedBox(height: 8),
+
+                  // Rating feedback text
+
+                  // Buttons
+                  Column(
+                    children: [
+                      // Rate Button
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        margin: EdgeInsets.only(bottom: 12),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            print('User clicked Rate button');
+
+                            // Track analytics
+                            try {
+                              await analytics.logEvent(
+                                name: 'rating_button_clicked',
+                                parameters: {
+                                  'timestamp': DateTime.now().toIso8601String(),
+                                  'platform':
+                                      Platform.isAndroid ? 'android' : 'ios',
+                                },
+                              );
+                            } catch (e) {
+                              print('Analytics error: $e');
+                            }
+
+                            // Always take user to store for rating/feedback
+                            await _handleRateButtonPressed();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF173F5A),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            elevation: 3,
+                          ),
+                          child: Text(
+                            l10n!.rate,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Secondary buttons row
+                      Row(
+                        children: [
+                          // "No Thanks" Button
+                          Expanded(
+                            child: Container(
+                              height: 44,
+                              margin: EdgeInsets.only(right: 6),
+                              child: TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  print('User clicked "No Thanks"');
+
+                                  // Set reminder for later (don't mark as rated)
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setString('last_reminder_date',
+                                      DateTime.now().toIso8601String());
+                                },
+                                style: TextButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    side: BorderSide(color: Colors.grey[300]!),
+                                  ),
+                                ),
+                                child: Text(
+                                  l10n!.noThanks,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // "Maybe Later" Button
+                          Expanded(
+                            child: Container(
+                              height: 44,
+                              margin: EdgeInsets.only(left: 6),
+                              child: TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  print('User clicked "Maybe Later"');
+
+                                  // Set reminder for later (don't mark as rated)
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setString('last_reminder_date',
+                                      DateTime.now().toIso8601String());
+                                },
+                                style: TextButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    side: BorderSide(color: Colors.grey[300]!),
+                                  ),
+                                ),
+                                child: Text(
+                                  l10n!.maybeLater,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
+  }
 
-    rateMyApp.init().then((_) {
-      if (rateMyApp.shouldOpenDialog) {
-        rateMyApp.showRateDialog(
-          context,
-          title: '${l10n!.rateThisApp}', // The dialog title.
-          message: '${l10n!.rateThisAppMessage}', // The dialog message.
-          rateButton: '${l10n!.rate}', // The dialog "rate" button text.
-          noButton:
-              '${l10n!.noThanks}', // iTHANKS', // The dialog "no" button text.
-          laterButton: '${l10n!.maybeLater}', // The dialog "later" button text.
-          listener: (button) {
-            // The button click listener (useful if you want to cancel the click event).
-            switch (button) {
-              case RateMyAppDialogButton.rate:
-                print('Clicked on "Rate".');
-                break;
-              case RateMyAppDialogButton.later:
-                print('Clicked on "Later".');
-                break;
-              case RateMyAppDialogButton.no:
-                print('Clicked on "No".');
-                break;
-            }
+  Future<void> _handleRateButtonPressed() async {
+    try {
+      final InAppReview inAppReview = InAppReview.instance;
 
-            return true; // Return false if you want to cancel the click event.
-          },
-          ignoreNativeDialog:
-              false, // Set to false if you want to show the Apple's native app rating dialog on iOS or Google's native app rating dialog (depends on the current Platform).
-          dialogStyle: const DialogStyle(), // Custom dialog styles.
-          onDismissed: () => rateMyApp.callEvent(RateMyAppEventType
-              .laterButtonPressed), // Called when the user dismissed the dialog (either by taping outside or by pressing the "back" button).
-          // contentBuilder: (co/ntext, defaultContent) => content, // This one allows you to change the default dialog content.
-          // actionsBuilder: (context) => [], // This one allows you to use your own buttons.
+      // Check if in-app review is available
+      if (await inAppReview.isAvailable()) {
+        print('Using native in-app review');
+        await inAppReview.requestReview();
+      } else {
+        print('Native review not available, opening store');
+        await _openStorePage();
+      }
+    } catch (e) {
+      print('In-app review failed: $e, opening store');
+      await _openStorePage();
+    }
+
+    // Mark as rated to prevent showing again
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_rated', true);
+  }
+
+  Future<void> _openStorePage() async {
+    try {
+      String storeUrl;
+      String nativeUrl;
+
+      if (Platform.isAndroid) {
+        // Android Play Store URLs
+        nativeUrl = 'market://details?id=com.mycompany.ispeedpix2pdf7';
+        storeUrl =
+            'https://play.google.com/store/apps/details?id=com.mycompany.ispeedpix2pdf7';
+      } else if (Platform.isIOS) {
+        // iOS App Store URLs
+        nativeUrl = 'itms-apps://apps.apple.com/app/id6667115897';
+        storeUrl = 'https://apps.apple.com/app/id6667115897';
+      } else {
+        print('Unsupported platform for store rating');
+        return;
+      }
+
+      // Try native app store URL first (opens in store app)
+      final Uri nativeUri = Uri.parse(nativeUrl);
+      if (await canLaunchUrl(nativeUri)) {
+        await launchUrl(nativeUri, mode: LaunchMode.externalApplication);
+        print('Successfully opened native store app: $nativeUrl');
+        return;
+      }
+
+      // Fallback to web URL (opens in browser)
+      final Uri webUri = Uri.parse(storeUrl);
+      if (await canLaunchUrl(webUri)) {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+        print('Successfully opened store page in browser: $storeUrl');
+      } else {
+        print('Could not launch any store URL');
+
+        // Show error message to user
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Unable to open app store. Please search for "iSpeedPix2PDF" in your app store.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error opening store page: $e');
+
+      // Show error message to user
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Unable to open app store. Please search for "iSpeedPix2PDF" in your app store.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 4),
+          ),
         );
       }
-    });
+    }
   }
+
+  // Method to manually trigger rating (for testing or manual trigger)
+  // Future<void> showRatingDialogManually() async {
+  //   await _showRatingDialog();
+  // }
 
   // Add this method to start tracking usage time
   // Force start usage tracking for testing purposes (bypasses trial/subscription checks)
@@ -4414,16 +4851,14 @@ class _ConverterWidgetState extends State<ConverterWidget>
       return; // No need to track for subscribers
     }
 
-    // Check if 3-day trial period has ended
+    // Check if 3-day trial period has ended OR promo code is applied
     bool trialEnded = await preferenceService.hasTrialEnded();
+
     if (!trialEnded) {
       print(
           '🚫 Timer will NOT run: 3 days have not passed (trialEnded = false)');
       return; // No need to track during trial period
     }
-
-    print(
-        '✅ Timer WILL run: 3 days passed AND user not subscribed (trialEnded=$trialEnded && isSubscribed=$_isSubscribed)');
 
     // Check if timer is already running
     if (_usageTimer != null && _usageTimer!.isActive) {

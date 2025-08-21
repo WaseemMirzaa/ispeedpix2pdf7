@@ -200,5 +200,11 @@
   "days": "일",
   "left": "남음",
   "upgradeNowButton": "지금 업그레이드",
-  "sessionTime": "세션 시간"
+  "sessionTime": "세션 시간",
+  "usePromoCode": "프로모 코드 사용",
+  "enterPromoCode": "프로모 코드 입력",
+  "apply": "적용",
+  "invalidPromoCode": "유효하지 않은 프로모 코드",
+  "promoCodeAppliedSuccessfully": "프로모 코드가 성공적으로 적용되었습니다!",
+  "promoCode": "프로모 코드"
 }

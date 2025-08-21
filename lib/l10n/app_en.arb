@@ -218,5 +218,11 @@
   "days": "days",
   "left": "left",
   "upgradeNowButton": "Upgrade Now",
-  "sessionTime": "session time"
+  "sessionTime": "session time",
+  "usePromoCode": "Use Promo Code",
+  "enterPromoCode": "Enter Promo Code",
+  "apply": "Apply", 
+  "invalidPromoCode": "Invalid Promo Code",
+  "promoCodeAppliedSuccessfully": "Promo Code Applied Successfully!",
+  "promoCode": "Promo Code"
 }

@@ -200,5 +200,11 @@
   "days": "日",
   "left": "残り",
   "upgradeNowButton": "今すぐアップグレード",
-  "sessionTime": "セッション時間"
+  "sessionTime": "セッション時間",
+  "usePromoCode": "プロモコードを使用",
+  "enterPromoCode": "プロモコードを入力",
+  "apply": "適用",
+  "invalidPromoCode": "無効なプロモコード",
+  "promoCodeAppliedSuccessfully": "プロモコードが正常に適用されました！",
+  "promoCode": "プロモコード"
 }

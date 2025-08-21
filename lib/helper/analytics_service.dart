@@ -34,7 +34,8 @@ class AnalyticsService {
 
       await _analytics.logEvent(
         name: buttonName,
-        parameters: parameters,
+        parameters:
+            parameters.map((key, value) => MapEntry(key, value as Object)),
       );
 
       print('Logged button tap: $buttonName');
@@ -60,7 +61,11 @@ class AnalyticsService {
         }
       });
 
-      await _analytics.logEvent(name: name, parameters: sanitizedParams);
+      await _analytics.logEvent(
+        name: name,
+        parameters:
+            parameters.map((key, value) => MapEntry(key, value as Object)),
+      );
       print('Analytics event logged: $name with parameters: $sanitizedParams');
     } catch (e) {
       print('Failed to log analytics event: $e');

@@ -200,5 +200,11 @@
   "days": "天",
   "left": "剩余",
   "upgradeNowButton": "立即升级",
-  "sessionTime": "会话时间"
+  "sessionTime": "会话时间",
+  "usePromoCode": "使用促销代码",
+  "enterPromoCode": "输入促销代码",
+  "apply": "应用",
+  "invalidPromoCode": "无效的促销代码",
+  "promoCodeAppliedSuccessfully": "促销代码应用成功！",
+  "promoCode": "促销代码"
 }

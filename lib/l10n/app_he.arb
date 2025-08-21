@@ -195,5 +195,11 @@
   "days": "ימים",
   "left": "נותר",
   "upgradeNowButton": "שדרג עכשיו",
-  "sessionTime": "זמן הפעלה"
+  "sessionTime": "זמן הפעלה",
+  "usePromoCode": "השתמש בקוד פרומו",
+  "enterPromoCode": "הכנס קוד פרומו",
+  "apply": "החל",
+  "invalidPromoCode": "קוד פרומו לא תקין",
+  "promoCodeAppliedSuccessfully": "קוד פרומו הוחל בהצלחה!",
+  "promoCode": "קוד פרומו"
 }

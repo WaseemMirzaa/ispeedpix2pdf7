@@ -200,5 +200,11 @@
   "days": "gün",
   "left": "kaldı",
   "upgradeNowButton": "Şimdi Yükselt",
-  "sessionTime": "oturum süresi"
+  "sessionTime": "oturum süresi",
+  "usePromoCode": "Promosyon Kodu Kullan",
+  "enterPromoCode": "Promosyon Kodu Girin",
+  "apply": "Uygula",
+  "invalidPromoCode": "Geçersiz Promosyon Kodu",
+  "promoCodeAppliedSuccessfully": "Promosyon Kodu Başarıyla Uygulandı!",
+  "promoCode": "Promosyon Kodu"
 }

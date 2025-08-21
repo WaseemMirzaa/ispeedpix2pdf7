@@ -200,5 +200,11 @@
   "days": "ngày",
   "left": "còn lại",
   "upgradeNowButton": "Nâng Cấp Ngay",
-  "sessionTime": "thời gian phiên"
+  "sessionTime": "thời gian phiên",
+  "usePromoCode": "Sử Dụng Mã Khuyến Mãi",
+  "enterPromoCode": "Nhập Mã Khuyến Mãi",
+  "apply": "Áp Dụng",
+  "invalidPromoCode": "Mã Khuyến Mãi Không Hợp Lệ",
+  "promoCodeAppliedSuccessfully": "Mã Khuyến Mãi Đã Được Áp Dụng Thành Công!",
+  "promoCode": "Mã Khuyến Mãi"
 }
