@@ -76,6 +76,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
       ),
     });
 
+    sanityCheckPromoDoc();
     // getSubscriptionsData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,6 +85,19 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
       // Ensure that no text field is focused when the app starts
       FocusScope.of(context).requestFocus(FocusNode());
     });
+  }
+
+  Future<void> sanityCheckPromoDoc() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('app_settings')
+          .doc('promo_code')
+          .get(const GetOptions(source: Source.server)); // server only
+      debugPrint(
+          'Sanity check -> exists: ${snap.exists}, data: ${snap.data()}');
+    } catch (e) {
+      debugPrint('Sanity check error: $e'); // will show PERMISSION_DENIED, etc.
+    }
   }
 
   @override
@@ -554,55 +568,63 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                         ),
                       ),
 
-                      StreamBuilder<DocumentSnapshot>(
+                      StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection('app_settings')
                             .doc('promo_code')
                             .snapshots(),
                         builder: (context, snapshot) {
+                          // 1) Handle errors first
+                          if (snapshot.hasError) {
+                            debugPrint(
+                                'Promo code stream error: ${snapshot.error}');
+                            return const SizedBox.shrink();
+                          }
+
+                          // 2) Show nothing (or loader) while waiting for first data
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const SizedBox
-                                .shrink(); // or a loader if you prefer
+                            return const SizedBox.shrink(); // or a loader
                           }
-                          if (!snapshot.hasData || !snapshot.data!.exists) {
+
+                          // 3) Ensure we actually have a doc
+                          final doc = snapshot.data;
+                          if (doc == null || !doc.exists) {
+                            debugPrint('Promo code doc missing');
                             return const SizedBox.shrink();
                           }
 
-                          final data =
-                              snapshot.data!.data() as Map<String, dynamic>;
-                          final bool isEnabled = data['is_enabled'] ?? false;
-                          final List<String> failureCodes =
-                              List<String>.from(data['failure_codes'] ?? []);
+                          // 4) Safely read data
+                          final data = doc.data() ?? const <String, dynamic>{};
+                          debugPrint('Promo code snapshot: $data');
 
-                          if (!isEnabled) {
-                            return const SizedBox.shrink();
-                          }
+                          final bool isEnabled =
+                              (data['is_enabled'] as bool?) ?? false;
+                          final List<String> failureCodes = List<String>.from(
+                            (data['failure_codes'] as List?) ?? const [],
+                          );
+
+                          if (!isEnabled) return const SizedBox.shrink();
 
                           return Visibility(
-                            visible: !_isSubscribed,
+                            visible: true,
                             child: Align(
                               alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 16.0, 8.0, 0.0),
+                                    8, 16, 8, 0),
                                 child: FFButtonWidget(
-                                  onPressed: () async {
+                                  onPressed: () {
                                     ShowPromoCodeDialog.show(
                                         context, l10n!, failureCodes);
                                   },
                                   text: '${l10n!.usePromoCode}',
-                                  // 'Buy Now in 1.99\$'
-                                  // ,
                                   options: FFButtonOptions(
                                     width: double.infinity,
-                                    height: 50.0,
+                                    height: 50,
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            24.0, 0.0, 24.0, 0.0),
-                                    iconPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
+                                            24, 0, 24, 0),
                                     color: const Color(0xFF173F5A),
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleLarge
@@ -610,15 +632,12 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                                           fontFamily: 'Readex Pro',
                                           color:
                                               FlutterFlowTheme.of(context).info,
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
+                                          fontSize: 18,
                                         ),
-                                    elevation: 0.0,
+                                    elevation: 0,
                                     borderSide: const BorderSide(
-                                      color: Color(0xFF173F5A),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                        color: Color(0xFF173F5A), width: 2),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               ),
@@ -627,6 +646,79 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
                         },
                       ),
 
+                      // StreamBuilder<DocumentSnapshot>(
+                      //   stream: FirebaseFirestore.instance
+                      //       .collection('app_settings')
+                      //       .doc('promo_code')
+                      //       .snapshots(),
+                      //   builder: (context, snapshot) {
+                      //     print('Promo code sapshot: ${snapshot.data!.data()}');
+                      //     if (snapshot.connectionState ==
+                      //         ConnectionState.waiting) {
+                      //       return const SizedBox
+                      //           .shrink(); // or a loader if you prefer
+                      //     }
+                      //     if (!snapshot.hasData || !snapshot.data!.exists) {
+                      //       return const SizedBox.shrink();
+                      //     }
+
+                      //     final data =
+                      //         snapshot.data!.data() as Map<String, dynamic>;
+                      //     final bool isEnabled = data['is_enabled'] ?? false;
+                      //     final List<String> failureCodes =
+                      //         List<String>.from(data['failure_codes'] ?? []);
+
+                      //     if (!isEnabled) {
+                      //       return const SizedBox.shrink();
+                      //     }
+
+                      //     return Visibility(
+                      //       visible: true,
+                      //       child: Align(
+                      //         alignment: const AlignmentDirectional(0.0, 0.0),
+                      //         child: Padding(
+                      //           padding: const EdgeInsetsDirectional.fromSTEB(
+                      //               8.0, 16.0, 8.0, 0.0),
+                      //           child: FFButtonWidget(
+                      //             onPressed: () async {
+                      //               ShowPromoCodeDialog.show(
+                      //                   context, l10n!, failureCodes);
+                      //             },
+                      //             text: '${l10n!.usePromoCode}',
+                      //             // 'Buy Now in 1.99\$'
+                      //             // ,
+                      //             options: FFButtonOptions(
+                      //               width: double.infinity,
+                      //               height: 50.0,
+                      //               padding:
+                      //                   const EdgeInsetsDirectional.fromSTEB(
+                      //                       24.0, 0.0, 24.0, 0.0),
+                      //               iconPadding:
+                      //                   const EdgeInsetsDirectional.fromSTEB(
+                      //                       0.0, 0.0, 0.0, 0.0),
+                      //               color: const Color(0xFF173F5A),
+                      //               textStyle: FlutterFlowTheme.of(context)
+                      //                   .titleLarge
+                      //                   .override(
+                      //                     fontFamily: 'Readex Pro',
+                      //                     color:
+                      //                         FlutterFlowTheme.of(context).info,
+                      //                     fontSize: 18.0,
+                      //                     letterSpacing: 0.0,
+                      //                   ),
+                      //               elevation: 0.0,
+                      //               borderSide: const BorderSide(
+                      //                 color: Color(0xFF173F5A),
+                      //                 width: 2.0,
+                      //               ),
+                      //               borderRadius: BorderRadius.circular(8.0),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                     ],
                   ),
                 ),
@@ -768,7 +860,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
             );
             setState(() {
               // isPurchased = true;
-              _isSubscribed = true;
+              // _isSubscribed = true;
             });
             LogHelper.logMessage('Receipt Status', 'Receipt found on device');
             LogHelper.logMessage('Receipt Data',
@@ -787,7 +879,7 @@ class _ConverterWidgetState extends State<SubscriptionWidget>
               );
               setState(() {
                 // isPurchased = true;
-                _isSubscribed = true;
+                // _isSubscribed = true;
               });
               LogHelper.logSuccessMessage(
                   'Purchase Verification', 'Valid production receipt found');

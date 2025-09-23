@@ -4178,7 +4178,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             // isPurchased = true;
             setState(() {
               // _isPurchased = true;
-              _isSubscribed = true;
+              // _isSubscribed = true;
             });
             LogHelper.logMessage('Receipt Status', 'Receipt found on device');
             LogHelper.logMessage('Receipt Data',
@@ -4190,7 +4190,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
               setState(() {
                 // _isP = true;
 
-                _isSubscribed = true;
+                // _isSubscribed = true;
               });
               LogHelper.logSuccessMessage(
                   'Purchase Verification', 'Valid production receipt found');
