@@ -2322,7 +2322,8 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                                   'remaining_time': '0',
                                                 },
                                               );
-                                              showUsageLimitDialog(context);
+                                              showUsageLimitDialog(
+                                                  context, _isSubscribed);
 
                                               _isLoaderShowing = false;
 
@@ -4341,7 +4342,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             Future.delayed(Duration(seconds: 1), () {
               if (mounted) {
                 _hasShownSubscriptionDialogThisSession = true;
-                showUsageLimitDialog(context);
+                showUsageLimitDialog(context, _isSubscribed);
               }
             });
           }
@@ -4834,7 +4835,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
           _hasShownSubscriptionDialogThisSession = true;
           Future.delayed(Duration(milliseconds: 500), () {
             if (mounted) {
-              showUsageLimitDialog(context);
+              showUsageLimitDialog(context, _isSubscribed);
             }
           });
         }
@@ -4929,7 +4930,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
             _pauseUsageTracking();
             _hasShownSubscriptionDialogThisSession = true;
             if (mounted) {
-              showUsageLimitDialog(context);
+              showUsageLimitDialog(context, _isSubscribed);
             }
           } else {
             print('⏰ Trial limit dialog already shown today, skipping');
@@ -5401,7 +5402,10 @@ void showDay4Dialog(BuildContext context) {
   );
 }
 
-void showUsageLimitDialog(BuildContext context) {
+void showUsageLimitDialog(BuildContext context, bool isSubscribed) {
+  if (isSubscribed) {
+    return;
+  }
   final l10n = AppLocalizations.of(context)!;
 
   showDialog(
