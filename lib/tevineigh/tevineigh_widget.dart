@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'tevineigh_model.dart';
 export 'tevineigh_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class TevineighWidget extends StatefulWidget {
   const TevineighWidget({super.key});

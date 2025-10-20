@@ -1,0 +1,632 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Arabic (`ar`).
+class AppLocalizationsAr extends AppLocalizations {
+  AppLocalizationsAr([String locale = 'ar']) : super(locale);
+
+  @override
+  String get rest => 'Reset';
+
+  @override
+  String get appTitle => 'iSpeedPix2pdf';
+
+  @override
+  String get defaultMixedOrientation => 'افتراضيًا - اتجاه مختلط';
+
+  @override
+  String get pagesFixedPortrait => 'الصفحات الثابتة - عمودي';
+
+  @override
+  String get landscapePhotosTopAlignedForEasyViewing =>
+      'صور المناظر الطبيعية - محاذاة الجزء العلوي لسهولة المشاهدة';
+
+  @override
+  String get reset => 'إعادة ضبط';
+
+  @override
+  String get chooseFiles => 'اختر الملفات';
+
+  @override
+  String get noFilesSelected => 'لم يتم تحديد ملفات';
+
+  @override
+  String get youCanSelectUpTo3ImagesInFreeVersion =>
+      '*يمكنك تحديد ما يصل إلى 3 صور في إصدار مجاني';
+
+  @override
+  String get youCanSelectUpTo60Images => '*يمكنك تحديد ما يصل إلى 60 صورة';
+
+  @override
+  String get filename => 'اسم الملف';
+
+  @override
+  String get filenameOptional => 'اسم الملف (اختياري)';
+
+  @override
+  String get enterCustomFileNameOptional => 'أدخل اسم الملف المخصص (اختياري)';
+
+  @override
+  String get filenameCannotContainCharacters =>
+      'لا يمكن أن يحتوي اسم الملف على أي من الأحرف التالية: \\ /: *؟  < > |';
+
+  @override
+  String get downloadPDF => 'تنزيل PDF';
+
+  @override
+  String get viewPdf => 'عرض PDF';
+
+  @override
+  String get about => 'عن';
+
+  @override
+  String get getFullLifetimeAccess => 'احصل على وصول كامل مدى الحياة في 1.99';
+
+  @override
+  String get viewPurchaseDetails => 'عرض تفاصيل الشراء';
+
+  @override
+  String get dataCollection => 'جمع البيانات:';
+
+  @override
+  String get invalidFilename => 'اسم الملف غير صالح';
+
+  @override
+  String get freeFeatureRenewal => 'تجدد الميزات المجانية كل 3 أيام';
+
+  @override
+  String get upgradePrompt =>
+      'قم بالترقية الآن مع شراء وإلغاء تأمين الطاقة الكاملة لـ iSpeedPix2pdf 🚀.';
+
+  @override
+  String get ok => 'نعم';
+
+  @override
+  String get rateAppTitle => 'قيم هذا التطبيق';
+
+  @override
+  String get rateAppMessage =>
+      'إذا كنت تستمتع باستخدام هذا التطبيق ، فسنقدر ذلك حقًا إذا كان بإمكانك أن تستغرق دقيقة لترك مراجعة! ';
+
+  @override
+  String get rateButton => 'معدل';
+
+  @override
+  String get noThanksButton => 'ًلا شكرا';
+
+  @override
+  String get maybeLaterButton => 'ربما في وقت لاحق';
+
+  @override
+  String get processing => 'يعالج';
+
+  @override
+  String get pleaseWait => 'انتظر من فضلك';
+
+  @override
+  String get trialLimitReached => 'وصل الحد من المحاكمة';
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get creatingPdf => 'PDFإنشاء ملف';
+
+  @override
+  String get loadingImagesInProgress => 'تحميل الصور';
+
+  @override
+  String get subscriptionRequired => 'الاشتراك المطلوب';
+
+  @override
+  String get subscriptionMessageRequired =>
+      'يرجى الاشتراك لمواصلة استخدام جميع الميزات';
+
+  @override
+  String get subscribeNowButton => 'اشترك الآن';
+
+  @override
+  String get restorePurchaseButton => 'استعادة الشراء';
+
+  @override
+  String get purchaseRestoredSuccessfully => 'شراء استعادة بنجاح';
+
+  @override
+  String get purchaseRestoreFailedError => 'فشل في استعادة الشراء';
+
+  @override
+  String get storagePermissionRequired => 'إذن التخزين المطلوب';
+
+  @override
+  String get storagePermissionMessageRequired =>
+      'هذا التطبيق يحتاج إلى إذن تخزين لحفظ PDFs';
+
+  @override
+  String get grantPermissionButton => 'منح المنحة';
+
+  @override
+  String get openSettingsButton => 'فتح الإعدادات';
+
+  @override
+  String get permissionDeniedError => 'تم رفض الإذن';
+
+  @override
+  String get errorWhileCreatingPdf => 'خطأ أثناء إنشاء PDF';
+
+  @override
+  String get errorWhileSavingPdf => 'خطأ حفظ PDF';
+
+  @override
+  String get errorWhileLoadingImages => 'خطأ تحميل الصور';
+
+  @override
+  String get pdfCreatedSuccessfully => 'أنشأت PDF بنجاح';
+
+  @override
+  String get pdfSavedSuccessfully => 'PDF حفظ بنجاح';
+
+  @override
+  String get tryAgainButton => 'حاول ثانية';
+
+  @override
+  String get continueButton => 'يكمل';
+
+  @override
+  String get cancelButton => 'يلغي';
+
+  @override
+  String get closeButton => 'يغلق';
+
+  @override
+  String get savingInProgress => 'توفير...';
+
+  @override
+  String get downloadingInProgress => 'تنزيل ...';
+
+  @override
+  String get invalidFileTypeError => 'نوع الملف غير صالح';
+
+  @override
+  String get maxFileSizeExceeded => 'تم تجاوز الحد الأقصى لحجم الملف';
+
+  @override
+  String get maxImagesLimitReached => 'تم الوصول إلى الحد الأقصى لعدد الصور';
+
+  @override
+  String get trialLimitMessageReached => 'لقد وصلت إلى حد التجربة. ';
+
+  @override
+  String freeVersionLimitReached(Object Count, Object count) {
+    return 'يقتصر الإصدار المجاني على $count pdfs';
+  }
+
+  @override
+  String get imageQualityHighOption => 'جودة عالية (90 ٪)';
+
+  @override
+  String get imageQualityMediumOption => 'الجودة المتوسطة (70 ٪)';
+
+  @override
+  String get imageQualityLowOption => 'جودة منخفضة (50 ٪)';
+
+  @override
+  String get orientationDefaultOption => 'التوجه الافتراضي';
+
+  @override
+  String get orientationPortraitOption => 'قوة صورة';
+
+  @override
+  String get orientationLandscapeOption => 'قوة المناظر الطبيعية';
+
+  @override
+  String get orientationMixedOption => 'اتجاه مختلط';
+
+  @override
+  String get unsupportedFileFormatError => 'تنسيق ملف غير مدعوم';
+
+  @override
+  String get supportedFormatsMessage => 'التنسيقات المدعومة: JPG ، PNG ، Heic';
+
+  @override
+  String get shareViaButton => 'مشاركة عبر';
+
+  @override
+  String get sharePdfButton => 'مشاركة PDF';
+
+  @override
+  String get enjoyingAppMessage => 'الاستمتاع iSpeedPix2pdf';
+
+  @override
+  String get rateAppStoreButton => 'معدل في متجر التطبيقات';
+
+  @override
+  String get ratePlayStoreButton => 'معدل في متجر اللعب';
+
+  @override
+  String get sendFeedbackButton => 'إرسال الملاحظات';
+
+  @override
+  String get preparingImagesInProgress => 'إعداد الصور ...';
+
+  @override
+  String get optimizingImagesInProgress => 'تحسين الصور ...';
+
+  @override
+  String get generatingPdfInProgress => 'توليد PDF ...';
+
+  @override
+  String get almostDoneMessage => 'تقريبا ...';
+
+  @override
+  String get unlockFeatureButton => 'فتح هذه الميزة';
+
+  @override
+  String get premiumFeatureMessage => 'ميزة قسط';
+
+  @override
+  String get upgradeToUnlockMessage => 'الترقية لفتح جميع الميزات';
+
+  @override
+  String get weDoNotCollectAnyPersonalData =>
+      ' نحن لا نجمع أو تخزين أو معالجة أي بيانات شخصية من المستخدمين. ';
+
+  @override
+  String get noImagesAreShared =>
+      'لا يتم رفع الصور إلى الخادم.\n- لا يتم جمع أو تخزين أو مشاركة البيانات الشخصية من قبل تطبيقنا المحمول.';
+
+  @override
+  String get filesSelected => 'الملفات المحددة';
+
+  @override
+  String get rateThisApp => 'قيم هذا التطبيق';
+
+  @override
+  String get rateThisAppMessage =>
+      'إذا كنت تستمتع باستخدام هذا التطبيق ، فستقدر ذلك حقًا إذا كان بإمكانك أن تستغرق دقيقة لمغادرة المراجعة! ';
+
+  @override
+  String get rate => 'معدل';
+
+  @override
+  String get noThanks => 'ًلا شكرا';
+
+  @override
+  String get maybeLater => 'ربما في وقت لاحق';
+
+  @override
+  String get permissionRequired => 'إذن مطلوب';
+
+  @override
+  String get freeTrialExpiredMessage =>
+      'انتهت صلاحية التجريبية المجانية أو الميزات المجانية المنهكة';
+
+  @override
+  String get upgradeNowButton => 'ترقية الآن';
+
+  @override
+  String get howToUse => 'كيفية استخدام';
+
+  @override
+  String get simplicityAndEfficiency => 'البساطة والكفاءة';
+
+  @override
+  String get privacyAndSecurity => 'الخصوصية والأمن';
+
+  @override
+  String get moreAppsByTevinEighDesigns =>
+      'Tevin Eights المزيد من التطبيقات من تصميم';
+
+  @override
+  String get aboutTevinEighDesigns => 'حول تصاميم Tevin Eigh';
+
+  @override
+  String get returnToConverter => 'العودة إلى المحول';
+
+  @override
+  String get currentPlanFullAccess => 'الخطة الحالية: الوصول الكامل';
+
+  @override
+  String get currentPlanFreeTrial => 'الخطة الحالية: تجربة مجانية';
+
+  @override
+  String get freeTrialOneWeekUnlimitedUse =>
+      'تجربة مجانية - 3 أيام - استخدام غير محدود';
+
+  @override
+  String get freeVersionTrialAfterTrialExpires =>
+      'نسخة مجانية - بعد انتهاء التجربة';
+
+  @override
+  String get createUpToFivePDFsEverySevenDays =>
+      '✔ قم بإنشاء ما يصل إلى 5 ملفات PDF كل 3 أيام';
+
+  @override
+  String get eachPDFCanHaveUpToThreePages =>
+      '\n✔ يمكن أن يكون لكل PDF ما يصل إلى 3 صفحات';
+
+  @override
+  String get autoResetEverySevenDays =>
+      '\n✔ إعادة التقييد التلقائي كل 3 أيام\n\n';
+
+  @override
+  String get oneTimePurchaseUnlockFullAccess =>
+      'لمرة واحدة الشراء (فتح الوصول الكامل)\n\n';
+
+  @override
+  String get adFreeAfterPurchase => '✔ خالي من الإعلانات بعد الشراء\n';
+
+  @override
+  String get unlimitedPDFCreation => '\n✔ خلق PDF غير محدود';
+
+  @override
+  String get singlePurchaseLifetimeAccess =>
+      '\n✔ عملية شراء واحدة للوصول إلى مدى الحياة\n\n';
+
+  @override
+  String get upgradeTodayToUnlockCompletePotential =>
+      'الترقية اليوم لإلغاء قفل الإمكانات الكاملة لـ iSpeedPix2pdf مع اشتراك مدى الحياة 🚀';
+
+  @override
+  String get enjoyFullAccess => 'استمتع وصولك الكامل';
+
+  @override
+  String get checkingActivePurchase => 'التحقق من الشراء النشط';
+
+  @override
+  String get alreadyPurchasedRestoreHere => 'تم شراؤها بالفعل؟ ';
+
+  @override
+  String get buyNowInFourNineNine => 'شراء الآن في 1.99';
+
+  @override
+  String get success => 'نجاح';
+
+  @override
+  String get yourPurchaseHasBeenSuccessfullyRestored =>
+      'تم استعادة عملية الشراء بنجاح!';
+
+  @override
+  String get purchaseHistory => 'سجل الشراء';
+
+  @override
+  String get noPurchasesFound => 'لم يتم العثور على عمليات شراء';
+
+  @override
+  String get weCouldNotFindAnyPreviousPurchasesToRestore =>
+      'لم نتمكن من العثور على أي عمليات شراء سابقة لاستعادتها.';
+
+  @override
+  String get purchaseDate => 'تاريخ الشراء';
+
+  @override
+  String get purchaseAmount => 'مبلغ الشراء';
+
+  @override
+  String get purchaseStatus => 'حالة الشراء';
+
+  @override
+  String get purchaseId => 'معرف الشراء';
+
+  @override
+  String get purchaseDetails => 'تفاصيل الشراء';
+
+  @override
+  String get error => 'خطأ';
+
+  @override
+  String get failedToRestorePurchasesPleaseTryAgainLater =>
+      'فشل في استعادة عمليات الشراء. ';
+
+  @override
+  String get howToUseISpeedPix2PDFStepByStep =>
+      'كيفية استخدام iSpeedPix2PDF: خطوة بخطوة';
+
+  @override
+  String get howToUsePointOne =>
+      '1. اختر الصور\'\'s  \nاضغط على زر \'\'اختيار الملفات\'\' لفتح \ngاليري الصور الخاصة بك\n- اختر الصور التي تريد تضمينها في \nPDF. يمكنك اختيار عدة صور دفعة واحدة\n \n2. إضافة اسم ملف (اختياري)\n- يمكنك إعطاء PDF الخاص بك اسم ملف مخصص عن طريق الضغط على حقل \'\'اسم الملف\'\'\n- إذا لم تقدم اسمًا، سيقوم التطبيق بتعيين اسم تلقائيًا بالشكل iSpeedPix2PDF_DATE_TIME\n \n3. عرض أو تنزيل PDF\n- قم بتنزيله لحفظ الملف (الملف مصمم \nليكون صغيرًا بما يكفي للمشاركة والإدارة بسهولة)\n- عاينه مباشرة داخل التطبيق للحصول على لمحة سريعة\n \n4. مشاركة PDF\n- بعد حفظه، يمكنك مشاركة PDF عبر البريد الإلكتروني، تطبيقات الرسائل، رفعه إلى خدمات السحابة، أو \nأي خيار آخر للمشاركة على جهازك\n- مع حفظ PDF، يمكنك بسهولة إدارة، \nتعديل، ومشاركة المسح الضوئي باستخدام الأدوات التي تعرفها بالفعل—مما يسهل العملية لتسريع وإدارة الوثائق بشكل أكثر كفاءة\n\nهذا كل شيء! لقد أنشأت، عاينت، وشاركت PDF مضغوط وسهل الإدارة باستخدام iSpeedPix2PDF.';
+
+  @override
+  String get mainMenu => 'القائمة الرئيسية';
+
+  @override
+  String get simplicityAndPrivacyDetail =>
+      'فلسفتنا - البساطة: تم تصميم تطبيقاتنا لتكون بديهية ومباشرة، مما يجعلها سهلة الاستخدام للجميع. - الأمان: من خلال إبقاء جميع العمليات على جانب العميل، فإننا نضمن أن تظل بياناتك خاصة وآمنة. - الكفاءة: نعمل باستمرار على تحسين تطبيقاتنا لإزالة الخطوات غير الضرورية مع الحفاظ على وظائفها الأساسية.';
+
+  @override
+  String get simplicityAndPrivacyDetailTwo =>
+      'نؤمن بتوفير ما تحتاجه تمامًا، لا أكثر ولا أقل. ومع تطورنا، يبقى التزامنا بتعزيز الكفاءة دون المساس بالهدف الأساسي لتطبيقاتنا.';
+
+  @override
+  String get simplicityAndPrivacyDetailThree =>
+      'استكشف مجموعتنا من تطبيقات جانب العميل وجرب الفرق الذي يمكن أن يحدثه البساطة والكفاءة والأمان في مهامك اليومية.';
+
+  @override
+  String get privacyAndSecurityDetailTitle =>
+      'مرحبًا بكم في iSpeedPix2PDF. نحن ملتزمون بحماية خصوصيتكم وضمان أمان معلوماتكم الشخصية. توضح سياسة الخصوصية هذه كيفية جمع بياناتكم واستخدامها وحمايتها عند استخدامكم تطبيق iSpeedPix2PDF على الأجهزة المحمولة.';
+
+  @override
+  String get privacyAndSecurityDetailOne =>
+      '١. جمع المعلومات واستخدامها - iSpeedPix2PDF تطبيق يعمل على جهاز العميل؛ جميع البيانات التي يعالجها التطبيق تبقى محلية على جهازك، دون إرسال أي بيانات إلى خوادم خارجية للمعالجة.\n- الوصول إلى معرض الصور: يتطلب iSpeedPix2PDF الوصول إلى معرض الصور على جهازك ليسمح لك باختيار الصور لتحويلها إلى ملفات PDF.\n- بمجرد إنشاء ملف PDF، لا يخزن التطبيق أي ملفات أو يحتفظ بها. يتمتع المستخدمون بالتحكم الكامل في ملفات PDF الخاصة بهم، ويمكنهم اختيار مشاركتها، أو إرسالها عبر البريد الإلكتروني، أو حفظها، أو تحميلها كما يحلو لهم.';
+
+  @override
+  String get privacyAndSecurityDetailTwo =>
+      '٢. عدم نقل البيانات - كتطبيق من جهة العميل، يضمن iSpeedPix2PDF عدم نقل أيٍّ من بياناتك، بما في ذلك معلوماتك الشخصية أو ملفات PDF المُنشأة، إلى خوادم خارجية أو خدمات خارجية. تتم كل خطوة من العملية - من اختيار الصور إلى إنشاء ملفات PDF - بالكامل على جهازك، مما يضمن أعلى مستوى من الخصوصية والأمان.';
+
+  @override
+  String get privacyAndSecurityDetailThree =>
+      '٣. لا نقل بيانات - كتطبيق من جهة العميل، يضمن iSpeedPix2PDF عدم نقل أيٍّ من بياناتك، بما في ذلك معلوماتك الشخصية أو ملفات PDF المُنشأة، إلى خوادم خارجية أو خدمات خارجية. كل خطوة من خطوات العملية - من اختيار الصور إلى الجينات ٣. اشتراك مدى الحياة لمرة واحدة - يعمل iSpeedPix2PDF بنظام اشتراك مدى الحياة لمرة واحدة، مما يعني أنك ستدفع مرة واحدة فقط للوصول الكامل إلى جميع الميزات - بدون رسوم متكررة أو رسوم خفية. تتم معالجة الدفع بأمان من خلال خدمة للتحقق من المشتريات وإدارتها. بمجرد الشراء، يظل التطبيق يعمل بكامل طاقته دون الحاجة إلى دفعات إضافية. تقييم ملفات PDF - يحدث بالكامل على جهازك، مما يضمن أعلى مستوى من الخصوصية والأمان.';
+
+  @override
+  String get privacyAndSecurityDetailFour =>
+      '٤. ممنوع الإعلانات - لا نعرض إعلانات ولا نبيع بياناتك. صُمم iSpeedPix2PDF لتوفير تجربة مستخدم سلسة وفعالة دون أي انقطاعات إعلانية. نركز على ضمان طريقة بسيطة وآمنة لإنشاء ملفات PDF ومشاركتها، تحت سيطرتك الكاملة.';
+
+  @override
+  String get view => 'منظر';
+
+  @override
+  String get aboutTevinEighDescription =>
+      'في Tevin Eigh Designs، نتخصص في تصميم تطبيقات العميل التي تُعالج المشاكل اليومية ببساطة وكفاءة وأمان. ينصب تركيزنا على توفير الوظائف الأساسية التي تحتاجها بأقل عدد ممكن من الخطوات والنقرات، مما يضمن لك التركيز على مهامك الرئيسية دون أي تشتيت.\n\nفلسفتنا\n- البساطة: صُممت تطبيقاتنا لتكون بديهية ومباشرة، مما يجعلها سهلة الاستخدام للجميع.\n- الأمان: من خلال إبقاء جميع عمليات المعالجة على جانب العميل، نضمن لك خصوصية بياناتك وأمانها.\n- الكفاءة: نعمل باستمرار على تحسين تطبيقاتنا لإزالة الخطوات غير الضرورية مع الحفاظ على وظائفها الأساسية.\n\nنؤمن بتوفير ما تحتاجه فقط، لا أكثر ولا أقل. ومع تطورنا، يبقى التزامنا بتعزيز الكفاءة دون المساس بالغرض الأساسي لتطبيقاتنا.\n\nاستكشف مجموعتنا من تطبيقات العميل وجرّب الفرق الذي تُحدثه البساطة والكفاءة والأمان في مهامك اليومية.\n\nwww.tevineigh.com\n';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get chooseLanguage => 'اختر اللغة';
+
+  @override
+  String get aboutAppDescription => 'Convert images to PDF quickly and easily';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get selectLanguage => 'اختر اللغة';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get privacyAndSecurityDetailFive =>
+      '٤. Google Firebase فقط لأغراض تحسين ظهور التطبيقات في متجر التطبيقات (ASO) وتحسين محركات البحث (SEO). لا نقوم بجمع أو بيع أو استخدام هذه المعلومات لأي أغراض أخرى.\n\nلمزيد من المعلومات حول ممارسات Google Firebase للبيانات، يُرجى الرجوع إلى سياسة الخصوصية الخاصة بهم:';
+
+  @override
+  String get monthlyUsageLimitReached => 'تم الوصول إلى الحد الشهري للاستخدام';
+
+  @override
+  String get monthlyUsageLimitDescription =>
+      'لقد استخدمت 3 دقائق من وقت الاستخدام المجاني لهذا الشهر. سيتم إعادة ضبط وقت الاستخدام في بداية الشهر القادم.';
+
+  @override
+  String get unlockUnlimitedUsageWithSubscription =>
+      'افتح وقت استخدام غير محدود من خلال شراء اشتراك مدى الحياة لمرة واحدة.';
+
+  @override
+  String get laterButton => 'لاحقاً';
+
+  @override
+  String remainingUsageTime(int minutes, int seconds) {
+    return 'الوقت المتبقي للاستخدام: $minutes دقيقة $seconds ثانية';
+  }
+
+  @override
+  String get threeMinutesUsagePerMonth => '✔ 3 دقائق من وقت الاستخدام شهرياً\n';
+
+  @override
+  String get usageTimeResetMonthly =>
+      '✔ يتم إعادة ضبط وقت الاستخدام شهرياً\n\n';
+
+  @override
+  String get trialTimeLeft => 'الوقت المتبقي للتجربة';
+
+  @override
+  String remainingTime(int minutes, String seconds) {
+    return '$minutes:$seconds متبقي';
+  }
+
+  @override
+  String get unlockUnlimitedAccessToday => 'افتح الوصول غير المحدود اليوم!';
+
+  @override
+  String get enjoyingFreeTrialUpgradeMessage =>
+      'أنت تستمتع بالتجربة المجانية! لماذا الانتظار؟ قم بالترقية الآن إلى خطتنا مدى الحياة ولا تقلق أبداً بشأن حدود الوقت. دفعة واحدة، استخدام غير محدود إلى الأبد — بدون اشتراكات، بدون رسوم متكررة!';
+
+  @override
+  String get usagePausedThirtyDays => 'الاستخدام متوقف (30 يوماً)';
+
+  @override
+  String get freeTimeExpired => 'انتهى الوقت المجاني';
+
+  @override
+  String get almostOutOfFreeTime => 'الوقت المجاني على وشك الانتهاء';
+
+  @override
+  String usagePausedMessage(int days) {
+    return 'وقتك المجاني متوقف لـ $days أيام أخرى. قم بالترقية إلى خطتنا مدى الحياة للحصول على استخدام غير محدود فوراً — بدون رسوم متكررة، بدون اشتراكات.';
+  }
+
+  @override
+  String get freeTimeExpiredMessage =>
+      'انتهى وقتك المجاني! قم بالترقية إلى خطتنا مدى الحياة بدفعة واحدة — بدون رسوم متكررة، بدون اشتراكات. احصل على استخدام غير محدود إلى الأبد.';
+
+  @override
+  String get almostOutOfFreeTimeMessage =>
+      'الوقت المجاني لهذا الشهر على وشك الانتهاء! قم بالترقية إلى خطتنا مدى الحياة بدفعة واحدة — بدون رسوم متكررة، بدون اشتراكات. احصل على استخدام غير محدود إلى الأبد.';
+
+  @override
+  String get subscribeNow => 'اشترك الآن';
+
+  @override
+  String get likingTheApp => 'هل تحب التطبيق؟';
+
+  @override
+  String get likingTheAppMessage =>
+      'هل تحب التطبيق؟ احصل على وصول مدى الحياة اليوم بدفعة واحدة — بدون رسوم متكررة، بدون اشتراكات. افتح استخدام غير محدود إلى الأبد!';
+
+  @override
+  String get maybeLatr => 'ربما لاحقاً';
+
+  @override
+  String get getLifetimeAccess => 'احصل على وصول مدى الحياة';
+
+  @override
+  String get stillEnjoyingIt => 'ما زلت تستمتع؟';
+
+  @override
+  String get stillEnjoyingItMessage =>
+      'ما زلت تستمتع؟ قم بالترقية الآن واحتفظ بالوصول إلى الأبد مع خطتنا مدى الحياة — دفعة واحدة، بدون اشتراكات، استخدام غير محدود مدى الحياة!';
+
+  @override
+  String get notNow => 'ليس الآن';
+
+  @override
+  String get upgradeForever => 'ترقية إلى الأبد';
+
+  @override
+  String get almostOutOfFreeTimeTitle => 'الوقت المجاني على وشك الانتهاء';
+
+  @override
+  String get almostOutOfFreeTimeWarningMessage =>
+      'الوقت المجاني لهذا الشهر على وشك الانتهاء! قم بالترقية إلى خطتنا مدى الحياة بدفعة واحدة — بدون رسوم متكررة، بدون اشتراكات. احصل على استخدام غير محدود إلى الأبد.';
+
+  @override
+  String get later => 'لاحقاً';
+
+  @override
+  String get upgradeNow => 'ترقية الآن';
+
+  @override
+  String get creatingPdfMessage => 'إنشاء PDF...';
+
+  @override
+  String get day => 'يوم';
+
+  @override
+  String get days => 'أيام';
+
+  @override
+  String get left => 'متبقي';
+
+  @override
+  String get sessionTime => 'وقت الجلسة';
+
+  @override
+  String get usePromoCode => 'استخدم رمز الخصم';
+
+  @override
+  String get enterPromoCode => 'أدخل رمز الخصم';
+
+  @override
+  String get apply => 'تطبيق';
+
+  @override
+  String get invalidPromoCode => 'رمز خصم غير صالح';
+
+  @override
+  String get promoCodeAppliedSuccessfully => 'تم تطبيق رمز الخصم بنجاح!';
+
+  @override
+  String get promoCode => 'رمز الخصم';
+}

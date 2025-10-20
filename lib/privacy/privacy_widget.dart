@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'privacy_model.dart';
 export 'privacy_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -234,7 +234,8 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
     // spans.add(TextSpan(text: '$point4\n\n', style: textStyle));
 
     // Add another span with a clickable link
-    spans.add(TextSpan(text: '${point5.replaceAll('5', '4')} ', style: textStyle));
+    spans.add(
+        TextSpan(text: '${point5.replaceAll('5', '4')} ', style: textStyle));
     spans.add(TextSpan(
       text: 'https://firebase.google.com/support/privacy',
       style: linkStyle,

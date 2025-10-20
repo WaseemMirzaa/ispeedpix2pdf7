@@ -5,7 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 import 'package:ispeedpix2pdf7/helper/analytics_service.dart';
 import 'package:ispeedpix2pdf7/helper/shared_preference_service.dart';
 import 'package:ispeedpix2pdf7/screens/preview_pdf_screen.dart';

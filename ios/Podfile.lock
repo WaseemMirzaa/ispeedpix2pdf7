@@ -1305,11 +1305,11 @@ PODS:
     - PromisesObjC (~> 2.4)
   - FirebaseSharedSwift (11.15.0)
   - Flutter (1.0.0)
-  - Google-Mobile-Ads-SDK (11.10.0):
+  - Google-Mobile-Ads-SDK (11.13.0):
     - GoogleUserMessagingPlatform (>= 1.1)
-  - google_mobile_ads (5.2.0):
+  - google_mobile_ads (5.3.1):
     - Flutter
-    - Google-Mobile-Ads-SDK (~> 11.10.0)
+    - Google-Mobile-Ads-SDK (~> 11.13.0)
     - webview_flutter_wkwebview
   - GoogleAdsOnDeviceConversion (2.1.0):
     - GoogleUtilities/Logger (~> 8.1)
@@ -1475,15 +1475,15 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
-  - purchases_flutter (9.2.0):
+  - purchases_flutter (8.11.0):
     - Flutter
-    - PurchasesHybridCommon (= 16.2.0)
-  - PurchasesHybridCommon (16.2.0):
-    - RevenueCat (= 5.34.0)
-  - RevenueCat (5.34.0)
-  - SDWebImage (5.21.1):
-    - SDWebImage/Core (= 5.21.1)
-  - SDWebImage/Core (5.21.1)
+    - PurchasesHybridCommon (= 14.3.0)
+  - PurchasesHybridCommon (14.3.0):
+    - RevenueCat (= 5.32.0)
+  - RevenueCat (5.32.0)
+  - SDWebImage (5.21.3):
+    - SDWebImage/Core (= 5.21.3)
+  - SDWebImage/Core (5.21.3)
   - share (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -1625,8 +1625,8 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 317270fec08a5d418fdbc8429282238cab3ac843
   FirebaseSharedSwift: e17c654ef1f1a616b0b33054e663ad1035c8fd40
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  Google-Mobile-Ads-SDK: 13e6e98edfd78ad8d8a791edb927658cc260a56f
-  google_mobile_ads: 2a538d8e42b1813809782792e48f8cf4374c2180
+  Google-Mobile-Ads-SDK: 14f57f2dc33532a24db288897e26494640810407
+  google_mobile_ads: fe0e2c1764ad95323dd0e3081d0bb2d58411f957
   GoogleAdsOnDeviceConversion: 2be6297a4f048459e0ae17fad9bfd2844e10cf64
   GoogleAppMeasurement: 700dce7541804bec33db590a5c496b663fbe2539
   GoogleUserMessagingPlatform: f8d0cdad3ca835406755d0a69aa634f00e76d576
@@ -1634,17 +1634,17 @@ SPEC CHECKSUMS:
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
   gRPC-Core: 860978b7db482de8b4f5e10677216309b5ff6330
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
-  in_app_review: a31b5257259646ea78e0e35fc914979b0031d011
+  in_app_review: 436034b18594851a7328d7f1c2ed5ec235b79cfc
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   pdfx: 7b876b09de8b7a0bf444a4f82b439ffcff4ee1ec
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  purchases_flutter: 343211332d04ed719fbb649b7efb930f260c8666
-  PurchasesHybridCommon: 55e97b4e090015ed138988e6559def2bd4c50ebe
-  RevenueCat: eb2aa042789d9c99ad5172bd96e28b96286d6ada
-  SDWebImage: f29024626962457f3470184232766516dee8dfea
+  purchases_flutter: c1245d908efb42739b626d03905302c003d26811
+  PurchasesHybridCommon: 7f0944cc5411bdcd1ea5d69affa6a6f9aaf87b13
+  RevenueCat: 7e1d0768fb287c9983173c9b28e39ccbeeb828a9
+  SDWebImage: 16309af6d214ba3f77a7c6f6fdda888cb313a50a
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
@@ -1655,6 +1655,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
   webview_flutter_wkwebview: a4af96a051138e28e29f60101d094683b9f82188
 
-PODFILE CHECKSUM: 6303fe664b311c570b0d28b73a86967b9b65b4cf
+PODFILE CHECKSUM: 5dc393737f73a9049e0012081d25eb862288964d
 
 COCOAPODS: 1.16.2

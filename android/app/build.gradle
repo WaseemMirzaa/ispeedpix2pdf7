@@ -30,8 +30,9 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 33
-    
+    compileSdkVersion 36
+    namespace "com.mycompany.ispeedpix2pdf7"
+
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -42,16 +43,9 @@ android {
         checkReleaseBuilds false
     }
 
-    // Disable AAR metadata check to allow SDK 33 with newer dependencies
-    dependenciesInfo {
-        includeInApk false
-        includeInBundle false
-    }
 
-    // Disable AAR metadata check task
-    tasks.withType(com.android.build.gradle.internal.tasks.CheckAarMetadataTask).configureEach {
-        enabled = false
-    }
+
+
 
 //    android {
     compileOptions {
@@ -80,19 +74,14 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            ndk {
-                debugSymbolLevel 'FULL'
-            }
+
         }
         debug {
-            ndk {
-                debugSymbolLevel 'FULL'
-            }
         }
     }
 
     packagingOptions {
-        doNotStrip "**/*.so"
+        // Keep default stripping behavior; do not forcefully keep symbols
     }
     sourceSets {
         main {
@@ -200,10 +189,10 @@ dependencies {
 // Add this task to extract debug symbols
 task extractNativeDebugSymbols(type: Copy) {
     dependsOn 'bundleRelease'
-    
+
     from file("${buildDir}/intermediates/stripped_native_libs/release/out/lib")
     into file("${buildDir}/symbols")
-    
+
     doLast {
         // Create ZIP files for each ABI
         file("${buildDir}/symbols").listFiles().each { abiDir ->

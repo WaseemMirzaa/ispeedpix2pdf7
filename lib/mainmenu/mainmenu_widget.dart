@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'mainmenu_model.dart';
 export 'mainmenu_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class MainmenuWidget extends StatefulWidget {
   const MainmenuWidget({super.key});

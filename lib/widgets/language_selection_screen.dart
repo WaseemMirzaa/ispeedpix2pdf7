@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ispeedpix2pdf7/converter/converter_widget.dart';
 import 'package:ispeedpix2pdf7/helper/language_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 import 'package:ispeedpix2pdf7/flutter_flow/flutter_flow_theme.dart';
 import 'package:ispeedpix2pdf7/main.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';

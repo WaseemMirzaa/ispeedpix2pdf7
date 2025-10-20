@@ -7,7 +7,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'simplicity_model.dart';
 export 'simplicity_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class SimplicityWidget extends StatefulWidget {
   const SimplicityWidget({super.key});

@@ -10,8 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'tevineigh_model.dart';
 export 'tevineigh_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class MoreAppsWidget extends StatefulWidget {
   const MoreAppsWidget({super.key});
@@ -134,9 +133,8 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
-
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12.0),
@@ -149,21 +147,23 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        10.0, 0.0, 10.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            10.0, 0.0, 10.0, 0.0),
                                     child: Text(
                                       'iSpeedScan',
                                       textAlign: TextAlign.start,
                                       style: FlutterFlowTheme.of(context)
                                           .labelLarge
                                           .override(
-                                        fontFamily: 'Inter',
-                                        color: FlutterFlowTheme.of(context).primaryText,
-                                        fontSize: 14,
-                                        letterSpacing: 0.0,
-                                      ),
-                                    ).animateOnPageLoad(
-                                        animationsMap['textOnPageLoadAnimation']!),
+                                            fontFamily: 'Inter',
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            fontSize: 14,
+                                            letterSpacing: 0.0,
+                                          ),
+                                    ).animateOnPageLoad(animationsMap[
+                                        'textOnPageLoadAnimation']!),
                                   ),
                                 ),
                                 Container(
@@ -176,28 +176,29 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
                                         } else if (Platform.isAndroid) {
                                           openPlayStore();
                                         }
-
                                       },
-                                      text: l10n.view ,
+                                      text: l10n.view,
                                       options: FFButtonOptions(
                                         // height: 20.0,
-                                        padding: const EdgeInsetsDirectional.fromSTEB(
-                                            24.0, 0.0, 24.0, 0.0),
-                                        iconPadding: const EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                        iconPadding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         color: const Color(0xFF173F5A),
-                                        textStyle:
-                                        FlutterFlowTheme.of(context).titleSmall.override(
-                                          fontFamily: 'Inter',
-                                          color: Colors.white,
-                                          letterSpacing: 0.0,
-                                        ),
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Inter',
+                                              color: Colors.white,
+                                              letterSpacing: 0.0,
+                                            ),
                                         // elevation: 3.0,
                                         borderSide: const BorderSide(
                                           color: Colors.transparent,
                                           width: 1.0,
                                         ),
-                                        borderRadius: BorderRadius.circular(8.0),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
                                     ),
                                   ),
@@ -230,10 +231,13 @@ class _MoreAppsWidgetWidgetState extends State<MoreAppsWidget>
   }
 
   Future<void> openPlayStore() async {
-    final String packageName = "com.tevineighdesigns.ispeedscan1"; // Replace with your package name
-    final Uri playStoreUrl = Uri.parse("https://play.google.com/store/apps/details?id=$packageName");
+    final String packageName =
+        "com.tevineighdesigns.ispeedscan1"; // Replace with your package name
+    final Uri playStoreUrl =
+        Uri.parse("https://play.google.com/store/apps/details?id=$packageName");
 
     if (!await launchUrl(playStoreUrl, mode: LaunchMode.externalApplication)) {
       throw 'Could not launch $playStoreUrl';
     }
-  }}
+  }
+}

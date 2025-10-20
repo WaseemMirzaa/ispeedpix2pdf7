@@ -10,6 +10,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # followed by an optional build number separated by a +.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
+# build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
@@ -118,7 +119,7 @@ dependencies:
   webview_flutter_android: 3.16.7
 
 #  flutter_share: ^2.0.0
-  purchases_flutter: ^9.2.0
+  purchases_flutter: ^8.11.0
 #  flutter_file_provider: ^1.0.0
 #  path_provider: ^2.0.9
 
