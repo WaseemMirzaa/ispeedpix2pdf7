@@ -18,9 +18,9 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "8.6.0" apply false
-    // Bump Kotlin to align with AGP 8.6 and Flutter 3.27 toolchains (16KB page support)
-    id "org.jetbrains.kotlin.android" version "1.9.24" apply false
+    id "com.android.application" version "8.7.2" apply false
+    // Kotlin 2.1.0 aligns with Play Services 23.0.0 kotlin metadata
+    id "org.jetbrains.kotlin.android" version "2.1.0" apply false
 }
 
 include ":app"
