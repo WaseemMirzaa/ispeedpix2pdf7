@@ -35,6 +35,24 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+// Fallback namespace for older library modules (AGP 8+ requires namespace)
+subprojects { subproj ->
+    subproj.plugins.withId("com.android.library") {
+        def hasNs = subproj.android.hasProperty("namespace")
+        if (!hasNs) {
+            def manifest = file("${subproj.projectDir}/src/main/AndroidManifest.xml")
+            def pkg = null
+            if (manifest.exists()) {
+                def content = manifest.getText('UTF-8')
+                def m = (content =~ /package=\"([^\"]+)\"/)
+                if (m.find()) { pkg = m.group(1) }
+            }
+            // Set namespace early so configuration succeeds under AGP 8+
+            subproj.android.namespace = pkg ?: "com.thirdparty.${subproj.name.replace('-', '_')}"
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

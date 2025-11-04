@@ -8,9 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
-import 'package:uri_to_file/uri_to_file.dart';
-import 'package:video_player/video_player.dart';
 // import 'package:uri_to_file/uri_to_file.dart'; // Removed due to namespace issues
+import 'package:video_player/video_player.dart';
 
 import 'dart:io';
 import 'dart:typed_data';
@@ -42,7 +41,16 @@ const allowedFormats = {'image/png', 'image/jpeg', 'video/mp4', 'image/gif'};
 // }
 Future<XFile?> convertContentUriToXFile(String uri) async {
   try {
-    final file = await toFile(uri); // This resolves the content:// URI properly
+    // Read the content URI bytes via platform channel; create a temp file
+    const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
+    final bytes = await platform.invokeMethod<Uint8List>('readContentUri', {
+      'uri': uri,
+    });
+    if (bytes == null || bytes.isEmpty) return null;
+    final tempDir = await getTemporaryDirectory();
+    final file = await File(
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg')
+        .writeAsBytes(bytes);
     return XFile(file.path);
   } catch (e) {
     print('❌ Failed to convert URI: $e');
