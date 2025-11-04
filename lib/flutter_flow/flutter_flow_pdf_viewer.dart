@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:internet_file/internet_file.dart';
+// import 'package:internet_file/internet_file.dart'; // commented: incompatible with http ^1.x
 import 'package:ispeedpix2pdf7/helper/PdfDimensionsHelper.dart';
 import 'package:pdfx/pdfx.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import 'package:http/http.dart' as http;
 
 class FlutterFlowPdfViewer extends StatefulWidget {
   const FlutterFlowPdfViewer({
@@ -37,12 +38,14 @@ class _FlutterFlowPdfViewerState extends State<FlutterFlowPdfViewer> {
   Future<void> _initializeController() async {
     safeSetState(() => _isLoading = true);
     final pdfDocument =
-        networkPath.isNotEmpty || assetPath.isNotEmpty || fileBytes.isNotEmpty
-            ? assetPath.isNotEmpty
+        (networkPath.isNotEmpty || assetPath.isNotEmpty || fileBytes.isNotEmpty)
+            ? (assetPath.isNotEmpty
                 ? await PdfDocument.openAsset(assetPath)
-                : networkPath.isNotEmpty
-                    ? await PdfDocument.openData(InternetFile.get(networkPath))
-                    : await PdfDocument.openData(fileBytes)
+                : (networkPath.isNotEmpty
+                    ? await PdfDocument.openData(
+                        (await http.get(Uri.parse(networkPath))).bodyBytes,
+                      )
+                    : await PdfDocument.openData(fileBytes)))
             : null;
     controller = pdfDocument != null
         ? PdfController(document: Future.value(pdfDocument))
@@ -67,37 +70,38 @@ class _FlutterFlowPdfViewerState extends State<FlutterFlowPdfViewer> {
 
   @override
   Widget build(BuildContext context) => Container(
-    // color: Colors.red,
-    child: SizedBox(
+        // color: Colors.red,
+        child: SizedBox(
           width: widget.width,
-      height: (widget.width != null) ? PdfDimensionsHelper.calculateA4Height(widget.width!) : widget.height,
-
-    child: _isLoading
+          height: (widget.width != null)
+              ? PdfDimensionsHelper.calculateA4Height(widget.width!)
+              : widget.height,
+          child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : controller != null
                   ? Container(
-      height: (widget.width != null) ? PdfDimensionsHelper.calculateA4Height(widget.width!) : widget.height,
-
-      child: Container(
-        color:  const Color(0xFFD3D3D3),
-
-        child: PdfView(
+                      height: (widget.width != null)
+                          ? PdfDimensionsHelper.calculateA4Height(widget.width!)
+                          : widget.height,
+                      child: Container(
+                        color: const Color(0xFFD3D3D3),
+                        child: PdfView(
                           controller: controller!,
                           scrollDirection: widget.horizontalScroll
                               ? Axis.horizontal
                               : Axis.vertical,
                           builders: PdfViewBuilders<DefaultBuilderOptions>(
                             options: const DefaultBuilderOptions(),
-                            documentLoaderBuilder: (_) =>
-                                const Center(child: CircularProgressIndicator()),
-                            pageLoaderBuilder: (_) =>
-                                const Center(child: CircularProgressIndicator()),
+                            documentLoaderBuilder: (_) => const Center(
+                                child: CircularProgressIndicator()),
+                            pageLoaderBuilder: (_) => const Center(
+                                child: CircularProgressIndicator()),
                             errorBuilder: (_, __) => Container(),
                           ),
                         ),
-      ),
-                  )
+                      ),
+                    )
                   : const SizedBox(),
         ),
-  );
+      );
 }

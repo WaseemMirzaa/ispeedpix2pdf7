@@ -12,7 +12,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
-import 'package:download/download.dart';
+// import 'package:download/download.dart'; // commented: deprecated; not used on mobile
 import 'dart:io';
 
 Future<List<dynamic>> downloadFFUploadedFile(
