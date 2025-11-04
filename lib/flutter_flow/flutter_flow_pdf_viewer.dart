@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 // import 'package:internet_file/internet_file.dart'; // commented: incompatible with http ^1.x
 import 'package:ispeedpix2pdf7/helper/PdfDimensionsHelper.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'package:http/http.dart' as http;
 
 class FlutterFlowPdfViewer extends StatefulWidget {
   const FlutterFlowPdfViewer({
@@ -29,79 +28,67 @@ class FlutterFlowPdfViewer extends StatefulWidget {
 }
 
 class _FlutterFlowPdfViewerState extends State<FlutterFlowPdfViewer> {
-  PdfController? controller;
   bool _isLoading = true;
   String get networkPath => widget.networkPath ?? '';
   String get assetPath => widget.assetPath ?? '';
   Uint8List get fileBytes => widget.fileBytes ?? Uint8List.fromList([]);
 
-  Future<void> _initializeController() async {
-    safeSetState(() => _isLoading = true);
-    final pdfDocument =
-        (networkPath.isNotEmpty || assetPath.isNotEmpty || fileBytes.isNotEmpty)
-            ? (assetPath.isNotEmpty
-                ? await PdfDocument.openAsset(assetPath)
-                : (networkPath.isNotEmpty
-                    ? await PdfDocument.openData(
-                        (await http.get(Uri.parse(networkPath))).bodyBytes,
-                      )
-                    : await PdfDocument.openData(fileBytes)))
-            : null;
-    controller = pdfDocument != null
-        ? PdfController(document: Future.value(pdfDocument))
-        : null;
-    safeSetState(() => _isLoading = false);
-  }
-
   @override
   void initState() {
     super.initState();
-    _initializeController();
+    _isLoading = false;
   }
 
   @override
   void didUpdateWidget(FlutterFlowPdfViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.networkPath != widget.networkPath ||
-        oldWidget.fileBytes != widget.fileBytes) {
-      _initializeController();
-    }
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-        // color: Colors.red,
-        child: SizedBox(
-          width: widget.width,
-          height: (widget.width != null)
-              ? PdfDimensionsHelper.calculateA4Height(widget.width!)
-              : widget.height,
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : controller != null
-                  ? Container(
-                      height: (widget.width != null)
-                          ? PdfDimensionsHelper.calculateA4Height(widget.width!)
-                          : widget.height,
-                      child: Container(
-                        color: const Color(0xFFD3D3D3),
-                        child: PdfView(
-                          controller: controller!,
-                          scrollDirection: widget.horizontalScroll
-                              ? Axis.horizontal
-                              : Axis.vertical,
-                          builders: PdfViewBuilders<DefaultBuilderOptions>(
-                            options: const DefaultBuilderOptions(),
-                            documentLoaderBuilder: (_) => const Center(
-                                child: CircularProgressIndicator()),
-                            pageLoaderBuilder: (_) => const Center(
-                                child: CircularProgressIndicator()),
-                            errorBuilder: (_, __) => Container(),
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-        ),
+  Widget build(BuildContext context) {
+    final height = (widget.width != null)
+        ? PdfDimensionsHelper.calculateA4Height(widget.width!)
+        : widget.height;
+
+    Widget viewer;
+    if (assetPath.isNotEmpty) {
+      viewer = SfPdfViewer.asset(
+        assetPath,
+        canShowScrollHead: true,
+        canShowScrollStatus: true,
+        pageSpacing: 4,
+        pageLayoutMode: widget.horizontalScroll
+            ? PdfPageLayoutMode.single
+            : PdfPageLayoutMode.continuous,
       );
+    } else if (networkPath.isNotEmpty) {
+      viewer = SfPdfViewer.network(
+        networkPath,
+        canShowScrollHead: true,
+        canShowScrollStatus: true,
+        pageSpacing: 4,
+        pageLayoutMode: widget.horizontalScroll
+            ? PdfPageLayoutMode.single
+            : PdfPageLayoutMode.continuous,
+      );
+    } else {
+      viewer = SfPdfViewer.memory(
+        fileBytes,
+        canShowScrollHead: true,
+        canShowScrollStatus: true,
+        pageSpacing: 4,
+        pageLayoutMode: widget.horizontalScroll
+            ? PdfPageLayoutMode.single
+            : PdfPageLayoutMode.continuous,
+      );
+    }
+
+    return SizedBox(
+      width: widget.width,
+      height: height,
+      child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(color: const Color(0xFFD3D3D3), child: viewer),
+    );
+  }
 }
