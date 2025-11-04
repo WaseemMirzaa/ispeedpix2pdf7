@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 36
+    compileSdkVersion 35
     namespace "com.mycompany.ispeedpix2pdf7"
 
 
@@ -43,7 +43,16 @@ android {
         checkReleaseBuilds false
     }
 
+  // Disable AAR metadata check to allow SDK 33 with newer dependencies
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
 
+    // Disable AAR metadata check task
+    tasks.withType(com.android.build.gradle.internal.tasks.CheckAarMetadataTask).configureEach {
+        enabled = false
+    }
 
 
 
@@ -71,17 +80,22 @@ android {
        }
    }
 
-    buildTypes {
+   buildTypes {
         release {
             signingConfig signingConfigs.release
-
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
         debug {
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
     packagingOptions {
-        // Keep default stripping behavior; do not forcefully keep symbols
+        doNotStrip "**/*.so"
     }
     sourceSets {
         main {

@@ -2703,15 +2703,16 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                 onPressed: () async {
                                   if (_hasBackSlash) {
                                     showFilenameErrorDialog(context);
+                                    safeSetState(() {});
                                   } else {
-                                    print(
-                                        'ConverterWidget: isPermissionEnabled Calling...');
+                                    // print(
+                                    // 'ConverterWidget: isPermissionEnabled Calling...');
                                     // var isPermissionEnabled =
                                     //     await _requestStoragePermission(
                                     //         context);
 
-                                    print(
-                                        'ConverterWidget: isPermissionEnabled Called...');
+                                    // print(
+                                    // 'ConverterWidget: isPermissionEnabled Called...');
 
                                     // if (!isPermissionEnabled) {
                                     //   print(
@@ -2720,32 +2721,34 @@ class _ConverterWidgetState extends State<ConverterWidget>
                                     //   return;
                                     // }
 
-                                    analytics.logEvent(
-                                      name:
-                                          'event_on_download_pdf_button_pressed',
-                                      parameters: {
-                                        'os': Platform.isAndroid
-                                            ? 'android'
-                                            : 'ios',
-                                        'timestamp':
-                                            DateTime.now().toIso8601String(),
-                                        // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
-                                      },
-                                    );
+                                    // analytics.logEvent(
+                                    //   name:
+                                    //       'event_on_download_pdf_button_pressed',
+                                    //   parameters: {
+                                    //     'os': Platform.isAndroid
+                                    //         ? 'android'
+                                    //         : 'ios',
+                                    //     'timestamp':
+                                    //         DateTime.now().toIso8601String(),
+                                    //     // 'selectedFileCount': selectedUploadedFiles!.length.toString(),
+                                    //   },
+                                    // );
 
                                     // print('ConverterWidget: isPermissionEnabled Called...');
+                                    try {
+                                      _model.filenameDefaultDown = await actions
+                                          .generateFormattedDateTime();
 
-                                    _model.filenameDefaultDown = await actions
-                                        .generateFormattedDateTime();
-
-                                    _model.download =
-                                        await actions.downloadFFUploadedFile(
-                                      _model.pdfFile!,
-                                      _model.filenameTextController.text != ''
-                                          ? _model.filenameTextController.text
-                                          : _model.filenameDefaultDown!,
-                                    );
-
+                                      _model.download =
+                                          await actions.downloadFFUploadedFile(
+                                        _model.pdfFile!,
+                                        _model.filenameTextController.text != ''
+                                            ? _model.filenameTextController.text
+                                            : _model.filenameDefaultDown!,
+                                      );
+                                    } catch (e) {
+                                      print('Error downloading file: $e');
+                                    }
                                     safeSetState(() {});
                                   }
                                 },
