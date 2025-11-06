@@ -114,6 +114,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
   void initState() {
     super.initState();
 
+    debugPrint('🧭 ConverterWidget.initState()');
     // Register the observer
     WidgetsBinding.instance.addObserver(this);
 
@@ -551,6 +552,7 @@ class _ConverterWidgetState extends State<ConverterWidget>
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🧭 ConverterWidget.build()');
     l10n = AppLocalizations.of(context);
 
     return GestureDetector(

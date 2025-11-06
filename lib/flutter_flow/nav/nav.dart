@@ -12,6 +12,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
+import 'package:ispeedpix2pdf7/splash/splash_screen.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -29,50 +30,28 @@ class AppStateNotifier extends ChangeNotifier {
   bool showSplashImage = true;
 
   void stopShowingSplashImage() {
+    if (!showSplashImage) return;
+    debugPrint('⏭️ Dismissing splash via AppStateNotifier');
     showSplashImage = false;
     notifyListeners();
   }
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
-      initialLocation: '/',
+      initialLocation: '/splash',
       debugLogDiagnostics: true,
-      refreshListenable: appStateNotifier,
       navigatorKey: appNavigatorKey,
-      errorBuilder: (context, state) => appStateNotifier.showSplashImage
-          ? Builder(
-              builder: (context) => Container(
-                color: FlutterFlowTheme.of(context).accent4,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/70769789-ECA9-4E75-AE97-86FF559889DF.jpg',
-                    width: 300.0,
-                    height: 300.0,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          : ConverterWidget(),
+      errorBuilder: (context, state) => ConverterWidget(),
       routes: [
+        FFRoute(
+          name: 'splash',
+          path: '/splash',
+          builder: (context, _) => const SplashScreen(),
+        ),
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) => appStateNotifier.showSplashImage
-              ? Builder(
-                  builder: (context) => Container(
-                    color: FlutterFlowTheme.of(context).accent4,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/70769789-ECA9-4E75-AE97-86FF559889DF.jpg',
-                        width: 300.0,
-                        height: 300.0,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                )
-              : ConverterWidget(),
+          builder: (context, _) => ConverterWidget(),
         ),
         FFRoute(
           name: 'converter',
