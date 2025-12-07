@@ -1,4 +1,4 @@
-# ispeedpix2pdf7
+# iSpeedPix2Pdf7
 
 *A fast and simple Flutter app to convert gallery images into high-quality PDFs.*
 
