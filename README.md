@@ -57,5 +57,3 @@ No recurring fees, no hidden charges.
 
 For questions, issues or suggestions:
 📧 **[m.waseemmirzaa@gmail.com](mailto:m.waseemmirzaa@gmail.com)**
-
--
