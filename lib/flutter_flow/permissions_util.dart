@@ -20,13 +20,13 @@ Future<bool> getPermissionStatus(Permission setting) async {
 }
 
 Future<void> requestPermission(Permission setting) async {
-  if (setting == Permission.photos && isAndroid) {
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-    if (androidInfo.version.sdkInt <= 32) {
-      await Permission.storage.request();
-    } else {
-      await Permission.photos.request();
-    }
-  }
-  await setting.request();
+  // if (setting == Permission.photos && isAndroid) {
+  //   final androidInfo = await DeviceInfoPlugin().androidInfo;
+  //   if (androidInfo.version.sdkInt <= 32) {
+  //     await Permission.storage.request();
+  //   } else {
+  //     await Permission.photos.request();
+  //   }
+  // }
+  // await setting.request();
 }

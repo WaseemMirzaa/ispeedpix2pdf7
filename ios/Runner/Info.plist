@@ -2,12 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>itms</string>
+    </array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>iSpeedPIX2PDF</string>
+	<string>iSpeedPix2PDF</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,6 +49,8 @@
 	<string>Allow acces to the app in order to take pictures that will convert to PDF</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Provide acccess to the app to upload pictures that will convert to PDF</string>
+	<key>GADIsAdManagerApp</key>
+	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -60,5 +66,38 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>de</string>
+	</array>
+
+	<key>GADApplicationIdentifier</key>
+<string>ca-app-pub-8212879270080474~4213561188</string>
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
 </dict>
 </plist>

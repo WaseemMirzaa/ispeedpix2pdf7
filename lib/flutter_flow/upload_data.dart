@@ -1,17 +1,215 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime_type/mime_type.dart';
+// import 'package:uri_to_file/uri_to_file.dart'; // Removed due to namespace issues
 import 'package:video_player/video_player.dart';
 
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow_util.dart';
 
 const allowedFormats = {'image/png', 'image/jpeg', 'video/mp4', 'image/gif'};
+
+// Future<XFile?> createXFileFromContentUri(String uriPath) async {
+//   try {
+//     // Open the URI as a stream via Platform Channels or use a plugin like `uri_to_file`
+//     final bytes = await File(uriPath)
+//         .readAsBytes(); // This may throw if it's a content://
+
+//     // Create a temporary file
+//     final tempDir = await getTemporaryDirectory();
+//     final file =
+//         File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+//     await file.writeAsBytes(bytes);
+
+//     return XFile(file.path);
+//   } catch (e) {
+//     print('❌ Failed to read file from content URI: $e');
+//     return null;
+//   }
+// }
+Future<XFile?> convertContentUriToXFile(String uri) async {
+  try {
+    // Read the content URI bytes via platform channel; create a temp file
+    const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
+    final bytes = await platform.invokeMethod<Uint8List>('readContentUri', {
+      'uri': uri,
+    });
+    if (bytes == null || bytes.isEmpty) return null;
+    final tempDir = await getTemporaryDirectory();
+    final file = await File(
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg')
+        .writeAsBytes(bytes);
+    return XFile(file.path);
+  } catch (e) {
+    print('❌ Failed to convert URI: $e');
+    return null;
+  }
+}
+
+// Android-specific image picker with proper limit enforcement
+Future<List<XFile>> _pickMultipleImagesAndroid({
+  required ImagePicker picker,
+  required double? maxWidth,
+  required double? maxHeight,
+  required int? imageQuality,
+  required int limit,
+}) async {
+  print(
+      '[IMAGE_LIMIT] 🤖 Android native picker: Attempting to use proper limit enforcement');
+
+  try {
+    // Use the enhanced Android native picker
+    final List<XFile> images = await _tryAndroidNativePicker(
+      picker: picker,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      imageQuality: imageQuality,
+      limit: limit,
+    );
+
+    print(
+        '[IMAGE_LIMIT] 🤖 Android native picker returned ${images.length} images');
+
+    // Double-check the limit enforcement
+    if (images.length > limit) {
+      print(
+          '[IMAGE_LIMIT] ⚠️ Android picker exceeded limit, manually enforcing');
+      return images.take(limit).toList();
+    }
+
+    return images;
+  } catch (e) {
+    print('[IMAGE_LIMIT] ❌ Android native picker error: $e');
+    rethrow;
+  }
+}
+
+// Future<XFile> convertUriToXFile(String contentUri) async {
+//   final file = await con(contentUri);
+//   return XFile(file.path);
+// }
+
+// Enhanced Android picker that uses platform channel for native limit enforcement
+Future<List<XFile>> _tryAndroidNativePicker({
+  required ImagePicker picker,
+  required double? maxWidth,
+  required double? maxHeight,
+  required int? imageQuality,
+  required int limit,
+}) async {
+  print(
+      '[IMAGE_LIMIT] 🔧 Trying Android native picker with platform channel limit: $limit');
+
+  try {
+    // First try using platform channel for native Android picker
+    final List<String>? imagePaths = await _callNativeAndroidPicker(limit);
+
+    if (imagePaths != null && imagePaths.isNotEmpty) {
+      print(
+          '[IMAGE_LIMIT] 📱 Native Android platform channel returned ${imagePaths.length} images');
+
+      // Check if we got Photo Picker content URIs - if so, fall back immediately
+      // bool hasPhotoPickerUris =
+      //     imagePaths.any((path) => path.contains('media/picker/'));
+      // if (hasPhotoPickerUris) {
+      //   print(
+      //       '[IMAGE_LIMIT] ⚠️ Detected Photo Picker content URIs, falling back to regular image_picker');
+      //   throw Exception('Photo Picker content URIs detected - using fallback');
+      // }
+
+      // Convert paths/URIs to XFile obj
+      //ects - FIX: Ensure proper file reading
+      final List<XFile> images = [];
+
+      for (String path in imagePaths) {
+        var xfile = await convertContentUriToXFile(path);
+        // final file = File(path); // Create File
+        print('[IMAGE_LIMIT] Creating XFile from path: $xfile');
+        if (xfile != null) {
+          images.add(xfile);
+        }
+      }
+
+      // Create XFile and verify it can be read
+      // final XFile xfile = XFile(file.path);
+
+      // Test if we can read the file to ensure it's valid
+      //     try {
+      //       final bytes = await xfile.readAsBytes();
+      //       if (bytes.isNotEmpty) {
+      //         print(
+      //             '[IMAGE_LIMIT] ✅ Successfully validated image: $path (${bytes.length} bytes)');
+      //       } else {
+      //         print('[IMAGE_LIMIT] ⚠️ Skipping empty image: $path');
+      //       }
+      //     } catch (readError) {
+      //       print('[IMAGE_LIMIT] ⚠️ Direct read failed for $path: $readError');
+      //       print(
+      //           '[IMAGE_LIMIT] ⚠️ Skipping image due to content URI read failure: $path');
+      //       // Skip this image - will be handled by fallback to regular image_picker
+      //     }
+      //   } catch (e) {
+      //     print('[IMAGE_LIMIT] ⚠️ Failed to validate image: $path, error: $e');
+      //   }
+
+      // prin/t(
+      // '[IMAGE_LIMIT] ✅ Successfully validated ${images.length} images out of ${imagePaths.length}');
+      return images;
+    } else {
+      print(
+          '[IMAGE_LIMIT] ⚠️ Native platform channel returned empty, falling back to image_picker');
+      throw Exception('Native picker returned empty result');
+    }
+  } catch (e) {
+    print('[IMAGE_LIMIT] ❌ Native platform channel failed: $e');
+    print('[IMAGE_LIMIT] 🔄 Falling back to image_picker with limit parameter');
+
+    // Fallback to image_picker with limit
+
+    // print(
+    // '[IMAGE_LIMIT] 📱 Fallback image_picker completed with ${images.length} images');
+    return [];
+  }
+}
+
+// Call native Android picker using platform channel
+Future<List<String>?> _callNativeAndroidPicker(int limit) async {
+  print(
+      '[IMAGE_LIMIT] 📱 Calling native Android picker via platform channel with limit: $limit');
+
+  try {
+    const platform = MethodChannel('com.ispeedpix2pdf.native_picker');
+    final List<dynamic>? result =
+        await platform.invokeMethod('pickMultipleImages', {
+      'limit': limit,
+    });
+
+    if (result != null) {
+      final List<String> imagePaths = result.cast<String>();
+      print(
+          '[IMAGE_LIMIT] 🎯 Native Android picker returned ${imagePaths.length} images via platform channel');
+      return imagePaths;
+    } else {
+      print('[IMAGE_LIMIT] ❌ Native Android picker returned null');
+      return null;
+    }
+  } catch (e) {
+    print('[IMAGE_LIMIT] ❌ Platform channel error: $e');
+    return null;
+  }
+}
 
 class SelectedFile {
   const SelectedFile({
@@ -56,6 +254,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   Color backgroundColor = const Color(0xFFF5F5F5),
   bool includeDimensions = false,
   bool includeBlurHash = false,
+  int remainingTime = 0,
 }) async {
   final createUploadMediaListTile =
       (String label, MediaSource mediaSource) => ListTile(
@@ -76,6 +275,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
               mediaSource,
             ),
           );
+
   final mediaSource = await showModalBottomSheet<MediaSource>(
       context: context,
       backgroundColor: backgroundColor,
@@ -132,9 +332,11 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
           ],
         );
       });
+
   if (mediaSource == null) {
     return null;
   }
+
   return selectMedia(
     storageFolderPath: storageFolderPath,
     maxWidth: maxWidth,
@@ -145,6 +347,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
     mediaSource: mediaSource,
     includeDimensions: includeDimensions,
     includeBlurHash: includeBlurHash,
+    remainingTime: remainingTime,
   );
 }
 
@@ -158,119 +361,192 @@ Future<List<SelectedFile>?> selectMedia({
   bool multiImage = false,
   bool includeDimensions = false,
   bool includeBlurHash = false,
+  bool isSubscribed = false,
+  bool are7DaysPassed = false,
+  bool isPurchased = false,
+  required int remainingTime,
 }) async {
-    try {
+  try {
+    final picker = ImagePicker();
 
+// Debug logging for image selection limit
+    print('[IMAGE_LIMIT] 📸 Image selection logic evaluation:');
+    print('[IMAGE_LIMIT] 🔍 !isSubscribed = ${!isSubscribed}');
+    print('[IMAGE_LIMIT] 🔍 are7DaysPassed = $are7DaysPassed');
+    print('[IMAGE_LIMIT] 🔍 remainingTime = $remainingTime');
+    print('[IMAGE_LIMIT] 🔍 remainingTime <= 0 = ${remainingTime <= 0}');
+    print(
+        '[IMAGE_LIMIT] 🧮 Full condition: (!isSubscribed && are7DaysPassed && remainingTime <= 0) = ${(!isSubscribed && are7DaysPassed && remainingTime <= 0)}');
+    print(
+        '[IMAGE_LIMIT] 🎯 Selected limit: ${(!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60} images');
+    if (multiImage) {
+      List<XFile> pickedMedia = [];
 
-      final picker = ImagePicker();
+      // Calculate image limit once for both platforms
+      final int imageLimit =
+          (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60;
 
+      if (Platform.isAndroid) {
+        // Android: Use Android-specific implementation with proper limit enforcement
+        print(
+            '[IMAGE_LIMIT] 🤖 Android: Using Android-specific picker with limit: $imageLimit');
 
-      if (multiImage) {
+        try {
+          // Use Android-specific implementation
+          pickedMedia = await _pickMultipleImagesAndroid(
+            picker: picker,
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            imageQuality: imageQuality,
+            limit: imageLimit,
+          );
+          print(
+              '[IMAGE_LIMIT] 📊 Android picker returned ${pickedMedia.length} images (limit: $imageLimit)');
+        } catch (e) {
+          print('[IMAGE_LIMIT] ❌ Android picker failed: $e');
+          print(
+              '[IMAGE_LIMIT] 🔄 Falling back to regular picker with manual limit');
 
-        final pickedMediaFuture = picker.pickMultiImage(
+          // Fallback to regular picker
+          pickedMedia = await picker.pickMultiImage(
             maxWidth: maxWidth,
             maxHeight: maxHeight,
             requestFullMetadata: true,
-          limit: 60
-          // imageQuality: imageQuality,
-        );
-
-        final pickedMedia = await pickedMediaFuture;
-
-        print('🟢🟢🟢🟢🟢 Picked Media ${pickedMedia.length}');
-
-        if (pickedMedia.isEmpty) {
-
-          print('🟢🟢🟢🟢🟢 Picked Media Empty Returning Null ${pickedMedia.length}');
-
-          return null;
-
-        }
-
-        print('🟢🟢🟢🟢🟢 Picked Media ${pickedMedia.length}');
-
-        return Future.wait(pickedMedia.asMap().entries.map((e) async {
-
-          final index = e.key;
-          final media = e.value;
-          final mediaBytes = await media.readAsBytes();
-          final path = _getStoragePath(storageFolderPath, media.name, false, index);
-          final dimensions = includeDimensions
-              ? isVideo
-              ? _getVideoDimensions(media.path)
-              : _getImageDimensions(mediaBytes)
-              : null;
-
-          return SelectedFile(
-
-            storagePath: path,
-
-            filePath: media.path,
-
-            bytes: mediaBytes,
-
-            dimensions: await dimensions,
-
+            imageQuality: imageQuality,
+            limit: imageLimit,
           );
 
-        }));
+          // Manually enforce limit for fallback
+          if (pickedMedia.length > imageLimit) {
+            print(
+                '[IMAGE_LIMIT] ✂️ Fallback: manually limiting to $imageLimit images');
+            pickedMedia = pickedMedia.take(imageLimit).toList();
+          }
+        }
+      } else {
+        final int imageLimit = (!isSubscribed &&
+                are7DaysPassed &&
+                remainingTime <= 0 &&
+                isPurchased == false)
+            ? 3
+            : 60;
+
+        // iOS: Use regular picker with limit
+        print('[IMAGE_LIMIT] 🍎 Using iOS picker with limit: $imageLimit');
+
+        print('[IMAGE_LIMIT] 🍎isSubscribed: $isSubscribed');
+
+        pickedMedia = await picker.pickMultiImage(
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+          requestFullMetadata: true,
+          imageQuality: imageQuality,
+          limit: imageLimit,
+        );
       }
 
-      final source = mediaSource == MediaSource.camera
-          ? ImageSource.camera
-          : ImageSource.gallery;
+      // Always enforce limit as final safety check
+      if (pickedMedia.length > imageLimit) {
+        print(
+            '[IMAGE_LIMIT] ✂️ Final safety check: limiting to $imageLimit images');
+        pickedMedia = pickedMedia.take(imageLimit).toList();
+      }
 
-      final pickedMediaFuture = isVideo
-          ? picker.pickVideo(source: source)
-          : picker.pickImage(
+      print('[IMAGE_LIMIT] ✅ Successfully picked ${pickedMedia.length} images');
 
-        maxWidth: maxWidth,
-
-        maxHeight: maxHeight,
-
-        imageQuality: imageQuality,
-
-        source: source,
-
-      );
-
-      final pickedMedia = await pickedMediaFuture;
-
-      final mediaBytes = await pickedMedia?.readAsBytes();
-      if (mediaBytes == null) {
+      if (pickedMedia.isEmpty) {
+        print('[IMAGE_LIMIT] ❌ No images selected, returning null');
 
         return null;
-
       }
 
-      final path = _getStoragePath(storageFolderPath, pickedMedia!.name, isVideo);
+      print('[IMAGE_LIMIT] ✅ Processing ${pickedMedia.length} selected images');
 
-      final dimensions = includeDimensions
-          ? isVideo
-          ? _getVideoDimensions(pickedMedia.path)
-          : _getImageDimensions(mediaBytes)
-          : null;
+      return Future.wait(pickedMedia.asMap().entries.map((e) async {
+        final index = e.key;
+        final media = e.value;
 
-      return [
-        SelectedFile(
+        // Enhanced error handling for Android content URIs
+        Uint8List? mediaBytes;
+        try {
+          print('[IMAGE_LIMIT] 📖 Reading bytes from: ${media.path}');
+          mediaBytes = await media.readAsBytes();
+          print('[IMAGE_LIMIT] ✅ Successfully read ${mediaBytes.length} bytes');
+        } catch (e) {
+          print('[IMAGE_LIMIT] ❌ Failed to read bytes from ${media.path}: $e');
+          // Skip this image if we can't read it
+          return null;
+        }
 
+        // Skip if no bytes were read
+        if (mediaBytes.isEmpty) {
+          print(
+              '[IMAGE_LIMIT] ⚠️ Skipping image with empty bytes: ${media.path}');
+          return null;
+        }
+
+        final path =
+            _getStoragePath(storageFolderPath, media.name, false, index);
+        final dimensions = includeDimensions
+            ? isVideo
+                ? _getVideoDimensions(media.path)
+                : _getImageDimensions(mediaBytes)
+            : null;
+
+        return SelectedFile(
           storagePath: path,
-
-          filePath: pickedMedia.path,
-
+          filePath: media.path,
           bytes: mediaBytes,
-
           dimensions: await dimensions,
-
-        ),
-      ];
-    } catch (e) {
-
-      print('🔴🔴🔴🔴🔴 Exception While Picking Images $e');
-
-      return null;
-
+        );
+      })).then((results) => results
+          .where((result) => result != null)
+          .cast<SelectedFile>()
+          .toList());
     }
+
+    final source = mediaSource == MediaSource.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    final pickedMediaFuture = isVideo
+        ? picker.pickVideo(source: source)
+        : picker.pickImage(
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            imageQuality: imageQuality,
+            source: source,
+          );
+
+    final pickedMedia = await pickedMediaFuture;
+
+    final mediaBytes = await pickedMedia?.readAsBytes();
+
+    if (mediaBytes == null) {
+      return null;
+    }
+
+    final path = _getStoragePath(storageFolderPath, pickedMedia!.name, isVideo);
+
+    final dimensions = includeDimensions
+        ? isVideo
+            ? _getVideoDimensions(pickedMedia.path)
+            : _getImageDimensions(mediaBytes)
+        : null;
+
+    return [
+      SelectedFile(
+        storagePath: path,
+        filePath: pickedMedia.path,
+        bytes: mediaBytes,
+        dimensions: await dimensions,
+      ),
+    ];
+  } catch (e) {
+    print('🔴🔴🔴🔴🔴 Exception While Picking Images $e');
+
+    return null;
+  }
 }
 
 bool validateFileFormat(String filePath, BuildContext context) {

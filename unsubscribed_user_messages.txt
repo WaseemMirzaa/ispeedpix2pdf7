@@ -1,0 +1,131 @@
+# UNSUBSCRIBED USER MESSAGES - EDIT THIS FILE
+# =============================================
+# Instructions: Edit the text after the "=" sign for each message
+# Keep the key names (before =) unchanged
+# After editing, provide this file back for replacement
+# =============================================================================
+# 1. TRIAL BANNER MESSAGES (During 3-Day Trial)
+# =============================================================================
+
+trialTimeLeft = Trial Time Left
+day = day
+days = days
+left = left
+
+# =============================================================================
+# 2. PROGRESS BAR & TIMER MESSAGES
+# =============================================================================
+
+sessionTime = session time
+# Note: This was hardcoded and needs to be added to localization
+
+# =============================================================================
+# 3. TRIAL MOTIVATION MESSAGES (During Trial, >50 seconds)
+# =============================================================================
+
+unlockUnlimitedAccessToday = Unlock Unlimited Access Today!
+enjoyingFreeTrialUpgradeMessage = You're enjoying the free trial! Why wait? Upgrade now to our lifetime plan and never worry about time limits again. One payment, unlimited usage forever — no subscriptions, no recurring charges!
+
+# =============================================================================
+# 4. USAGE WARNING BANNER MESSAGES (Different States)
+# =============================================================================
+
+# When Time < 90 seconds (Yellow/Orange State):
+likingTheApp = Liking the App?
+likingTheAppMessage = Liking the app? Get lifetime access today with a single one-time payment — no recurring charges, no subscriptions. Unlock unlimited usage forever!
+
+# When Time < 50 seconds (Red State):
+almostOutOfFreeTime = Almost Out of Free Time
+almostOutOfFreeTimeMessage = You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited usage forever.
+
+# When Time Expired:
+freeTimeExpired = Free Time Expired
+freeTimeExpiredMessage = ⏰ Time's up! But your journey continues...🌟 Upgrade to Premium and scan without limits! Join thousands of users who've unlocked their full potential.
+
+# When Usage Paused (30-day cooldown):
+usagePausedThirtyDays = Usage Paused (30 Days)
+usagePausedMessage = Your free time is paused for {days} more days. Upgrade to our lifetime plan to get unlimited usage immediately — no recurring charges, no subscriptions.
+
+# =============================================================================
+# 5. SUBSCRIBE NOW BUTTON
+# =============================================================================
+
+subscribeNow = Subscribe Now
+
+# =============================================================================
+# 6. DAY 2 ENGAGEMENT DIALOG
+# =============================================================================
+
+# Title: (uses likingTheApp above)
+# Message: (uses likingTheAppMessage above)
+# Buttons:
+maybeLatr = Maybe Later
+getLifetimeAccess = Get Lifetime Access
+
+# =============================================================================
+# 7. DAY 4 ENGAGEMENT DIALOG
+# =============================================================================
+
+stillEnjoyingIt = Still Enjoying It?
+stillEnjoyingItMessage = Still enjoying it? Upgrade now and keep access forever with our lifetime plan — one payment, no subscriptions, unlimited usage for life!
+# Buttons:
+notNow = Not Now
+upgradeForever = Upgrade Forever
+
+# =============================================================================
+# 8. USAGE LIMIT DIALOG (Time Expired)
+# =============================================================================
+
+monthlyUsageLimitReached = Monthly Usage Limit Reached
+monthlyUsageLimitDescription = You've used your 3 minutes of free usage time for this month. Your usage time will reset at the beginning of next month.
+unlockUnlimitedUsageWithSubscription = Unlock unlimited usage time with a one-time purchase of our lifetime subscription.
+# Buttons:
+laterButton = Later
+subscribeNowButton = Subscribe Now
+
+# =============================================================================
+# 9. USAGE WARNING DIALOG (80-90% Usage)
+# =============================================================================
+
+# Title: (uses likingTheApp above)
+# Message: (uses likingTheAppMessage above)
+# Buttons:
+later = Later
+upgradeNowButton = Upgrade Now
+
+# =============================================================================
+# 10. LOADING DIALOG
+# =============================================================================
+
+creatingPdfMessage = Creating PDF...
+
+# =============================================================================
+# 11. TRIAL LIMIT DIALOG (Trial Expired)
+# =============================================================================
+
+freeTrialExpiredMessage = Free trial expired or free features exhausted
+freeFeatureRenewal = FREE FEATURES RENEW EVERY 7 DAYS
+upgradePrompt = Upgrade now with a one-time purchase and unlock the full power of iSpeedPix2pdf 🚀.
+cancelButton = CANCEL
+
+# =============================================================================
+# NOTES FOR EDITING:
+# =============================================================================
+# 
+# 1. Keep messaging friendly and non-aggressive
+# 2. Emphasize $4.99 lifetime payment (no subscriptions)
+# 3. Use "one-time payment" and "no recurring charges" consistently
+# 4. Messages should be motivational, not pushy
+# 5. Maintain consistent tone across all dialogs
+# 6. Keep button text short and clear
+# 7. Use exclamation marks sparingly for emphasis
+# 8. Focus on value proposition: unlimited usage forever
+#
+# Current Strategy:
+# - Trial period: Positive, motivational
+# - Warning states: Friendly reminders
+# - Expired states: Clear but not aggressive
+# - Always offer "Later" or "Maybe Later" options
+# - Emphasize lifetime value vs subscriptions
+#
+# =============================================================================

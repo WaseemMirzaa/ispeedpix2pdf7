@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'tevineigh_model.dart';
 export 'tevineigh_model.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class TevineighWidget extends StatefulWidget {
   const TevineighWidget({super.key});
@@ -66,6 +67,7 @@ class _TevineighWidgetState extends State<TevineighWidget>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -75,7 +77,7 @@ class _TevineighWidgetState extends State<TevineighWidget>
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF4A90E2),
+          backgroundColor: const Color(0xFF173F5A),
           automaticallyImplyLeading: false,
           leading: InkWell(
             splashColor: Colors.transparent,
@@ -122,7 +124,8 @@ class _TevineighWidgetState extends State<TevineighWidget>
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             20.0, 0.0, 20.0, 0.0),
                         child: Text(
-                          'At Tevin Eigh Designs, we specialize in creating client-side apps that solve daily problems with simplicity, efficiency, and security. Our focus is on delivering the core functionality you need with the fewest steps and clicks possible, ensuring you can concentrate on your main tasks without distractions.\n\nOur Philosophy\n-Simplicity: Our apps are designed to be intuitive and straithforward, making them easy to use for everyone.\n-Security: By keeping all processing on the client side, we ensure your data remains private and secure.\n-Efficiency: We continually refine our apps to remove unnecessary steps while preserving their core functionality.\n\nWe Believe in providing just what you need, nothing more, nothing less. As we evolve, our commitment remains to enhance efficiency without compromising on the primary purpose of our applications.\n\nExplore our range of client-side apps and experience the difference simplicity, efficiency, and security can make in your daily tasks.\n\nwww.tevineigh.com\n',
+                          l10n!.aboutTevinEighDescription,
+                          // 'At Tevin Eigh Designs, we specialize in creating client-side apps that solve daily problems with simplicity, efficiency, and security. Our focus is on delivering the core functionality you need with the fewest steps and clicks possible, ensuring you can concentrate on your main tasks without distractions.\n\nOur Philosophy\n-Simplicity: Our apps are designed to be intuitive and straithforward, making them easy to use for everyone.\n-Security: By keeping all processing on the client side, we ensure your data remains private and secure.\n-Efficiency: We continually refine our apps to remove unnecessary steps while preserving their core functionality.\n\nWe Believe in providing just what you need, nothing more, nothing less. As we evolve, our commitment remains to enhance efficiency without compromising on the primary purpose of our applications.\n\nExplore our range of client-side apps and experience the difference simplicity, efficiency, and security can make in your daily tasks.\n\nwww.tevineigh.com\n',
                           textAlign: TextAlign.start,
                           style: FlutterFlowTheme.of(context)
                               .labelLarge
@@ -139,19 +142,21 @@ class _TevineighWidgetState extends State<TevineighWidget>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: FFButtonWidget(
                     onPressed: () async {
-                      context.pushNamed('Mainmenu');
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     text: 'Main Menu',
                     options: FFButtonOptions(
                       height: 40.0,
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                      iconPadding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                      color: const Color(0xFF4A90E2),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          24.0, 0.0, 24.0, 0.0),
+                      iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 0.0),
+                      color: const Color(0xFF173F5A),
                       textStyle:
                           FlutterFlowTheme.of(context).titleSmall.override(
                                 fontFamily: 'Inter',

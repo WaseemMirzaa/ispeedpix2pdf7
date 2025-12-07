@@ -1,0 +1,158 @@
+# ISPEEDSCAN USER MESSAGES - FOR COMPARISON
+# ==========================================
+# Note: This is a template based on user preferences and patterns
+# mentioned in memories. Actual ispeedscan messages may differ.
+# Please provide the actual ispeedscan messages for accurate comparison.
+
+# =============================================================================
+# 1. TRIAL BANNER MESSAGES (During 3-Day Trial)
+# =============================================================================
+
+trialTimeLeft = Trial Time Left
+day = day
+days = days
+left = left
+
+# =============================================================================
+# 2. PROGRESS BAR & TIMER MESSAGES
+# =============================================================================
+
+sessionTime = session time
+# Note: Based on user preferences, this should be localized
+
+# =============================================================================
+# 3. TRIAL MOTIVATION MESSAGES (During Trial, >50 seconds)
+# =============================================================================
+
+unlockUnlimitedAccessToday = Unlock Unlimited Access Today!
+enjoyingFreeTrialUpgradeMessage = You're enjoying the free trial! Why wait? Upgrade now to our lifetime plan and never worry about time limits again. One payment, unlimited scanning forever — no subscriptions, no recurring charges!
+
+# =============================================================================
+# 4. USAGE WARNING BANNER MESSAGES (Different States)
+# =============================================================================
+
+# When Time < 90 seconds (Yellow/Orange State):
+likingTheApp = Liking the App?
+likingTheAppMessage = Liking the app? Get lifetime access today with a single one-time payment — no recurring charges, no subscriptions. Unlock unlimited scanning forever!
+
+# When Time < 50 seconds (Red State):
+almostOutOfFreeTime = Almost Out of Free Time
+almostOutOfFreeTimeMessage = You're almost out of free time this month! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited scanning forever.
+
+# When Time Expired:
+freeTimeExpired = Free Time Expired
+freeTimeExpiredMessage = Your free time has expired! Upgrade to our lifetime plan with a single one-time payment — no recurring charges, no subscriptions. Get unlimited scanning forever.
+
+# When Usage Paused (30-day cooldown):
+usagePausedThirtyDays = Usage Paused (30 Days)
+usagePausedMessage = Your free time is paused for {days} more days. Upgrade to our lifetime plan to get unlimited scanning immediately — no recurring charges, no subscriptions.
+
+# =============================================================================
+# 5. SUBSCRIBE NOW BUTTON
+# =============================================================================
+
+subscribeNow = Subscribe Now
+
+# =============================================================================
+# 6. DAY 2 ENGAGEMENT DIALOG
+# =============================================================================
+
+# Title: (uses likingTheApp above)
+# Message: (uses likingTheAppMessage above)
+# Buttons:
+maybeLatr = Maybe Later
+getLifetimeAccess = Get Lifetime Access
+
+# =============================================================================
+# 7. DAY 4 ENGAGEMENT DIALOG
+# =============================================================================
+
+stillEnjoyingIt = Still Enjoying It?
+stillEnjoyingItMessage = Still enjoying it? Upgrade now and keep access forever with our lifetime plan — one payment, no subscriptions, unlimited scanning for life!
+# Buttons:
+notNow = Not Now
+upgradeForever = Upgrade Forever
+
+# =============================================================================
+# 8. USAGE LIMIT DIALOG (Time Expired)
+# =============================================================================
+
+monthlyUsageLimitReached = Monthly Usage Limit Reached
+monthlyUsageLimitDescription = You've used your 3 minutes of free scanning time for this month. Your usage time will reset at the beginning of next month.
+unlockUnlimitedUsageWithSubscription = Unlock unlimited scanning time with a one-time purchase of our lifetime subscription.
+# Buttons:
+laterButton = Later
+subscribeNowButton = Subscribe Now
+
+# =============================================================================
+# 9. USAGE WARNING DIALOG (80-90% Usage)
+# =============================================================================
+
+# Title: (uses likingTheApp above)
+# Message: (uses likingTheAppMessage above)
+# Buttons:
+later = Later
+upgradeNowButton = Upgrade Now
+
+# =============================================================================
+# 10. LOADING DIALOG
+# =============================================================================
+
+creatingPdfMessage = Creating PDF...
+# Note: For ispeedscan, this might be "Scanning..." or "Processing scan..."
+
+# =============================================================================
+# 11. TRIAL LIMIT DIALOG (Trial Expired)
+# =============================================================================
+
+freeTrialExpiredMessage = Free trial expired or free features exhausted
+freeFeatureRenewal = FREE FEATURES RENEW EVERY 7 DAYS
+upgradePrompt = Upgrade now with a one-time purchase and unlock the full power of iSpeedScan 🚀.
+cancelButton = CANCEL
+
+# =============================================================================
+# ISPEEDSCAN-SPECIFIC MESSAGES (Estimated based on scanning functionality)
+# =============================================================================
+
+# Scanning-related messages that might be different:
+scanningInProgress = Scanning in progress...
+processingDocument = Processing document...
+scanComplete = Scan complete
+scanningDocument = Scanning document...
+enhancingImage = Enhancing image quality...
+detectingEdges = Detecting document edges...
+optimizingForOCR = Optimizing for text recognition...
+
+# Scan limit messages:
+scanLimitReached = Scan Limit Reached
+scanLimitDescription = You've reached your scanning limit for this month.
+unlimitedScansAvailable = Get unlimited scans with lifetime access!
+
+# =============================================================================
+# KEY DIFFERENCES FROM ISPEEDPIX2PDF:
+# =============================================================================
+# 
+# 1. "PDF" → "Scan" or "Scanning" in most contexts
+# 2. "Creating PDF" → "Scanning" or "Processing scan"
+# 3. "PDF creation" → "Document scanning"
+# 4. "unlimited PDFs" → "unlimited scans"
+# 5. "PDF features" → "scanning features"
+# 6. May have OCR-related messages
+# 7. May have document enhancement messages
+# 8. May have edge detection messages
+#
+# =============================================================================
+# NOTES FOR COMPARISON:
+# =============================================================================
+# 
+# To get accurate ispeedscan messages, please provide:
+# 1. The actual ispeedscan app localization files
+# 2. Dialog and popup code from ispeedscan
+# 3. Any scanning-specific user messages
+# 4. Timer and progress messages from ispeedscan
+# 5. Subscription dialog texts from ispeedscan
+#
+# This will allow for a proper side-by-side comparison
+# and ensure consistent messaging strategy across both apps.
+#
+# =============================================================================

@@ -1,0 +1,444 @@
+================================================================================
+                    CONVERTER WIDGET FEATURES & SUBSCRIPTION GUIDE
+================================================================================
+
+File: lib/converter/converter_widget.dart
+Date: 2025-01-23
+Purpose: Comprehensive guide to subscription logic, trial management, usage 
+         tracking, and feature restrictions in the main converter widget
+
+================================================================================
+                                OVERVIEW
+================================================================================
+
+The ConverterWidget is the main screen of the iSpeedPix2PDF app that handles:
+- 3-day trial management
+- Subscription status checking
+- Usage time tracking (3-minute limit)
+- PDF creation with image limits
+- Multiple dialog systems for user engagement
+- Analytics tracking for user behavior
+
+================================================================================
+                            SUBSCRIPTION SYSTEM
+================================================================================
+
+### 1. SUBSCRIPTION STATUS VARIABLES
+
+```dart
+bool _isSubscribed = false;           // Current subscription status
+bool _is7DaysPassed = false;          // Trial expiration status (3-day trial)
+CustomerInfo? _customerInfo;          // RevenueCat customer information
+Offerings? offerings;                 // Available subscription offerings
+```
+
+### 2. SUBSCRIPTION CHECK LOGIC
+
+**Method:** `checkSubscriptionStatus()`
+**Purpose:** Determines user's subscription and trial status
+
+**Flow:**
+1. Check if 3-day trial has ended using `preferenceService.hasTrialEnded()`
+2. Query RevenueCat for active subscriptions
+3. Look for 'sub_lifetime' entitlement
+4. Set `_isSubscribed = true` if active subscription found
+5. Handle trial users and previous app purchases
+
+**Code Logic:**
+```dart
+if (_customerInfo?.entitlements.all['sub_lifetime'] != null &&
+    _customerInfo?.entitlements.all['sub_lifetime']?.isActive == true) {
+  // User has active subscription
+  _isSubscribed = true;
+} else {
+  // Check for previous app purchases (legacy users)
+  bool hasPreviousPurchase = await checkPreviousAppPurchase();
+  if (hasPreviousPurchase) {
+    _isSubscribed = true;
+  }
+}
+```
+
+### 3. SUBSCRIPTION BENEFITS
+
+**Subscribed Users (_isSubscribed = true):**
+- ✅ Unlimited PDF creation
+- ✅ No image count limits (60 images max)
+- ✅ No usage time restrictions
+- ✅ No trial dialogs
+- ✅ Full app functionality
+
+**Non-Subscribed Users (_isSubscribed = false):**
+- ⏰ 3-day trial period
+- 📊 3-minute monthly usage limit after trial
+- 🖼️ 3-image limit per PDF after trial
+- 💬 Engagement dialogs (Day 2)
+- ⏸️ 30-day pause after usage limit reached
+
+================================================================================
+                              TRIAL SYSTEM
+================================================================================
+
+### 1. TRIAL DURATION
+- **Trial Period:** 3 days from first app installation
+- **Trial Benefits:** Full app functionality during trial
+- **Trial Tracking:** Stored in SharedPreferences as 'trial_end_date'
+
+### 2. TRIAL STATUS CHECKING
+
+**Method:** `preferenceService.hasTrialEnded()`
+**Logic:**
+```dart
+// Set trial end date on first launch
+await preferenceService.setTrialEndDate();
+
+// Check if trial has ended
+bool trialEnded = await preferenceService.hasTrialEnded();
+```
+
+### 3. TRIAL BEHAVIOR
+
+**During Trial (Days 1-3):**
+- ✅ Unlimited PDF creation
+- ✅ No image limits
+- ✅ No usage time tracking
+- ✅ Full 180 seconds always available
+- 💬 Day 2 engagement dialog
+
+**After Trial (Day 4+):**
+- ⏰ 3-minute monthly usage limit
+- 🖼️ 3-image limit per PDF
+- ⏸️ 30-day pause when limit reached
+- 💬 Usage limit dialogs
+
+================================================================================
+                            USAGE TIME SYSTEM
+================================================================================
+
+### 1. USAGE TIME VARIABLES
+
+```dart
+Timer? _usageDisplayTimer;           // Timer for UI updates
+int _remainingUsageTime = 180;       // Remaining seconds (3 minutes)
+bool _showUsageTime = false;         // Whether to show timer UI
+Timer? _usageTimer;                  // Background usage tracking
+int _usageSeconds = 0;               // Current session usage
+bool _isTimerActive = false;         // Timer state flag
+```
+
+### 2. USAGE TIME LOGIC
+
+**Timer Activation Rules:**
+```dart
+// Timer will NOT run if:
+if (_isSubscribed) {
+  return; // Subscribers have unlimited time
+}
+
+bool trialEnded = await preferenceService.hasTrialEnded();
+if (!trialEnded) {
+  return; // Trial users have unlimited time
+}
+
+// Timer WILL run for: Non-subscribed users after trial
+```
+
+### 3. USAGE TIME CALCULATION
+
+**Method:** `_updateUsageTimeDisplay()`
+
+**Logic Flow:**
+1. **Subscribed Users:** Always show 180 seconds
+2. **Trial Users:** Always show 180 seconds
+3. **Post-Trial Users:** Calculate based on monthly usage
+4. **Paused Users:** Show 0 seconds
+
+**Code:**
+```dart
+if (_isSubscribed) {
+  remainingTime = 180; // Full time for subscribers
+} else if (!trialEnded) {
+  remainingTime = 180; // Full time during trial
+} else {
+  // Calculate remaining time for post-trial users
+  int baseRemainingTime = await preferenceService.getRemainingUsageTime();
+  remainingTime = max(0, baseRemainingTime - _usageSeconds);
+}
+```
+
+### 4. USAGE TRACKING
+
+**Method:** `_startUsageTracking()`
+**Frequency:** Every 1 second
+**Recording:** Every 10 seconds to SharedPreferences
+
+**Tracking Logic:**
+```dart
+_usageTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+  _usageSeconds++;
+  
+  // Record usage every 10 seconds
+  if (_usageSeconds % 10 == 0) {
+    await preferenceService.recordUsageTime(10);
+  }
+  
+  // Check for warnings and limits
+  if (_remainingUsageTime <= 0) {
+    _pauseUsageTracking();
+    showUsageLimitDialog(context);
+  }
+});
+```
+
+### 5. USAGE PAUSE SYSTEM
+
+**Trigger:** When monthly 3-minute limit is reached
+**Duration:** 30 days
+**Storage:** SharedPreferences tracks pause start date
+
+**Pause Logic:**
+```dart
+// Start 30-day pause
+await preferenceService.startUsagePause();
+
+// Check if still paused
+bool isPaused = await preferenceService.isUsagePaused();
+int remainingDays = await preferenceService.getRemainingPauseDays();
+```
+
+================================================================================
+                              IMAGE LIMITS
+================================================================================
+
+### 1. IMAGE LIMIT LOGIC
+
+**Location:** PDF creation and image selection
+**Implementation:** Passed to `selectMedia()` function
+
+**Limit Calculation:**
+```dart
+// In selectMedia() call
+isSubscribed: _isSubscribed,
+are7DaysPassed: _is7DaysPassed,
+remainingTime: _remainingUsageTime,
+
+// In upload_data.dart
+final int imageLimit = (!isSubscribed && are7DaysPassed && remainingTime <= 0) ? 3 : 60;
+```
+
+**Image Limits:**
+- **Subscribed Users:** 60 images per PDF
+- **Trial Users:** 60 images per PDF
+- **Post-Trial Users (with time):** 60 images per PDF
+- **Post-Trial Users (no time):** 3 images per PDF
+
+### 2. IMAGE LIMIT ENFORCEMENT
+
+**Method:** Native Android picker and iOS picker
+**Enforcement:** Both native picker limits and manual trimming
+**Fallback:** Manual limit enforcement if native picker fails
+
+================================================================================
+                              DIALOG SYSTEMS
+================================================================================
+
+### 1. ENGAGEMENT DIALOGS
+
+**Day 2 Dialog:**
+- **Trigger:** 2 days after installation
+- **Condition:** During 3-day trial only
+- **Message:** "Liking the app? Get lifetime access today."
+- **Frequency:** Once per day maximum
+- **Storage:** 'has_shown_day2_dialog' in SharedPreferences
+
+**Day 2 Dialog Logic:**
+```dart
+if (daysSinceInstallation >= 2 && !hasShownDay2 && !_hasShownDay2Dialog) {
+  bool canShowToday = await preferenceService.canShowDay2DialogToday();
+  if (canShowToday) {
+    showDay2Dialog(context);
+  }
+}
+```
+
+### 2. USAGE WARNING DIALOGS
+
+**80-90% Warning Dialog:**
+- **Trigger:** When 18-36 seconds remaining (80-90% usage)
+- **Purpose:** Warn user about approaching limit
+- **Frequency:** Once per session
+- **Flag:** `_hasShownWarningDialog`
+
+**Warning Logic:**
+```dart
+if (!_hasShownWarningDialog && 
+    remainingTime > 0 && 
+    remainingTime <= 36 && 
+    remainingTime >= 18) {
+  _hasShownWarningDialog = true;
+  showUsageWarningDialog(context);
+}
+```
+
+### 3. USAGE LIMIT DIALOGS
+
+**Usage Limit Reached Dialog:**
+- **Trigger:** When 3-minute monthly limit is reached
+- **Message:** "Monthly usage limit reached"
+- **Action:** Starts 30-day pause
+- **Frequency:** Once per day maximum
+- **Session Control:** `_hasShownSubscriptionDialogThisSession`
+
+**Limit Dialog Logic:**
+```dart
+if (!hasRemainingTime && !_hasShownSubscriptionDialogThisSession) {
+  bool canShowToday = await preferenceService.canShowTrialLimitDialogToday();
+  if (canShowToday) {
+    await preferenceService.startUsagePause();
+    showUsageLimitDialog(context);
+  }
+}
+```
+
+### 4. DIALOG FREQUENCY CONTROL
+
+**Session Control:**
+- `_hasShownSubscriptionDialogThisSession` - Prevents multiple dialogs per session
+- Reset only when app is restarted
+
+**Daily Control:**
+- `canShowTrialLimitDialogToday()` - Once per day limit
+- `canShowDay2DialogToday()` - Once per day limit
+- Stored in SharedPreferences with date tracking
+
+================================================================================
+                              PDF CREATION
+================================================================================
+
+### 1. PDF CREATION FLOW
+
+**Method:** `createPDF()`
+**Trigger:** After image selection
+**Prerequisites:** Images selected and validated
+
+**Flow:**
+1. Check if user has remaining time (post-trial users)
+2. Show usage limit dialog if no time remaining
+3. Process selected images
+4. Convert images to PDF
+5. Save PDF to device
+6. Show preview screen
+
+### 2. PDF CREATION RESTRICTIONS
+
+**Pre-Creation Checks:**
+```dart
+// Check if user is not subscribed and trial has ended
+if (!_isSubscribed && _is7DaysPassed) {
+  int remainingTime = await preferenceService.getRemainingUsageTime();
+  
+  if (remainingTime <= 0 && !_hasShownSubscriptionDialogThisSession) {
+    showUsageLimitDialog(context);
+    return; // Stop PDF creation
+  }
+}
+```
+
+**Image Processing:**
+- Validates image bytes are not empty
+- Skips corrupted images
+- Processes valid images only
+- Updates UI with progress
+
+### 3. PDF CREATION ANALYTICS
+
+**Events Logged:**
+- `event_on_create_pdf_called` - When PDF creation starts
+- `event_on_view_pdf_button_purchased` - When user views PDF
+- Usage limit events when restrictions hit
+
+================================================================================
+                            APP LIFECYCLE MANAGEMENT
+================================================================================
+
+### 1. LIFECYCLE METHODS
+
+**initState():**
+- Initialize SharedPreferences
+- Set trial end date
+- Check subscription status
+- Start usage time display
+- Check for day-based dialogs
+
+**didChangeAppLifecycleState():**
+- **App Resumed:** Resume usage tracking, check subscription
+- **App Paused:** Pause usage tracking
+- **Background/Foreground:** Manage timer states
+
+### 2. TIMER MANAGEMENT
+
+**Multiple Timer Prevention:**
+```dart
+// Check if timer is already running
+if (_usageTimer != null && _usageTimer!.isActive) {
+  print('⚠️ Usage timer already running, skipping start');
+  return;
+}
+```
+
+**Timer Cleanup:**
+```dart
+@override
+void dispose() {
+  _usageTimer?.cancel();
+  _usageDisplayTimer?.cancel();
+  WidgetsBinding.instance.removeObserver(this);
+  super.dispose();
+}
+```
+
+================================================================================
+                              ANALYTICS TRACKING
+================================================================================
+
+### 1. SUBSCRIPTION EVENTS
+
+- `event_on_subscription_already_purchased` - User has active subscription
+- `event_on_first_open` - First time app is opened
+- `event_usage_limit_reached` - Monthly limit reached
+
+### 2. USAGE EVENTS
+
+- `event_on_create_pdf_called` - PDF creation initiated
+- `event_on_view_pdf_button_purchased` - PDF viewed
+- Day 2 dialog events
+- Usage warning events
+
+### 3. ANALYTICS PARAMETERS
+
+**Standard Parameters:**
+- `os` - Platform (android/ios)
+- `timestamp` - Event timestamp
+- `remaining_time` - Current remaining usage time
+- `selectedFileCount` - Number of images selected
+
+================================================================================
+                                SUMMARY
+================================================================================
+
+The ConverterWidget implements a comprehensive freemium model with:
+
+1. **3-Day Trial:** Full functionality for new users
+2. **Usage Limits:** 3-minute monthly limit post-trial
+3. **Image Limits:** 3 images per PDF when usage exhausted
+4. **Engagement System:** Day 2 dialogs during trial
+5. **Pause System:** 30-day cooldown after limit reached
+6. **Subscription Benefits:** Unlimited access for paid users
+
+The system is designed to encourage subscription while providing fair trial
+access and preventing abuse through multiple restriction layers and tracking
+mechanisms.
+
+================================================================================
+                                END OF GUIDE
+================================================================================

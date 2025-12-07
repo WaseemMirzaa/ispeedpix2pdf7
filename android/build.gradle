@@ -5,13 +5,25 @@ allprojects {
     }
 }
 
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0"
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
 rootProject.buildDir = '../build'
 subprojects {
     afterEvaluate { project ->
         if (project.plugins.hasPlugin("com.android.application") ||
                 project.plugins.hasPlugin("com.android.library")) {
             project.android {
-                compileSdkVersion 34
+                compileSdkVersion 35
             }
         }
     }
@@ -21,6 +33,24 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
+}
+
+// Fallback namespace for older library modules (AGP 8+ requires namespace)
+subprojects { subproj ->
+    subproj.plugins.withId("com.android.library") {
+        def hasNs = subproj.android.hasProperty("namespace")
+        if (!hasNs) {
+            def manifest = file("${subproj.projectDir}/src/main/AndroidManifest.xml")
+            def pkg = null
+            if (manifest.exists()) {
+                def content = manifest.getText('UTF-8')
+                def m = (content =~ /package=\"([^\"]+)\"/)
+                if (m.find()) { pkg = m.group(1) }
+            }
+            // Set namespace early so configuration succeeds under AGP 8+
+            subproj.android.namespace = pkg ?: "com.thirdparty.${subproj.name.replace('-', '_')}"
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

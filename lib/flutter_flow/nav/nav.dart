@@ -2,13 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ispeedpix2pdf7/converter/subscription_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
+import '../../tevineigh/more_apps.dart';
 import '/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
+import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
+import 'package:ispeedpix2pdf7/splash/splash_screen.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -26,50 +30,28 @@ class AppStateNotifier extends ChangeNotifier {
   bool showSplashImage = true;
 
   void stopShowingSplashImage() {
+    if (!showSplashImage) return;
+    debugPrint('⏭️ Dismissing splash via AppStateNotifier');
     showSplashImage = false;
     notifyListeners();
   }
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
-      initialLocation: '/',
+      initialLocation: '/splash',
       debugLogDiagnostics: true,
-      refreshListenable: appStateNotifier,
       navigatorKey: appNavigatorKey,
-      errorBuilder: (context, state) => appStateNotifier.showSplashImage
-          ? Builder(
-              builder: (context) => Container(
-                color: FlutterFlowTheme.of(context).accent4,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/70769789-ECA9-4E75-AE97-86FF559889DF.jpg',
-                    width: 300.0,
-                    height: 300.0,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          : ConverterWidget(),
+      errorBuilder: (context, state) => ConverterWidget(),
       routes: [
+        FFRoute(
+          name: 'splash',
+          path: '/splash',
+          builder: (context, _) => const SplashScreen(),
+        ),
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) => appStateNotifier.showSplashImage
-              ? Builder(
-                  builder: (context) => Container(
-                    color: FlutterFlowTheme.of(context).accent4,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/70769789-ECA9-4E75-AE97-86FF559889DF.jpg',
-                        width: 300.0,
-                        height: 300.0,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                )
-              : ConverterWidget(),
+          builder: (context, _) => ConverterWidget(),
         ),
         FFRoute(
           name: 'converter',
@@ -82,9 +64,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => MainmenuWidget(),
         ),
         FFRoute(
+          name: 'MoreApps',
+          path: '/MoreApps',
+          builder: (context, params) => MoreAppsWidget(),
+        ),
+        FFRoute(
           name: 'Tevineigh',
           path: '/tevineigh',
           builder: (context, params) => TevineighWidget(),
+        ),
+        FFRoute(
+          name: 'Subscription',
+          path: '/subscription',
+          builder: (context, params) => SubscriptionWidget(),
         ),
         FFRoute(
           name: 'Howto',
@@ -102,10 +94,15 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => SimplicityWidget(),
         ),
         FFRoute(
-          name: 'test',
-          path: '/test',
-          builder: (context, params) => TestWidget(),
-        )
+          name: 'LanguageSelection',
+          path: '/language-selection',
+          builder: (context, params) => LanguageSelectionScreen(),
+        ),
+        // FFRoute(
+        //   name: 'test',
+        //   path: '/test',
+        //   builder: (context, params) => TestWidget(),
+        // )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
 

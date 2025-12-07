@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'privacy_model.dart';
 export 'privacy_model.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PrivacyWidget extends StatefulWidget {
   const PrivacyWidget({super.key});
@@ -22,6 +25,8 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
 
   final animationsMap = <String, AnimationInfo>{};
 
+  AppLocalizations? l10n;
+
   @override
   void initState() {
     super.initState();
@@ -31,12 +36,12 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
       'textOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
         effectsBuilder: () => [
-          ScaleEffect(
+          MoveEffect(
             curve: Curves.easeInOut,
             delay: 0.0.ms,
             duration: 600.0.ms,
-            begin: const Offset(3.0, 3.0),
-            end: const Offset(1.0, 1.0),
+            begin: const Offset(-74.0, 0.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -54,6 +59,8 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
 
   @override
   Widget build(BuildContext context) {
+    // '4. No Advertisements - We do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.';
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -63,7 +70,7 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF4A90E2),
+          backgroundColor: const Color(0xFF173F5A),
           automaticallyImplyLeading: false,
           leading: InkWell(
             splashColor: Colors.transparent,
@@ -94,8 +101,8 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 10.0, 0.0, 0.0),
                         child: Text(
                           'Privacy and Security',
                           style:
@@ -109,18 +116,21 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                       Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             20.0, 20.0, 20.0, 0.0),
-                        child: Text(
-                          'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.\n \n1. Information Collection and Use\niSpeedPix2PDF is a client-side app, designed to function without collecting, storing, or processing any personal information externally. The app operates entirely on your device, meaning all data processed by the app remains local to your device, with no data sent to external servers.\nPhoto Gallery Access: iSpeedPix2PDF requires access to your device\'s photo gallery to allow you to select images for conversion into PDFs and to save the generated PDFs.\nAll actions are performed locally, and the app does not access or modify any existing photos—only the images you select are used for PDF creation.\nOnce a PDF is generated, it is stored securely in your device\'s gallery without any data leaving your device.\n \n2. No Data Transmission\nAs a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating and saving PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.\n \n3. No Advertisements or In-App Purchases\nWe do not display ads or sell your data. iSpeedPix2PDF is designed to provide a seamless and efficient user experience without interruptions from advertisements or unnecessary in-app purchases. Our focus is on ensuring a simple and secure method for creating and sharing PDFs, completely under your control.',
+                        child: SelectableText.rich(
+                          TextSpan(
+                            style: FlutterFlowTheme.of(context)
+                                .labelLarge
+                                .override(
+                                  fontFamily: 'Inter',
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  fontSize: 12.5,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                            children: _buildPrivacyTextSpans(context),
+                          ),
                           textAlign: TextAlign.start,
-                          style: FlutterFlowTheme.of(context)
-                              .labelLarge
-                              .override(
-                                fontFamily: 'Inter',
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontSize: 12.5,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.w500,
-                              ),
                         ).animateOnPageLoad(
                             animationsMap['textOnPageLoadAnimation']!),
                       ),
@@ -128,19 +138,22 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: FFButtonWidget(
                     onPressed: () async {
-                      context.pushNamed('Mainmenu');
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      // context.pushReplacement('Mainmenu');
                     },
                     text: 'Main Menu',
                     options: FFButtonOptions(
                       height: 40.0,
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                      iconPadding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                      color: const Color(0xFF4A90E2),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          24.0, 0.0, 24.0, 0.0),
+                      iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 0.0, 0.0),
+                      color: const Color(0xFF173F5A),
                       textStyle:
                           FlutterFlowTheme.of(context).titleSmall.override(
                                 fontFamily: 'Inter',
@@ -162,5 +175,86 @@ class _PrivacyWidgetState extends State<PrivacyWidget>
         ),
       ),
     );
+  }
+
+  List<InlineSpan> _buildPrivacyTextSpans(
+    BuildContext contex,
+  ) {
+    l10n = AppLocalizations.of(context);
+
+    var point0 = l10n!.privacyAndSecurityDetailTitle;
+    // 'Welcome to iSpeedPix2PDF. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you use the iSpeedPix2PDF app on mobile devices.';
+    var point1 = l10n!.privacyAndSecurityDetailOne;
+    '1. Information Collection and Use - iSpeedPix2PDF is a client-side app; all data processed by the app remains local to your device, with no data sent to external servers for processing.\n-Photo Gallery Access: iSpeedPix2PDF requires access to your device’s photo gallery to allow you to select images for conversion into PDFs.\n-Once a PDF is generated, the app does not store or retain any files. Users have full control over their PDFs and can choose to share, email, save, or upload them as they prefer.';
+    var point2 = l10n!.privacyAndSecurityDetailTwo;
+    // '2. No Data Transmission - As a client-side app, iSpeedPix2PDF ensures that none of your data, including personal information or generated PDFs, is transmitted to external servers or third-party services. Every step of the process—from selecting images to generating PDFs—happens entirely on your device, guaranteeing the highest level of privacy and security.';
+    var point3 = l10n!.privacyAndSecurityDetailThree;
+    // '3. One-Time Lifetime Subscription - iSpeedPix2PDF operates on a one-time lifetime subscription model, meaning you only need to pay once for full access to all features—no recurring charges, no hidden fees. Payment processing is handled securely through a service to verify and manage purchases. Once purchased, the app remains fully functional without requiring additional payments.';
+    var point4 = l10n!.privacyAndSecurityDetailFour;
+
+    var point5 = l10n!.privacyAndSecurityDetailFive;
+
+    // Define the style for links
+    final linkStyle = FlutterFlowTheme.of(context).labelLarge.override(
+          fontFamily: 'Inter',
+          color: Colors.blue,
+          fontSize: 12.5,
+          letterSpacing: 0.0,
+          fontWeight: FontWeight.w500,
+          decoration: TextDecoration.underline,
+        );
+
+    // Define the regular text style
+    final textStyle = FlutterFlowTheme.of(context).labelLarge.override(
+          fontFamily: 'Inter',
+          color: FlutterFlowTheme.of(context).primaryText,
+          fontSize: 12.5,
+          letterSpacing: 0.0,
+          fontWeight: FontWeight.w500,
+        );
+
+    // Create a list to hold all text spans
+    List<InlineSpan> spans = [];
+
+    // Add the main content
+    spans.add(TextSpan(text: '$point0\n\n', style: textStyle));
+    spans.add(TextSpan(text: '$point1\n\n', style: textStyle));
+    spans.add(TextSpan(text: '$point2\n\n', style: textStyle));
+
+    // Add a span with a clickable link
+    spans.add(TextSpan(text: '$point3 ', style: textStyle));
+    // spans.add(TextSpan(
+    //   text: 'Terms of Service',
+    //   style: linkStyle,
+    //   recognizer: TapGestureRecognizer()
+    //     ..onTap = () => launchURL('https://tevineighdesigns.com/terms'),
+    // ));
+    spans.add(TextSpan(text: '\n\n', style: textStyle));
+
+    // spans.add(TextSpan(text: '$point4\n\n', style: textStyle));
+
+    // Add another span with a clickable link
+    spans.add(
+        TextSpan(text: '${point5.replaceAll('5', '4')} ', style: textStyle));
+    spans.add(TextSpan(
+      text: 'https://firebase.google.com/support/privacy',
+      style: linkStyle,
+      recognizer: TapGestureRecognizer()
+        ..onTap =
+            () => launchURL('https://firebase.google.com/support/privacy'),
+    ));
+
+    return spans;
+  }
+
+  // Helper method to launch URLs
+  Future<void> launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
   }
 }

@@ -108,7 +108,7 @@ class _NavBarWithMiddleButtonWidgetState
                   size: 50.0,
                 ),
                 onPressed: () async {
-                  context.pushNamed('Mainmenu');
+                  context.pushReplacement('Mainmenu');
                 },
               ),
               FlutterFlowIconButton(

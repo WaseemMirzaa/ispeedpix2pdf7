@@ -1,3 +1,5 @@
+import 'package:ispeedpix2pdf7/widgets/language_selection_screen.dart';
+
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'mainmenu_model.dart';
 export 'mainmenu_model.dart';
+import 'package:ispeedpix2pdf7/l10n/app_localizations.dart';
 
 class MainmenuWidget extends StatefulWidget {
   const MainmenuWidget({super.key});
@@ -23,6 +26,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final animationsMap = <String, AnimationInfo>{};
+
+  AppLocalizations? l10n;
 
   @override
   void initState() {
@@ -104,11 +109,34 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
 
   @override
   Widget build(BuildContext context) {
+    l10n = AppLocalizations.of(context);
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+      appBar: AppBar(
+        backgroundColor: Color(0xFF173F5A),
+        automaticallyImplyLeading: false,
+        leading: InkWell(
+          splashColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () async {
+            context.safePop();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_rounded,
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            size: 30.0,
+          ),
+        ),
+        actions: [],
+        centerTitle: false,
+        elevation: 2.0,
+      ),
       body: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 0.0),
+        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -117,18 +145,11 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Container(
-                      width: MediaQuery.sizeOf(context).width * 1.0,
-                      height: 82.0,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF4A90E2),
-                      ),
-                    ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 25.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 25.0, 0.0, 0.0),
                       child: Text(
-                        'iSpeedPix2PDF',
+                        l10n!.appTitle,
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Inter',
                               fontSize: 24.0,
@@ -139,8 +160,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                           animationsMap['textOnPageLoadAnimation']!),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 30.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 30.0, 0.0, 0.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,13 +238,14 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                   onTap: () async {
                                     context.pushNamed(
                                       'Howto',
-                                      extra: <String, dynamic>{
-                                        kTransitionInfoKey: const TransitionInfo(
-                                          hasTransition: true,
-                                          transitionType:
-                                              PageTransitionType.topToBottom,
-                                        ),
-                                      },
+                                      // extra: <String, dynamic>{
+                                      //   kTransitionInfoKey:
+                                      //       const TransitionInfo(
+                                      //     hasTransition: true,
+                                      //     transitionType:
+                                      //         PageTransitionType.topToBottom,
+                                      //   ),
+                                      // },
                                     );
                                   },
                                   child: Row(
@@ -231,11 +253,12 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'How to Use Pix to Pdf',
+                                            l10n!.howToUse
+                                            // 'How to Use'
+                                            ,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -246,8 +269,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -299,11 +322,13 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'Simplicity and Efficiency',
+                                            l10n!.simplicityAndEfficiency
+
+                                            // 'Simplicity and Efficiency'
+                                            ,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -314,8 +339,8 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -367,11 +392,12 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'Privacy and Security',
+                                            l10n!.privacyAndSecurity,
+
+                                            // 'Privacy and Security',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -382,8 +408,77 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                         ),
                                       ),
                                       Align(
-                                        alignment:
-                                            const AlignmentDirectional(0.9, 0.0),
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
+                                        child: Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          size: 18.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ).animateOnPageLoad(
+                                    animationsMap['rowOnPageLoadAnimation3']!),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16.0, 12.0, 16.0, 0.0),
+                            child: Container(
+                              width: double.infinity,
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 5.0,
+                                    color: Color(0x3416202A),
+                                    offset: Offset(
+                                      0.0,
+                                      2.0,
+                                    ),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(12.0),
+                                shape: BoxShape.rectangle,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    context.pushNamed('MoreApps');
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
+                                          child: Text(
+                                            l10n!.moreAppsByTevinEighDesigns,
+
+                                            // 'More Apps By Tevin Eigh Designs',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  fontFamily: 'Inter',
+                                                  letterSpacing: 0.0,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: const AlignmentDirectional(
+                                            0.9, 0.0),
                                         child: Icon(
                                           Icons.arrow_forward_ios,
                                           color: FlutterFlowTheme.of(context)
@@ -435,11 +530,12 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 0.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12.0, 0.0, 0.0, 0.0),
                                           child: AutoSizeText(
-                                            'About Tevin Eigh Designs',
+                                            l10n!.aboutTevinEighDesigns,
+
+                                            // 'About Tevin Eigh Designs',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -462,24 +558,114 @@ class _MainmenuWidgetState extends State<MainmenuWidget>
                               ),
                             ),
                           ),
+//                           Padding(
+//                             padding: const EdgeInsetsDirectional.fromSTEB(
+//                                 16.0, 12.0, 16.0, 0.0),
+//                             child: Container(
+//                               width: double.infinity,
+//                               height: 60.0,
+//                               decoration: BoxDecoration(
+//                                 color: FlutterFlowTheme.of(context)
+//                                     .secondaryBackground,
+//                                 boxShadow: const [
+//                                   BoxShadow(
+//                                     blurRadius: 5.0,
+//                                     color: Color(0x3416202A),
+//                                     offset: Offset(
+//                                       0.0,
+//                                       2.0,
+//                                     ),
+//                                   )
+//                                 ],
+//                                 borderRadius: BorderRadius.circular(12.0),
+//                                 shape: BoxShape.rectangle,
+//                               ),
+//                               child: Padding(
+//                                 padding: const EdgeInsets.all(8.0),
+//                                 child: InkWell(
+//                                   splashColor: Colors.transparent,
+//                                   focusColor: Colors.transparent,
+//                                   hoverColor: Colors.transparent,
+//                                   highlightColor: Colors.transparent,
+//                                   onTap: () async {
+//                                     // Navigate to language selection screen
+//                                     final result = await Navigator.push(
+//                                       context,
+//                                       MaterialPageRoute(
+//                                           builder: (context) =>
+//                                               LanguageSelectionScreen()),
+//                                     );
+
+//                                     print('ResultPopLanguage $result');
+//                                     // Check if language was changed (result is true)
+//                                     if (result == true) {
+//                                       // Refresh the UI with the new language
+//                                       // setState(() {
+//                                       // l10n = AppLocalizations.of(context);
+//                                       // });
+
+//                                       print('ResultPopLanguage $result');
+// // c                          context.pushNamed('co/nverter');
+
+//                                       // Navigator.of(context).pop(true);
+//                                     }
+//                                   },
+//                                   child: Row(
+//                                     mainAxisSize: MainAxisSize.max,
+//                                     children: [
+//                                       Expanded(
+//                                         child: Padding(
+//                                           padding: const EdgeInsetsDirectional
+//                                               .fromSTEB(12.0, 0.0, 0.0, 0.0),
+//                                           child: Text(
+//                                             l10n!.selectLanguage ?? '',
+//                                             style: FlutterFlowTheme.of(context)
+//                                                 .bodyLarge
+//                                                 .override(
+//                                                   fontFamily: 'Inter',
+//                                                   letterSpacing: 0.0,
+//                                                 ),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                       Align(
+//                                         alignment: const AlignmentDirectional(
+//                                             0.9, 0.0),
+//                                         child: Icon(
+//                                           Icons.arrow_forward_ios,
+//                                           color: FlutterFlowTheme.of(context)
+//                                               .secondaryText,
+//                                           size: 18.0,
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ).animateOnPageLoad(
+//                                     animationsMap['rowOnPageLoadAnimation4']!),
+//                               ),
+//                             ),
+//                           ),
+//
                         ],
                       ),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0.0, 25.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 25.0, 0.0, 25.0),
                       child: FFButtonWidget(
                         onPressed: () async {
                           context.pushNamed('converter');
                         },
-                        text: 'Return to Converter',
+                        text: l10n!.returnToConverter,
+
+                        // 'Return to Converter',
                         options: FFButtonOptions(
                           height: 40.0,
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               24.0, 0.0, 24.0, 0.0),
                           iconPadding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 0.0, 0.0),
-                          color: const Color(0xFF4A90E2),
+                          color: const Color(0xFF173F5A),
                           textStyle:
                               FlutterFlowTheme.of(context).titleSmall.override(
                                     fontFamily: 'Inter',
